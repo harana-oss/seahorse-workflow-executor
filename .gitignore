@@ -1,5 +1,8 @@
 # Created by http://www.gitignore.io
 
+.bsp/
+.DS_Store
+
 ### Scala ###
 *.class
 *.log
@@ -32,5 +35,6 @@ private_*.conf
 private_*/
 
 # Jekyll
+docs/.jekyll-cache/
 docs/_site
 docs/operations/examples/*.md
