@@ -1,6 +1,7 @@
 package io.deepsense.deeplang.doperations
 
-import spray.json.{JsNumber, JsObject}
+import spray.json.JsNumber
+import spray.json.JsObject
 
 import io.deepsense.deeplang._
 import io.deepsense.deeplang.doperables.Transformer
@@ -8,7 +9,8 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.MockDOperablesFactory._
 import io.deepsense.deeplang.doperations.exceptions.TooManyPossibleTypesException
 import io.deepsense.deeplang.exceptions.DeepLangMultiException
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
 import io.deepsense.deeplang.params.ParamsMatchers._
 
 class FitSpec extends UnitSpec with DeeplangTestSupport {
@@ -26,18 +28,18 @@ class FitSpec extends UnitSpec with DeeplangTestSupport {
       testFit(op1, transformer1)
 
       val paramsForEstimator = JsObject(estimator.paramA.name -> JsNumber(2))
-      val op2 = Fit().setEstimatorParams(paramsForEstimator)
+      val op2                = Fit().setEstimatorParams(paramsForEstimator)
       testFit(op2, transformer2)
     }
     "not modify params in input Estimator instance upon execution" in {
-      val estimator = new MockEstimator
+      val estimator         = new MockEstimator
       val originalEstimator = estimator.replicate()
 
       val paramsForEstimator = JsObject(estimator.paramA.name -> JsNumber(2))
-      val op = Fit().setEstimatorParams(paramsForEstimator)
+      val op                 = Fit().setEstimatorParams(paramsForEstimator)
       op.executeUntyped(Vector(estimator, mock[DataFrame]))(mock[ExecutionContext])
 
-      estimator should have (theSameParamsAs (originalEstimator))
+      estimator should have(theSameParamsAs(originalEstimator))
     }
     "infer Transformer from input Estimator on input DataFrame with proper parameters set" in {
       val estimator = new MockEstimator
@@ -55,23 +57,23 @@ class FitSpec extends UnitSpec with DeeplangTestSupport {
       testInference(op1, transformerKnowledge1)
 
       val paramsForEstimator = JsObject(estimator.paramA.name -> JsNumber(2))
-      val op2 = Fit().setEstimatorParams(paramsForEstimator)
+      val op2                = Fit().setEstimatorParams(paramsForEstimator)
       testInference(op2, transformerKnowledge2)
     }
     "not modify params in input Estimator instance upon inference" in {
-      val estimator = new MockEstimator
+      val estimator         = new MockEstimator
       val originalEstimator = estimator.replicate()
 
       val paramsForEstimator = JsObject(estimator.paramA.name -> JsNumber(2))
-      val op = Fit().setEstimatorParams(paramsForEstimator)
-      val inputDF = DataFrame.forInference(createSchema())
+      val op                 = Fit().setEstimatorParams(paramsForEstimator)
+      val inputDF            = DataFrame.forInference(createSchema())
       op.inferKnowledgeUntyped(Vector(DKnowledge(estimator), DKnowledge(inputDF)))(mock[InferContext])
 
-      estimator should have (theSameParamsAs (originalEstimator))
+      estimator should have(theSameParamsAs(originalEstimator))
     }
     "throw Exception" when {
       "there are more than one Estimator in input Knowledge" in {
-        val inputDF = DataFrame.forInference(createSchema())
+        val inputDF    = DataFrame.forInference(createSchema())
         val estimators = Set[DOperable](new MockEstimator, new MockEstimator)
 
         val op = Fit()
@@ -80,13 +82,14 @@ class FitSpec extends UnitSpec with DeeplangTestSupport {
         }
       }
       "Estimator's dynamic parameters are invalid" in {
-        val inputDF = DataFrame.forInference(createSchema())
+        val inputDF   = DataFrame.forInference(createSchema())
         val estimator = new MockEstimator
-        val fit = Fit().setEstimatorParams(JsObject(estimator.paramA.name -> JsNumber(-2)))
+        val fit       = Fit().setEstimatorParams(JsObject(estimator.paramA.name -> JsNumber(-2)))
         a[DeepLangMultiException] shouldBe thrownBy {
           fit.inferKnowledgeUntyped(Vector(DKnowledge(estimator), DKnowledge(inputDF)))(mock[InferContext])
         }
       }
     }
   }
+
 }

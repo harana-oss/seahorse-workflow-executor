@@ -13,13 +13,15 @@ class HashingTFTransformer extends SparkTransformerAsMultiColumnTransformer[Hash
     name = "num features",
     description = Some("The number of features."),
     sparkParamGetter = _.numFeatures,
-    validator = RangeValidator(1.0, Int.MaxValue, step = Some(1.0)))
+    validator = RangeValidator(1.0, Int.MaxValue, step = Some(1.0))
+  )
+
   // With default setting in Bundled Image (1 << 20) makes jvm run out of memory even for few rows.
   setDefault(numFeatures, (1 << 18).toDouble)
 
   override protected def getSpecificParams: Array[Param[_]] = Array(numFeatures)
 
-  def setNumFeatures(value: Int): this.type = {
+  def setNumFeatures(value: Int): this.type =
     set(numFeatures -> value)
-  }
+
 }

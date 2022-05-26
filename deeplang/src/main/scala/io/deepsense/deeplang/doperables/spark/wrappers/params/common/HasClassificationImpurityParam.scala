@@ -11,13 +11,12 @@ import io.deepsense.deeplang.params.wrappers.spark.ChoiceParamWrapper
 trait HasClassificationImpurityParam extends Params {
 
   val impurity =
-    new ChoiceParamWrapper[ml.param.Params {val impurity: ml.param.Param[String]},
-      ClassificationImpurity](
+    new ChoiceParamWrapper[ml.param.Params { val impurity: ml.param.Param[String] }, ClassificationImpurity](
       name = "classification impurity",
       description = Some("The criterion used for information gain calculation."),
-      sparkParamGetter = _.impurity)
+      sparkParamGetter = _.impurity
+    )
+
   setDefault(impurity, Gini())
 
 }
-
-

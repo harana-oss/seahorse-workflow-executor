@@ -22,4 +22,6 @@ addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.9")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
 
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.9.18-1")
+
 logLevel := Level.Warn

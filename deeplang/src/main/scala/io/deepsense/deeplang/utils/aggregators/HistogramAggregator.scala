@@ -1,7 +1,6 @@
 package io.deepsense.deeplang.utils.aggregators
 
-case class HistogramAggregator(buckets: Array[Double], evenBuckets: Boolean)
-  extends Aggregator[Array[Long], Double] {
+case class HistogramAggregator(buckets: Array[Double], evenBuckets: Boolean) extends Aggregator[Array[Long], Double] {
 
   // Code based on DoubleRDDFunctions::histogram method.
   // Changes:
@@ -21,47 +20,44 @@ case class HistogramAggregator(buckets: Array[Double], evenBuckets: Boolean)
       // its out of bounds.
       // We do this rather than buckets.lengthCompare(insertionPoint)
       // because Array[Double] fails to override it (for now).
-      if (insertionPoint > 0 && insertionPoint < buckets.length) {
+      if (insertionPoint > 0 && insertionPoint < buckets.length)
         Some(insertionPoint - 1)
-      } else {
+      else
         None
-      }
-    } else if (location < buckets.length - 1) {
+    } else if (location < buckets.length - 1)
       // Exact match, just insert here
       Some(location)
-    } else {
+    else
       // Exact match to the last element
       Some(location - 1)
-    }
   }
 
   // Determine the bucket function in constant time. Requires that buckets are evenly spaced
-  private def fastBucketFunction(min: Double, max: Double, count: Int)(e: Double): Option[Int] = {
+  private def fastBucketFunction(min: Double, max: Double, count: Int)(e: Double): Option[Int] =
     // If our input is not a number unless the increment is also NaN then we fail fast
-    if (e.isNaN || e < min || e > max) {
+    if (e.isNaN || e < min || e > max)
       None
-    } else {
+    else {
       // Compute ratio of e's distance along range to total range first, for better precision
       val bucketNumber = (((e - min) / (max - min)) * count).toInt
       // should be less than count, but will equal count if e == max, in which case
       // it's part of the last end-range-inclusive bucket, so return count-1
       Some(math.min(bucketNumber, count - 1))
     }
-  }
 
   // Decide which bucket function to pass to histogramPartition. We decide here
   // rather than having a general function so that the decision need only be made
   // once rather than once per shard
-  private val bucketFunction = if (evenBuckets) {
-    fastBucketFunction(buckets.head, buckets.last, buckets.length - 1) _
-  } else {
-    basicBucketFunction _
-  }
+  private val bucketFunction =
+    if (evenBuckets)
+      fastBucketFunction(buckets.head, buckets.last, buckets.length - 1) _
+    else
+      basicBucketFunction _
 
   override def mergeValue(r: Array[Long], t: Double): Array[Long] = {
     bucketFunction(t) match {
       case Some(x: Int) => r(x) += 1
-      case _ => {}
+      case _            =>
     }
     r
   }
@@ -72,4 +68,5 @@ case class HistogramAggregator(buckets: Array[Double], evenBuckets: Boolean)
   }
 
   override def initialElement: Array[Long] = new Array[Long](buckets.length - 1)
+
 }

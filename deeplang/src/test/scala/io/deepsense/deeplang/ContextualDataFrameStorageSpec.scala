@@ -1,7 +1,7 @@
 package io.deepsense.deeplang
 
 import org.apache.spark.sql.{DataFrame => SparkDataFrame}
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 
@@ -9,21 +9,20 @@ import io.deepsense.commons.models.Id
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.exceptions.CustomOperationExecutionException
 
-
-class ContextualDataFrameStorageSpec
-    extends UnitSpec
-    with BeforeAndAfter
-    with DeeplangTestSupport {
+class ContextualDataFrameStorageSpec extends UnitSpec with BeforeAndAfter with DeeplangTestSupport {
 
   val workflowId = Id.randomId
+
   val nodeId = Id.randomId
+
   val portNumber = 332
 
   val dataFrame = createDataFrame()
+
   val sparkDataFrame = dataFrame.sparkDataFrame
 
-
   var dataFrameStorage: DataFrameStorage = _
+
   var storage: ContextualDataFrameStorage = _
 
   before {
@@ -63,8 +62,8 @@ class ContextualDataFrameStorageSpec
     }
 
     "return data frame" in {
-      val dataFrame = mock[DataFrame]
-      val retDataFrame = storage.withInputDataFrame(portNumber, sparkDataFrame) { dataFrame }
+      val dataFrame    = mock[DataFrame]
+      val retDataFrame = storage.withInputDataFrame(portNumber, sparkDataFrame)(dataFrame)
 
       assert(retDataFrame == dataFrame)
       verify(dataFrameStorage).setInputDataFrame(workflowId, nodeId, portNumber, sparkDataFrame)
@@ -98,5 +97,5 @@ class ContextualDataFrameStorageSpec
     }
 
   }
-}
 
+}

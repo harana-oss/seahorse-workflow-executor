@@ -1,22 +1,23 @@
 package io.deepsense.deeplang.doperables
 
 import io.deepsense.deeplang.OperationExecutionDispatcher.Result
-import io.deepsense.deeplang.{DKnowledge, ExecutionContext}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.ExecutionContext
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.spark.wrappers.params.common.HasIsLargerBetterParam
 import io.deepsense.deeplang.doperations.exceptions.CustomOperationExecutionException
-import io.deepsense.deeplang.params.{CodeSnippetParam, StringParam, Param}
+import io.deepsense.deeplang.params.CodeSnippetParam
+import io.deepsense.deeplang.params.StringParam
+import io.deepsense.deeplang.params.Param
 
-abstract class CustomCodeEvaluator()
-  extends Evaluator
-    with HasIsLargerBetterParam {
+abstract class CustomCodeEvaluator() extends Evaluator with HasIsLargerBetterParam {
 
   val InputPortNumber: Int = 0
+
   val OutputPortNumber: Int = 0
 
-  val metricName = StringParam(
-    name = "metric name",
-    description = None)
+  val metricName = StringParam(name = "metric name", description = None)
+
   setDefault(metricName -> "custom metric")
 
   def getMetricName: String = $(metricName)
@@ -39,9 +40,8 @@ abstract class CustomCodeEvaluator()
 
     val composedCode = getComposedCode(userCode)
 
-    if (!isValid(ctx, composedCode)) {
+    if (!isValid(ctx, composedCode))
       throw CustomOperationExecutionException("Code validation failed")
-    }
 
     ctx.dataFrameStorage.withInputDataFrame(InputPortNumber, df.sparkDataFrame) {
       runCode(ctx, composedCode) match {
@@ -52,7 +52,8 @@ abstract class CustomCodeEvaluator()
           val sparkDataFrame =
             ctx.dataFrameStorage.getOutputDataFrame(OutputPortNumber).getOrElse {
               throw CustomOperationExecutionException(
-                "Function `evaluate` finished successfully, but did not produce a metric.")
+                "Function `evaluate` finished successfully, but did not produce a metric."
+              )
             }
 
           val metricValue = sparkDataFrame.collect.head.getAs[Double](0)
@@ -63,4 +64,5 @@ abstract class CustomCodeEvaluator()
 
   override def _infer(k: DKnowledge[DataFrame]): MetricValue =
     MetricValue.forInference(getMetricName)
+
 }

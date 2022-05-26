@@ -7,7 +7,8 @@ import org.apache.spark.ml.regression.RandomForestRegressor
 
 import io.deepsense.deeplang.params.Params
 import io.deepsense.deeplang.params.validators.RangeValidator
-import io.deepsense.deeplang.params.wrappers.spark.{IntParamWrapper, DoubleParamWrapper}
+import io.deepsense.deeplang.params.wrappers.spark.IntParamWrapper
+import io.deepsense.deeplang.params.wrappers.spark.DoubleParamWrapper
 
 trait HasMaxMemoryInMBParam extends Params {
 
@@ -15,7 +16,9 @@ trait HasMaxMemoryInMBParam extends Params {
     name = "max memory",
     description = Some("Maximum memory in MB allocated to histogram aggregation."),
     sparkParamGetter = _.maxMemoryInMB,
-    validator = RangeValidator.positiveIntegers)
+    validator = RangeValidator.positiveIntegers
+  )
+
   setDefault(maxMemoryInMB, 256.0)
 
 }

@@ -3,25 +3,33 @@ package io.deepsense.deeplang
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.{SparkConf, SparkContext}
-import org.scalatest.mockito.MockitoSugar._
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import org.scalatestplus.mockito.MockitoSugar._
 
-import io.deepsense.commons.rest.client.datasources.{DatasourceClient, DatasourceInMemoryClientFactory}
+import io.deepsense.commons.rest.client.datasources.DatasourceClient
+import io.deepsense.commons.rest.client.datasources.DatasourceInMemoryClientFactory
 import io.deepsense.commons.spark.sql.UserDefinedFunctions
-import io.deepsense.deeplang.doperables.dataframe.{DataFrame, DataFrameBuilder}
+import io.deepsense.deeplang.doperables.dataframe.DataFrame
+import io.deepsense.deeplang.doperables.dataframe.DataFrameBuilder
 import io.deepsense.sparkutils.SparkSQLSession
 
 trait LocalExecutionContext {
-  protected lazy implicit val executionContext: ExecutionContext = LocalExecutionContext.createExecutionContext()
-  protected lazy implicit val sparkContext = LocalExecutionContext.sparkContext
+
+  implicit protected lazy val executionContext: ExecutionContext = LocalExecutionContext.createExecutionContext()
+
+  implicit protected lazy val sparkContext = LocalExecutionContext.sparkContext
+
   protected lazy val sparkSQLSession = LocalExecutionContext.sparkSQLSession
+
   protected lazy val createDataFrame = LocalExecutionContext.createDataFrame _
+
 }
 
 object LocalExecutionContext {
 
   def createDataFrame(rows: Seq[Row], schema: StructType): DataFrame = {
-    val rdd: RDD[Row] = sparkContext.parallelize(rows)
+    val rdd: RDD[Row]  = sparkContext.parallelize(rows)
     val sparkDataFrame = sparkSQLSession.createDataFrame(rdd, schema)
     DataFrame.fromSparkDataFrame(sparkDataFrame)
   }
@@ -38,7 +46,8 @@ object LocalExecutionContext {
     mock[DataFrameStorage],
     None,
     None,
-    mock[CustomCodeExecutionProvider])
+    mock[CustomCodeExecutionProvider]
+  )
 
   def createExecutionContext(datasourceClient: DatasourceClient = defaultDatasourceClient) =
     ExecutionContext(
@@ -72,7 +81,9 @@ object LocalExecutionContext {
     .setAppName("TestApp")
     .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     .registerKryoClasses(Array())
+
   lazy val sparkContext: SparkContext = new SparkContext(sparkConf)
+
   lazy val sparkSQLSession: SparkSQLSession = {
     val sqlSession = new SparkSQLSession(sparkContext)
     UserDefinedFunctions.registerFunctions(sqlSession.udfRegistration)

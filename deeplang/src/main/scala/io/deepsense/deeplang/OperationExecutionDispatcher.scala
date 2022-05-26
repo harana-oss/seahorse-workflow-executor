@@ -1,7 +1,8 @@
 package io.deepsense.deeplang
 
 import scala.collection.concurrent.TrieMap
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
+import scala.concurrent.Promise
 
 import io.deepsense.commons.models.Id
 
@@ -22,10 +23,15 @@ class OperationExecutionDispatcher {
     require(promise.isDefined)
     promise.get.success(result)
   }
+
 }
 
 object OperationExecutionDispatcher {
+
   type OperationId = (Id, Id)
+
   type Error = String
+
   type Result = Either[Error, Unit]
+
 }

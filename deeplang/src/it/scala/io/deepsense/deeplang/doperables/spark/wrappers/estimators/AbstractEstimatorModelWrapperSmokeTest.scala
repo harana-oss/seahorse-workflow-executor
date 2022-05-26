@@ -6,14 +6,13 @@ import io.deepsense.deeplang.DeeplangIntegTestSupport
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.spark.wrappers.estimators.AbstractEstimatorModelWrapperSmokeTest.TestDataFrameRow
 import io.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
-import io.deepsense.deeplang.doperables.{Estimator, Transformer}
+import io.deepsense.deeplang.doperables.Estimator
+import io.deepsense.deeplang.doperables.Transformer
 import io.deepsense.deeplang.params.ParamPair
 import io.deepsense.sparkutils.Linalg
 import io.deepsense.sparkutils.Linalg.Vectors
 
-abstract class AbstractEstimatorModelWrapperSmokeTest
-  extends DeeplangIntegTestSupport
-  with TransformerSerialization {
+abstract class AbstractEstimatorModelWrapperSmokeTest extends DeeplangIntegTestSupport with TransformerSerialization {
 
   import DeeplangIntegTestSupport._
   import TransformerSerialization._
@@ -26,27 +25,69 @@ abstract class AbstractEstimatorModelWrapperSmokeTest
 
   val dataFrame: DataFrame = {
     val rowSeq = Seq(
-      TestDataFrameRow(0.0, 0.5, Vectors.dense(1.0, 2.0, 3.0), 0, 0, 0.2, 1.0, 0.5,
-        Seq("a", "a", "a", "b", "b", "c").toArray, Vectors.dense(0.3, 0.5, 1)),
-      TestDataFrameRow(1.0, 2.0, Vectors.dense(4.0, 5.0, 6.0), 1, 1, 0.4, 0.0, 0.2,
-        Seq("a", "b", "c", "d", "d", "d").toArray, Vectors.dense(0.2, 0.1, 0.5)),
-      TestDataFrameRow(1.0, 0.0, Vectors.dense(16.0, 11.0, 9.0), 2, 3, 0.4, 1.0, 0.8,
-        Seq("a", "c", "d", "f", "f", "g").toArray, Vectors.dense(0.2, 0.1, 1)),
-      TestDataFrameRow(0.0, 1.0, Vectors.dense(32.0, 11.0, 9.0), 4, 3, 0.2, 0.0, 0.1,
-        Seq("b", "d", "d", "f", "f", "g").toArray, Vectors.dense(0.1, 0.2, 0.1))
+      TestDataFrameRow(
+        0.0,
+        0.5,
+        Vectors.dense(1.0, 2.0, 3.0),
+        0,
+        0,
+        0.2,
+        1.0,
+        0.5,
+        Seq("a", "a", "a", "b", "b", "c").toArray,
+        Vectors.dense(0.3, 0.5, 1)
+      ),
+      TestDataFrameRow(
+        1.0,
+        2.0,
+        Vectors.dense(4.0, 5.0, 6.0),
+        1,
+        1,
+        0.4,
+        0.0,
+        0.2,
+        Seq("a", "b", "c", "d", "d", "d").toArray,
+        Vectors.dense(0.2, 0.1, 0.5)
+      ),
+      TestDataFrameRow(
+        1.0,
+        0.0,
+        Vectors.dense(16.0, 11.0, 9.0),
+        2,
+        3,
+        0.4,
+        1.0,
+        0.8,
+        Seq("a", "c", "d", "f", "f", "g").toArray,
+        Vectors.dense(0.2, 0.1, 1)
+      ),
+      TestDataFrameRow(
+        0.0,
+        1.0,
+        Vectors.dense(32.0, 11.0, 9.0),
+        4,
+        3,
+        0.2,
+        0.0,
+        0.1,
+        Seq("b", "d", "d", "f", "f", "g").toArray,
+        Vectors.dense(0.1, 0.2, 0.1)
+      )
     )
     createDataFrame(rowSeq)
   }
 
   def assertTransformedDF(dataFrame: DataFrame): Unit = {}
+
   def assertTransformedSchema(schema: StructType): Unit = {}
+
   def isAlgorithmDeterministic: Boolean = true
 
   className should {
     "successfully run _fit(), _transform() and _transformSchema()" in {
       val estimatorWithParams = estimator.set(estimatorParams: _*)
-      val transformer = estimatorWithParams._fit(executionContext, dataFrame)
-      val transformed = transformer._transform(executionContext, dataFrame)
+      val transformer         = estimatorWithParams._fit(executionContext, dataFrame)
+      val transformed         = transformer._transform(executionContext, dataFrame)
       assertTransformedDF(transformed)
       val transformedSchema = transformer._transformSchema(dataFrame.sparkDataFrame.schema)
       assertTransformedSchema(transformedSchema.get)
@@ -54,7 +95,7 @@ abstract class AbstractEstimatorModelWrapperSmokeTest
     }
     "successfully run _fit_infer() and _transformSchema() with schema" in {
       val estimatorWithParams = estimator.set(estimatorParams: _*)
-      val transformer = estimatorWithParams._fit_infer(Some(dataFrame.sparkDataFrame.schema))
+      val transformer         = estimatorWithParams._fit_infer(Some(dataFrame.sparkDataFrame.schema))
       transformer._transformSchema(dataFrame.sparkDataFrame.schema)
     }
     "successfully run _fit_infer() without schema" in {
@@ -67,56 +108,51 @@ abstract class AbstractEstimatorModelWrapperSmokeTest
     }
   }
 
-  def testSerializedTransformer(
-    transformer: Transformer,
-    expectedDF: DataFrame,
-    expectedSchema: StructType): Unit = {
+  def testSerializedTransformer(transformer: Transformer, expectedDF: DataFrame, expectedSchema: StructType): Unit = {
 
     val (df, Some(schema)) = useSerializedTransformer(transformer, dataFrame)
     assertTransformedDF(df)
-    if (isAlgorithmDeterministic) {
+    if (isAlgorithmDeterministic)
       assertDataFramesEqual(expectedDF, df, checkRowOrder = false)
-    }
     assertTransformedSchema(schema)
     assertSchemaEqual(schema, expectedSchema)
   }
 
-  def useSerializedTransformer(
-    transformer: Transformer,
-    dataFrame: DataFrame): (DataFrame, Option[StructType]) = {
+  def useSerializedTransformer(transformer: Transformer, dataFrame: DataFrame): (DataFrame, Option[StructType]) = {
 
     transformer.paramValuesToJson
     checkTransformerCorrectness(transformer)
     val deserialized = transformer.loadSerializedTransformer(tempDir)
-    val resultDF = deserialized.transform.apply(executionContext)(())(dataFrame)
+    val resultDF     = deserialized.transform.apply(executionContext)(())(dataFrame)
     val resultSchema = deserialized._transformSchema(dataFrame.sparkDataFrame.schema)
     checkTransformerCorrectness(deserialized)
     (resultDF, resultSchema)
   }
 
-  /**
-    * Checks correctness of the transformer e.g.
-    * report generation (crucial thing in our system) etc.
+  /** Checks correctness of the transformer e.g. report generation (crucial thing in our system) etc.
     * @param transformer
     */
-  private def checkTransformerCorrectness(transformer: Transformer): Unit = {
+  private def checkTransformerCorrectness(transformer: Transformer): Unit =
     // Generating reports is one of the most important functionality of our product,
     // when report is generated without error it very often means that everything went fine,
     // and user won't see any errors.
     transformer.report
-  }
+
 }
 
 object AbstractEstimatorModelWrapperSmokeTest {
+
   case class TestDataFrameRow(
-    myLabel: Double,
-    myWeight: Double,
-    myFeatures: Linalg.Vector,
-    myItemId: Int,
-    myUserId: Int,
-    myRating: Double,
-    myCensor: Double,
-    myNoZeroLabel: Double,
-    myStringFeatures: Array[String],
-    myStandardizedFeatures: Linalg.Vector)
+      myLabel: Double,
+      myWeight: Double,
+      myFeatures: Linalg.Vector,
+      myItemId: Int,
+      myUserId: Int,
+      myRating: Double,
+      myCensor: Double,
+      myNoZeroLabel: Double,
+      myStringFeatures: Array[String],
+      myStandardizedFeatures: Linalg.Vector
+  )
+
 }

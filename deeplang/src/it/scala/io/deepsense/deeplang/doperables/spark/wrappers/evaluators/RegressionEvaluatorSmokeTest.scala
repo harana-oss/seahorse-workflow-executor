@@ -11,8 +11,9 @@ class RegressionEvaluatorSmokeTest extends AbstractEvaluatorSmokeTest {
   override val evaluator: RegressionEvaluator = new RegressionEvaluator()
 
   override val evaluatorParams: Seq[ParamPair[_]] = Seq(
-    evaluator.metricName -> RegressionEvaluator.Rmse(),
+    evaluator.metricName       -> RegressionEvaluator.Rmse(),
     evaluator.predictionColumn -> NameSingleColumnSelection("prediction"),
-    evaluator.labelColumn -> NameSingleColumnSelection("label")
+    evaluator.labelColumn      -> NameSingleColumnSelection("label")
   )
+
 }

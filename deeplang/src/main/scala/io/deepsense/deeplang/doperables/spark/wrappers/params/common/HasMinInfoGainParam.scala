@@ -7,7 +7,8 @@ import org.apache.spark.ml.regression.RandomForestRegressor
 
 import io.deepsense.deeplang.params.Params
 import io.deepsense.deeplang.params.validators.RangeValidator
-import io.deepsense.deeplang.params.wrappers.spark.{DoubleParamWrapper, IntParamWrapper}
+import io.deepsense.deeplang.params.wrappers.spark.DoubleParamWrapper
+import io.deepsense.deeplang.params.wrappers.spark.IntParamWrapper
 
 trait HasMinInfoGainParam extends Params {
 
@@ -16,7 +17,9 @@ trait HasMinInfoGainParam extends Params {
       name = "min information gain",
       description = Some("The minimum information gain for a split to be considered at a tree node."),
       sparkParamGetter = _.minInfoGain,
-      RangeValidator(0.0, Double.MaxValue))
+      RangeValidator(0.0, Double.MaxValue)
+    )
+
   setDefault(minInfoGain, 0.0)
 
 }

@@ -7,17 +7,19 @@ import io.deepsense.deeplang.UnitSpec
 import io.deepsense.deeplang.doperations.inout.InputStorageTypeChoice.File
 import io.deepsense.deeplang.exceptions.DeepLangException
 import io.deepsense.deeplang.params.ParameterType._
-import io.deepsense.deeplang.params.choice.{Choice, ChoiceParam}
+import io.deepsense.deeplang.params.choice.Choice
+import io.deepsense.deeplang.params.choice.ChoiceParam
 import io.deepsense.deeplang.params.exceptions.ParamValueNotProvidedException
 
 class ParamsSpec extends UnitSpec {
+
   import ParamsSpec._
 
   "Class with Params" should {
 
     "return array of its params ordered asc by index" in {
       val p = WithParams()
-      p.params should contain theSameElementsInOrderAs Seq(p.param2, p.param1)
+      (p.params should contain).theSameElementsInOrderAs(Seq(p.param2, p.param1))
     }
     "validate its params" in {
       val p = WithParams()
@@ -43,10 +45,12 @@ class ParamsSpec extends UnitSpec {
       "some params get overwritten" in {
         val p = WithParams()
         p.set1(4)
-        p.setParamsFromJson(JsObject(
-          p.param1.name -> 5.toJson,
-          p.param2.name -> 6.toJson
-        ))
+        p.setParamsFromJson(
+          JsObject(
+            p.param1.name -> 5.toJson,
+            p.param2.name -> 6.toJson
+          )
+        )
         p.get1 shouldBe 5
         p.get2 shouldBe 6
       }
@@ -59,28 +63,35 @@ class ParamsSpec extends UnitSpec {
       "value of some param is JsNull" in {
         val p = WithParams()
         p.set1(4)
-        p.setParamsFromJson(JsObject(
-          p.param1.name -> JsNull,
-          p.param2.name -> 6.toJson
-        ))
+        p.setParamsFromJson(
+          JsObject(
+            p.param1.name -> JsNull,
+            p.param2.name -> 6.toJson
+          )
+        )
         p.get1 shouldBe defaultForParam1
         p.get2 shouldBe 6
       }
       "value of some param that doesn't have default is JsNull" in {
         val p = WithParams()
         p.set2(17)
-        p.setParamsFromJson(JsObject(
-          p.param2.name -> JsNull
-        ))
+        p.setParamsFromJson(
+          JsObject(
+            p.param2.name -> JsNull
+          )
+        )
         p.is2Defined shouldBe false
       }
       "ignoreNulls is set" in {
         val p = WithParams()
         p.set1(4)
-        p.setParamsFromJson(JsObject(
-          p.param1.name -> JsNull,
-          p.param2.name -> 6.toJson
-        ), ignoreNulls = true)
+        p.setParamsFromJson(
+          JsObject(
+            p.param1.name -> JsNull,
+            p.param2.name -> 6.toJson
+          ),
+          ignoreNulls = true
+        )
         p.get1 shouldBe 4
         p.get2 shouldBe 6
       }
@@ -88,13 +99,12 @@ class ParamsSpec extends UnitSpec {
     "throw Deserialization exception" when {
       "unknown param name is used it should be ignored" in {
         val p = WithParams()
-        p.setParamsFromJson(JsObject(
-          "unknownName" -> 5.toJson,
-          p.param2.name -> 6.toJson))
+        p.setParamsFromJson(JsObject("unknownName" -> 5.toJson, p.param2.name -> 6.toJson))
         p.get1 shouldBe defaultForParam1
       }
     }
   }
+
   "Params.isSet" should {
     "return true" when {
       "param value is set" in {
@@ -110,6 +120,7 @@ class ParamsSpec extends UnitSpec {
       }
     }
   }
+
   "Params.isDefined" should {
     "return true" when {
       "param value is set" in {
@@ -129,6 +140,7 @@ class ParamsSpec extends UnitSpec {
       }
     }
   }
+
   "Params.clear" should {
     "clear param value" in {
       val p = WithParams()
@@ -137,6 +149,7 @@ class ParamsSpec extends UnitSpec {
       p.is1Set shouldBe false
     }
   }
+
   "Params.$" should {
     "return param value" when {
       "it is defined" in {
@@ -154,20 +167,21 @@ class ParamsSpec extends UnitSpec {
     "throw exception" when {
       "neither param value nor default is defined" in {
         val p = WithParams()
-        val exception = intercept [ParamValueNotProvidedException] {
+        val exception = intercept[ParamValueNotProvidedException] {
           p.get2
         }
         exception.name shouldBe p.param2.name
       }
     }
   }
+
   "Params.extractParamMap" should {
     "return enriched paramMap" in {
       val p = WithParams()
       p.set2(8)
       val extraParam = MockParam("c")
-      val extraPair = ParamPair(extraParam, 9)
-      val extraMap = ParamMap(extraPair)
+      val extraPair  = ParamPair(extraParam, 9)
+      val extraMap   = ParamMap(extraPair)
       p.extractParamMap(extraMap) shouldBe ParamMap(
         ParamPair(p.param1, defaultForParam1),
         ParamPair(p.param2, 8),
@@ -175,24 +189,25 @@ class ParamsSpec extends UnitSpec {
       )
     }
   }
+
   "Params.sameAs" should {
     val valueOne = 100
     val valueTwo = 5
     "return true" when {
       "classes of both objects are the same and object have" +
         " the same parameters with the same values" in {
-        val withParamsA1 = new WithParamsA
-        val withParamsA2 = new WithParamsA
-        withParamsA1.sameAs(withParamsA2) shouldBe true
+          val withParamsA1 = new WithParamsA
+          val withParamsA2 = new WithParamsA
+          withParamsA1.sameAs(withParamsA2) shouldBe true
 
-        withParamsA1.set1(valueOne)
-        withParamsA2.set1(valueOne)
-        withParamsA1.sameAs(withParamsA2) shouldBe true
+          withParamsA1.set1(valueOne)
+          withParamsA2.set1(valueOne)
+          withParamsA1.sameAs(withParamsA2) shouldBe true
 
-        withParamsA1.set2(valueTwo)
-        withParamsA2.set2(valueTwo)
-        withParamsA1.sameAs(withParamsA2) shouldBe true
-      }
+          withParamsA1.set2(valueTwo)
+          withParamsA2.set2(valueTwo)
+          withParamsA1.sameAs(withParamsA2) shouldBe true
+        }
       "comparing replicated Params" in {
         val withParamsA1 = new WithParamsA
         val withParamsA2 = withParamsA1.replicate()
@@ -220,112 +235,145 @@ class ParamsSpec extends UnitSpec {
       }
     }
   }
+
 }
 
 object ParamsSpec extends UnitSpec {
+
   case class MockException(override val message: String) extends DeepLangException(message)
 
   case class MockParam(name: String) extends Param[Int] {
+
     override val description: Option[String] = Some("description")
+
     override val parameterType: ParameterType = mock[ParameterType]
 
     override def valueToJson(value: Int): JsValue = value.toJson
+
     override def valueFromJson(jsValue: JsValue): Int = jsValue.convertTo[Int]
 
     override def validate(value: Int): Vector[DeepLangException] = Vector(MockException(name))
 
     override def replicate(name: String): MockParam = copy(name = name)
+
   }
 
   val defaultForParam1 = 1
+
   val nameOfParam2 = "name of param2"
 
   // This class also shows how Params trait is to be used
   case class WithParams() extends Params {
+
     val param2 = MockParam(nameOfParam2)
+
     val param1 = MockParam("name of param1")
 
     val params: Array[Param[_]] = Array(param2, param1)
 
     def set1(v: Int): this.type = set(param1 -> v)
+
     def set2(v: Int): this.type = set(param2 -> v)
 
     def get1: Int = $(param1)
+
     def get2: Int = $(param2)
 
     def is1Set: Boolean = isSet(param1)
 
     def is1Defined: Boolean = isDefined(param1)
+
     def is2Defined: Boolean = isDefined(param2)
 
     def clear1: this.type = clear(param1)
 
     setDefault(param1 -> defaultForParam1)
+
   }
 
   class WithParamsA extends WithParams
+
   class WithParamsB extends WithParams
 
   case class ParamsWithChoice() extends Params {
-    val choiceParam = ChoiceParam[ChoiceWithRepeatedParameter](
-      name = "choice",
-      description = Some("choice"))
+
+    val choiceParam = ChoiceParam[ChoiceWithRepeatedParameter](name = "choice", description = Some("choice"))
 
     def setChoice(v: ChoiceWithRepeatedParameter): this.type = set(choiceParam, v)
 
     override val params: Array[Param[_]] = Array(choiceParam)
+
   }
 
   sealed trait ChoiceWithRepeatedParameter extends Choice {
-    override val choiceOrder: List[Class[_ <: ChoiceWithRepeatedParameter]] = List(
-      classOf[ChoiceOne],
-      classOf[ChoiceTwo])
+
+    override val choiceOrder: List[Class[_ <: ChoiceWithRepeatedParameter]] =
+      List(classOf[ChoiceOne], classOf[ChoiceTwo])
+
   }
 
   case class ChoiceOne() extends ChoiceWithRepeatedParameter {
+
     override val name = "one"
 
-    val numericParam = NumericParam(
-      name = "x",
-      description = Some("numericParam"))
+    val numericParam = NumericParam(name = "x", description = Some("numericParam"))
 
     override val params: Array[Param[_]] = Array(numericParam)
+
   }
 
   case class ChoiceTwo() extends ChoiceWithRepeatedParameter {
+
     override val name = "two"
 
-    val numericParam = NumericParam(
-      name = "x",
-      description = Some("numericParam"))
+    val numericParam = NumericParam(name = "x", description = Some("numericParam"))
 
     override val params: Array[Param[_]] = Array(numericParam)
+
   }
 
   object DeclareParamsFixtures {
+
     val outsideParam = MockParam("outside name")
 
     class ParamsFromOutside extends Params {
+
       val param = MockParam("name")
+
       val params: Array[Param[_]] = Array(outsideParam, param)
+
     }
 
     class ParamsWithNotUniqueNames extends Params {
+
       val param1 = MockParam("some name")
+
       val param2 = MockParam(param1.name)
+
       val params: Array[Param[_]] = Array(param1, param2)
+
     }
 
     class NotAllParamsDeclared extends Params {
+
       val param1 = MockParam("some name")
+
       val param2 = MockParam("some other name")
+
       val params: Array[Param[_]] = Array(param1)
+
     }
 
     class ParamsRepeated extends Params {
+
       val param1 = MockParam("some name")
+
       val param2 = MockParam("some other name")
+
       val params: Array[Param[_]] = Array(param1, param2, param1)
+
     }
+
   }
+
 }

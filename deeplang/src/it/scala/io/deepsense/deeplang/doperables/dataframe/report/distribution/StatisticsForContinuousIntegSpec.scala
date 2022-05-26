@@ -1,19 +1,3 @@
-/**
- * Copyright 2015, deepsense.io
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package io.deepsense.deeplang.doperables.dataframe.report.distribution
 
 import java.sql.Timestamp
@@ -25,7 +9,8 @@ import org.apache.spark.sql.types._
 
 import io.deepsense.commons.datetime.DateTimeConverter
 import io.deepsense.deeplang.DeeplangIntegTestSupport
-import io.deepsense.deeplang.doperables.dataframe.{DataFrame, DataFrameTestFactory}
+import io.deepsense.deeplang.doperables.dataframe.DataFrame
+import io.deepsense.deeplang.doperables.dataframe.DataFrameTestFactory
 import io.deepsense.reportlib.model._
 
 class StatisticsForContinuousIntegSpec extends DeeplangIntegTestSupport with DataFrameTestFactory {
@@ -47,6 +32,7 @@ class StatisticsForContinuousIntegSpec extends DeeplangIntegTestSupport with Dat
       }
     }
   }
+
   "Null value in data" should {
     val distribution = distributionForDouble(1, 2, 3, 4, Double.NaN, 5)
     "not be skipped in calculating min and max" in {
@@ -60,24 +46,23 @@ class StatisticsForContinuousIntegSpec extends DeeplangIntegTestSupport with Dat
 
   lazy val columnName = "column_name"
 
-  private def distributionForDouble(data: Double*): ContinuousDistribution = {
+  private def distributionForDouble(data: Double*): ContinuousDistribution =
     distributionFor(data, DoubleType)
-  }
 
-  private def distributionForInt(data: Int*): ContinuousDistribution = {
+  private def distributionForInt(data: Int*): ContinuousDistribution =
     distributionFor(data, IntegerType)
-  }
 
-  private def distributionForTimestamps(data: Timestamp*): ContinuousDistribution = {
+  private def distributionForTimestamps(data: Timestamp*): ContinuousDistribution =
     distributionFor(data, TimestampType)
-  }
 
   private def distributionFor(data: Seq[Any], dataType: DataType): ContinuousDistribution = {
-    val schema = StructType(Array(
-      StructField(columnName, dataType)
-    ))
+    val schema = StructType(
+      Array(
+        StructField(columnName, dataType)
+      )
+    )
 
-    val rows = data.map(v => Row(v))
+    val rows      = data.map(v => Row(v))
     val dataFrame = createDataFrame(rows, schema)
 
     val report = dataFrame.report
@@ -89,8 +74,7 @@ class StatisticsForContinuousIntegSpec extends DeeplangIntegTestSupport with Dat
     DataFrame.fromSparkDataFrame(dataFrame)
   }
 
-  def formatDate(millis: Long): String = {
+  def formatDate(millis: Long): String =
     DateTimeConverter.toString(DateTimeConverter.fromMillis(millis))
-  }
 
 }

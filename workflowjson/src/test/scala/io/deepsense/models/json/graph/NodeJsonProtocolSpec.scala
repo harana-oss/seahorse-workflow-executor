@@ -13,14 +13,14 @@ class NodeJsonProtocolSpec extends GraphJsonTestSupport with IdJsonProtocol {
   import io.deepsense.models.json.graph.NodeJsonProtocol._
 
   "Node with Operation transformed to Json" should {
-    val expectedOperationId = DOperation.Id.randomId
+    val expectedOperationId   = DOperation.Id.randomId
     val expectedOperationName = "expectedName"
-    val dOperation = mock[DOperation]
+    val dOperation            = mock[DOperation]
 
     when(dOperation.id).thenReturn(expectedOperationId)
     when(dOperation.name).thenReturn(expectedOperationName)
 
-    val node = mock[DeeplangNode]
+    val node           = mock[DeeplangNode]
     val expectedNodeId = Node.Id.randomId
     when(node.value).thenReturn(dOperation)
     when(node.id).thenReturn(expectedNodeId)
@@ -36,4 +36,5 @@ class NodeJsonProtocolSpec extends GraphJsonTestSupport with IdJsonProtocol {
       operationField.fields("name").convertTo[String] shouldBe expectedOperationName
     }
   }
+
 }

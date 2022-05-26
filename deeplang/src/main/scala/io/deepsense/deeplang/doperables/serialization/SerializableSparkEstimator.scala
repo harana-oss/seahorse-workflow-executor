@@ -1,17 +1,18 @@
-
 package io.deepsense.deeplang.doperables.serialization
 
 import org.apache.spark.ml.param.ParamMap
-import org.apache.spark.ml.util.{MLWritable, MLWriter}
-import org.apache.spark.ml.{Estimator, Model}
+import org.apache.spark.ml.util.MLWritable
+import org.apache.spark.ml.util.MLWriter
+import org.apache.spark.ml.Estimator
+import org.apache.spark.ml.Model
 import org.apache.spark.sql
 import org.apache.spark.sql.types.StructType
 
 import io.deepsense.sparkutils.ML
 
 class SerializableSparkEstimator[T <: Model[T], E <: Estimator[T]](val sparkEstimator: E)
-  extends ML.Estimator[SerializableSparkModel[T]]
-  with MLWritable {
+    extends ML.Estimator[SerializableSparkModel[T]]
+    with MLWritable {
 
   override val uid: String = "e2a121fe-da6e-4ef2-9c5e-56ee558c14f0"
 
@@ -27,4 +28,5 @@ class SerializableSparkEstimator[T <: Model[T], E <: Estimator[T]](val sparkEsti
 
   override def transformSchema(schema: StructType): StructType =
     sparkEstimator.transformSchema(schema)
+
 }

@@ -13,8 +13,9 @@ class IDFEstimatorSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
   import estimator._
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    minDocFreq -> 0,
-    inputColumn -> NameSingleColumnSelection("myFeatures"),
+    minDocFreq          -> 0,
+    inputColumn         -> NameSingleColumnSelection("myFeatures"),
     singleInPlaceChoice -> NoInPlaceChoice().setOutputColumn("testOutputColumn")
   )
+
 }

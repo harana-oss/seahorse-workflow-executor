@@ -8,6 +8,6 @@ sealed trait InferenceResult
 case class DataFrameInferenceResult(schema: StructType) extends InferenceResult
 
 case class ParamsInferenceResult(
-  schema: JsValue,
-  values: JsValue
+    schema: JsValue,
+    values: JsValue
 ) extends InferenceResult

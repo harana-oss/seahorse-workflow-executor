@@ -14,4 +14,5 @@ object NoDistributionReasons {
 
   def NotApplicableForType(dataType: DataType): String =
     s"Distribution not applicable for type ${dataType.typeName}"
+
 }

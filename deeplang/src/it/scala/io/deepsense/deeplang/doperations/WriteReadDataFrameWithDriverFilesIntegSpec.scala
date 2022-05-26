@@ -6,22 +6,23 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 import org.scalatest.BeforeAndAfter
 
-import io.deepsense.deeplang.{TestFiles, DeeplangIntegTestSupport}
+import io.deepsense.deeplang.TestFiles
+import io.deepsense.deeplang.DeeplangIntegTestSupport
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.inout._
 
-class WriteReadDataFrameWithDriverFilesIntegSpec
-  extends DeeplangIntegTestSupport
-  with BeforeAndAfter with TestFiles {
+class WriteReadDataFrameWithDriverFilesIntegSpec extends DeeplangIntegTestSupport with BeforeAndAfter with TestFiles {
 
   import DeeplangIntegTestSupport._
 
   val schema: StructType =
-    StructType(Seq(
-      StructField("boolean", BooleanType),
-      StructField("double", DoubleType),
-      StructField("string", StringType)
-    ))
+    StructType(
+      Seq(
+        StructField("boolean", BooleanType),
+        StructField("double", DoubleType),
+        StructField("string", StringType)
+      )
+    )
 
   val rows = {
     val base = Seq(
@@ -47,7 +48,9 @@ class WriteReadDataFrameWithDriverFilesIntegSpec
               .setFileFormat(
                 new OutputFileFormatChoice.Csv()
                   .setCsvColumnSeparator(CsvParameters.ColumnSeparatorChoice.Tab())
-                  .setNamesIncluded(true)))
+                  .setNamesIncluded(true)
+              )
+          )
       wdf.executeUntyped(Vector(dataFrame))(executionContext)
 
       val rdf =
@@ -55,10 +58,13 @@ class WriteReadDataFrameWithDriverFilesIntegSpec
           .setStorageType(
             new InputStorageTypeChoice.File()
               .setSourceFile(absoluteTestsDirPath.fullPath + "/test_files")
-              .setFileFormat(new InputFileFormatChoice.Csv()
-                .setCsvColumnSeparator(CsvParameters.ColumnSeparatorChoice.Tab())
-                .setNamesIncluded(true)
-                .setShouldConvertToBoolean(true)))
+              .setFileFormat(
+                new InputFileFormatChoice.Csv()
+                  .setCsvColumnSeparator(CsvParameters.ColumnSeparatorChoice.Tab())
+                  .setNamesIncluded(true)
+                  .setShouldConvertToBoolean(true)
+              )
+          )
       val loadedDataFrame = rdf.executeUntyped(Vector())(executionContext).head.asInstanceOf[DataFrame]
 
       assertDataFramesEqual(loadedDataFrame, dataFrame, checkRowOrder = false)
@@ -67,20 +73,25 @@ class WriteReadDataFrameWithDriverFilesIntegSpec
     "write and read JSON file" in {
       val wdf =
         new WriteDataFrame()
-          .setStorageType(new OutputStorageTypeChoice.File()
-            .setOutputFile(absoluteTestsDirPath.fullPath + "json")
-            .setFileFormat(new OutputFileFormatChoice.Json()))
+          .setStorageType(
+            new OutputStorageTypeChoice.File()
+              .setOutputFile(absoluteTestsDirPath.fullPath + "json")
+              .setFileFormat(new OutputFileFormatChoice.Json())
+          )
 
       wdf.executeUntyped(Vector(dataFrame))(executionContext)
 
       val rdf =
         new ReadDataFrame()
-          .setStorageType(new InputStorageTypeChoice.File()
-            .setSourceFile(absoluteTestsDirPath.fullPath + "json")
-            .setFileFormat(new InputFileFormatChoice.Json()))
+          .setStorageType(
+            new InputStorageTypeChoice.File()
+              .setSourceFile(absoluteTestsDirPath.fullPath + "json")
+              .setFileFormat(new InputFileFormatChoice.Json())
+          )
       val loadedDataFrame = rdf.executeUntyped(Vector())(executionContext).head.asInstanceOf[DataFrame]
 
       assertDataFramesEqual(loadedDataFrame, dataFrame, checkRowOrder = false)
     }
   }
+
 }

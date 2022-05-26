@@ -1,6 +1,7 @@
 package io.deepsense.commons.utils
 
-import io.deepsense.commons.{StandardSpec, UnitTestSupport}
+import io.deepsense.commons.StandardSpec
+import io.deepsense.commons.UnitTestSupport
 
 class DoubleUtilsSpec extends StandardSpec with UnitTestSupport {
 
@@ -13,10 +14,10 @@ class DoubleUtilsSpec extends StandardSpec with UnitTestSupport {
       val numbers = List(
         (0.0, "0"),
         (0.5, "0.5"),
-        (1D, "1"),
+        (1d, "1"),
         (5.5, "5.5"),
-        (1000D, "1000"),
-        (-1001D, "-1001")
+        (1000d, "1000"),
+        (-1001d, "-1001")
       )
       for {
         (d, s) <- numbers
@@ -31,7 +32,7 @@ class DoubleUtilsSpec extends StandardSpec with UnitTestSupport {
         (1234.5, "1234.5"),
         (0.55454545, "0.554545"),
         (100.55454545, "100.555"),
-        (1000000.999999999D, "1e+6"),
+        (1000000.999999999d, "1e+6"),
         (77777777777.7777777, "7.77778e+10")
       )
       for {
@@ -39,4 +40,5 @@ class DoubleUtilsSpec extends StandardSpec with UnitTestSupport {
       } DoubleUtils.double2String(d) shouldBe s
     }
   }
+
 }

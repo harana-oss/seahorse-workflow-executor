@@ -1,16 +1,20 @@
 package io.deepsense.models.json.workflow
 
 import org.scalatest._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import spray.json._
 
-import io.deepsense.deeplang.catalogs.doperable.{ClassDescriptor, HierarchyDescriptor, TraitDescriptor}
+import io.deepsense.deeplang.catalogs.doperable.ClassDescriptor
+import io.deepsense.deeplang.catalogs.doperable.HierarchyDescriptor
+import io.deepsense.deeplang.catalogs.doperable.TraitDescriptor
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class HierarchyDescriptorJsonProtocolSpec
-  extends FlatSpec
-  with Matchers
-  with MockitoSugar
-  with HierarchyDescriptorJsonProtocol {
+    extends AnyFlatSpec
+    with Matchers
+    with MockitoSugar
+    with HierarchyDescriptorJsonProtocol {
 
   "TraitDescriptor" should "be correctly serialized to json" in {
     val traitDescriptor: TraitDescriptor = TraitDescriptor("Sorted", List("Iterable", "Comparable"))
@@ -30,7 +34,7 @@ class HierarchyDescriptorJsonProtocolSpec
 
   it should "be correctly deserialized from json" in {
     val descriptor: TraitDescriptor = TraitDescriptor("Sorted", List("Iterable", "Comparable"))
-    val json = expectedJsTrait(descriptor)
+    val json                        = expectedJsTrait(descriptor)
 
     val fromJson: TraitDescriptor = json.convertTo[TraitDescriptor]
 
@@ -39,7 +43,7 @@ class HierarchyDescriptorJsonProtocolSpec
 
   it should "be correctly deserialized from json when parents are empty" in {
     val descriptor: TraitDescriptor = TraitDescriptor("Sorted", List())
-    val json = expectedJsTrait(descriptor)
+    val json                        = expectedJsTrait(descriptor)
 
     val fromJson: TraitDescriptor = json.convertTo[TraitDescriptor]
 
@@ -64,7 +68,7 @@ class HierarchyDescriptorJsonProtocolSpec
 
   it should "be correctly deserialized from json when no parent" in {
     val descriptor: ClassDescriptor = ClassDescriptor("Model", None, List("T1", "T2"))
-    val json = expectedJsClass(descriptor)
+    val json                        = expectedJsClass(descriptor)
 
     val fromJson = json.convertTo[ClassDescriptor]
 
@@ -73,7 +77,7 @@ class HierarchyDescriptorJsonProtocolSpec
 
   it should "be correctly deserialized from json when without traits" in {
     val descriptor: ClassDescriptor = ClassDescriptor("Model", Some("parent"), List())
-    val json = expectedJsClass(descriptor)
+    val json                        = expectedJsClass(descriptor)
 
     val fromJson = json.convertTo[ClassDescriptor]
 
@@ -83,12 +87,13 @@ class HierarchyDescriptorJsonProtocolSpec
   "HierarchyDescriptor" should "be correctly serialized to json" in {
     val hierarchyDescriptor: HierarchyDescriptor = HierarchyDescriptor(
       Map(
-        "Sorted" -> TraitDescriptor("Sorted", List("Iterable", "Comparable")),
+        "Sorted"    -> TraitDescriptor("Sorted", List("Iterable", "Comparable")),
         "Trainable" -> TraitDescriptor("Trainable", List())
       ),
       Map(
         "DataFrame" -> ClassDescriptor("DataFrame", Some("Data"), List("Data")),
-        "Whatever" -> ClassDescriptor("Whatever", None, List()))
+        "Whatever"  -> ClassDescriptor("Whatever", None, List())
+      )
     )
 
     val json = hierarchyDescriptor.toJson
@@ -107,12 +112,13 @@ class HierarchyDescriptorJsonProtocolSpec
   it should "be correctly deserialized from json" in {
     val hierarchyDescriptor: HierarchyDescriptor = HierarchyDescriptor(
       Map(
-        "Sorted" -> TraitDescriptor("Sorted", List("Iterable", "Comparable")),
+        "Sorted"    -> TraitDescriptor("Sorted", List("Iterable", "Comparable")),
         "Trainable" -> TraitDescriptor("Trainable", List())
       ),
       Map(
         "DataFrame" -> ClassDescriptor("DataFrame", Some("Data"), List("Data")),
-        "Whatever" -> ClassDescriptor("Whatever", None, List()))
+        "Whatever"  -> ClassDescriptor("Whatever", None, List())
+      )
     )
     val json = hierarchyDescriptor.toJson
 
@@ -123,32 +129,36 @@ class HierarchyDescriptorJsonProtocolSpec
 
   it should "be correctly deserialized from json when empty" in {
     val hierarchyDescriptor: HierarchyDescriptor = HierarchyDescriptor(Map(), Map())
-    val json = hierarchyDescriptor.toJson
+    val json                                     = hierarchyDescriptor.toJson
 
     val fromJson = json.convertTo[HierarchyDescriptor]
 
     assert(hierarchyDescriptor == fromJson)
   }
 
-  private[this] def expectedJsHierarchy(hierarchy: HierarchyDescriptor): JsObject = {
-    JsObject(Map[String, JsValue](
-      "traits" -> JsObject(hierarchy.traits.values.map(t => t.name -> expectedJsTrait(t)).toMap),
-      "classes" -> JsObject(hierarchy.classes.values.map(c => c.name -> expectedJsClass(c)).toMap)
-    ))
-  }
+  private[this] def expectedJsHierarchy(hierarchy: HierarchyDescriptor): JsObject =
+    JsObject(
+      Map[String, JsValue](
+        "traits"  -> JsObject(hierarchy.traits.values.map(t => t.name -> expectedJsTrait(t)).toMap),
+        "classes" -> JsObject(hierarchy.classes.values.map(c => c.name -> expectedJsClass(c)).toMap)
+      )
+    )
 
-  private[this] def expectedJsTrait(traitDescriptor: TraitDescriptor): JsObject = {
-    JsObject(Map(
-      "name" -> JsString(traitDescriptor.name),
-      "parents" -> JsArray(traitDescriptor.parents.map(JsString(_)).toVector)
-    ))
-  }
+  private[this] def expectedJsTrait(traitDescriptor: TraitDescriptor): JsObject =
+    JsObject(
+      Map(
+        "name"    -> JsString(traitDescriptor.name),
+        "parents" -> JsArray(traitDescriptor.parents.map(JsString(_)).toVector)
+      )
+    )
 
-  private[this] def expectedJsClass(classDescriptor: ClassDescriptor): JsObject = {
-    JsObject(Map[String, JsValue](
-      "name" -> JsString(classDescriptor.name),
-      "parent" -> classDescriptor.parent.map(JsString(_)).getOrElse(JsNull),
-      "traits" -> JsArray(classDescriptor.traits.map(JsString(_)).toVector)
-    ))
-  }
+  private[this] def expectedJsClass(classDescriptor: ClassDescriptor): JsObject =
+    JsObject(
+      Map[String, JsValue](
+        "name"   -> JsString(classDescriptor.name),
+        "parent" -> classDescriptor.parent.map(JsString(_)).getOrElse(JsNull),
+        "traits" -> JsArray(classDescriptor.traits.map(JsString(_)).toVector)
+      )
+    )
+
 }

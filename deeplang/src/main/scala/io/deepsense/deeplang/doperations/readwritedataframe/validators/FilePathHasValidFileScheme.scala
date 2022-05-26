@@ -1,8 +1,10 @@
 package io.deepsense.deeplang.doperations.readwritedataframe.validators
 
-import io.deepsense.deeplang.doperations.inout.{InputStorageTypeChoice, OutputStorageTypeChoice}
+import io.deepsense.deeplang.doperations.inout.InputStorageTypeChoice
+import io.deepsense.deeplang.doperations.inout.OutputStorageTypeChoice
 import io.deepsense.deeplang.doperations.readwritedataframe.FilePath
-import io.deepsense.deeplang.doperations.{ReadDataFrame, WriteDataFrame}
+import io.deepsense.deeplang.doperations.ReadDataFrame
+import io.deepsense.deeplang.doperations.WriteDataFrame
 
 object FilePathHasValidFileScheme {
 

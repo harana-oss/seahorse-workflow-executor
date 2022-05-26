@@ -4,19 +4,23 @@ import org.apache.spark.sql.types.StructType
 
 import io.deepsense.deeplang.ExecutionContext
 import io.deepsense.deeplang.doperables.Projector.ColumnProjection
-import io.deepsense.deeplang.doperables.dataframe.{DataFrame, DataFrameColumnsGetter}
+import io.deepsense.deeplang.doperables.dataframe.DataFrame
+import io.deepsense.deeplang.doperables.dataframe.DataFrameColumnsGetter
 import io.deepsense.deeplang.params.selections.SingleColumnSelection
 import io.deepsense.deeplang.params._
-import io.deepsense.deeplang.params.choice.{Choice, ChoiceParam}
+import io.deepsense.deeplang.params.choice.Choice
+import io.deepsense.deeplang.params.choice.ChoiceParam
 import io.deepsense.deeplang.utils.SparkUtils
 
 class Projector extends Transformer {
 
   val projectionColumns = ParamsSequence[ColumnProjection](
     name = "projection columns",
-    description = Some("Column to project in the output DataFrame."))
+    description = Some("Column to project in the output DataFrame.")
+  )
 
   def getProjectionColumns: Seq[ColumnProjection] = $(projectionColumns)
+
   def setProjectionColumns(value: Seq[ColumnProjection]): this.type = set(projectionColumns, value)
 
   override val params: Array[io.deepsense.deeplang.params.Param[_]] = Array(projectionColumns)
@@ -24,14 +28,14 @@ class Projector extends Transformer {
   override def _transform(ctx: ExecutionContext, df: DataFrame): DataFrame = {
     val exprSeq = getProjectionColumns.map { cp =>
       val renameExpressionPart = cp.getRenameColumn.getColumnName match {
-        case None => ""
+        case None             => ""
         case Some(columnName) => s" AS ${SparkUtils.escapeColumnName(columnName)}"
       }
       SparkUtils.escapeColumnName(df.getColumnName(cp.getOriginalColumn)) + renameExpressionPart
     }
-    if (exprSeq.isEmpty) {
+    if (exprSeq.isEmpty)
       DataFrame.empty(ctx)
-    } else {
+    else {
       val filtered = df.sparkDataFrame.selectExpr(exprSeq: _*)
       DataFrame.fromSparkDataFrame(filtered)
     }
@@ -41,7 +45,7 @@ class Projector extends Transformer {
     val namesPairsSeq = getProjectionColumns.map { cp =>
       val originalColumnName = DataFrameColumnsGetter.getColumnName(schema, cp.getOriginalColumn)
       val resultColumnName = cp.getRenameColumn.getColumnName match {
-        case None => originalColumnName
+        case None             => originalColumnName
         case Some(columnName) => columnName
       }
       (originalColumnName, resultColumnName)
@@ -51,47 +55,57 @@ class Projector extends Transformer {
     }
     Some(StructType(fields))
   }
+
 }
 
 object Projector {
-  val OriginalColumnParameterName = "original column"
-  val RenameColumnParameterName = "rename column"
-  val ColumnNameParameterName = "column name"
 
+  val OriginalColumnParameterName = "original column"
+
+  val RenameColumnParameterName = "rename column"
+
+  val ColumnNameParameterName = "column name"
 
   case class ColumnProjection() extends Params {
 
     val originalColumn = SingleColumnSelectorParam(
       name = OriginalColumnParameterName,
       description = Some("Column from the input DataFrame."),
-      portIndex = 0)
+      portIndex = 0
+    )
 
     def getOriginalColumn: SingleColumnSelection = $(originalColumn)
+
     def setOriginalColumn(value: SingleColumnSelection): this.type = set(originalColumn, value)
 
     val renameColumn = ChoiceParam[RenameColumnChoice](
       name = RenameColumnParameterName,
-      description = Some("Determine if the column should be renamed."))
+      description = Some("Determine if the column should be renamed.")
+    )
+
     setDefault(renameColumn, RenameColumnChoice.No())
 
     def getRenameColumn: RenameColumnChoice = $(renameColumn)
+
     def setRenameColumn(value: RenameColumnChoice): this.type = set(renameColumn, value)
 
     val params: Array[io.deepsense.deeplang.params.Param[_]] = Array(originalColumn, renameColumn)
+
   }
 
-
   sealed trait RenameColumnChoice extends Choice {
+
     import RenameColumnChoice._
 
     def getColumnName: Option[String]
+
     override val choiceOrder: List[Class[_ <: RenameColumnChoice]] =
-      List(
-        classOf[No],
-        classOf[Yes])
+      List(classOf[No], classOf[Yes])
+
   }
 
   object RenameColumnChoice {
+
     case class Yes() extends RenameColumnChoice {
 
       override val name: String = "Yes"
@@ -100,20 +114,27 @@ object Projector {
         name = ColumnNameParameterName,
         description = Some("New name for a column in the output DataFrame.")
       )
+
       setDefault(columnName, "")
 
       override def getColumnName: Option[String] = Some($(columnName))
+
       def setColumnName(value: String): this.type = set(columnName, value)
 
       override val params: Array[Param[_]] = Array(columnName)
+
     }
+
     case class No() extends RenameColumnChoice {
+
       override val name: String = "No"
 
       override def getColumnName: Option[String] = None
 
       override val params: Array[Param[_]] = Array()
+
     }
+
   }
 
 }

@@ -1,12 +1,17 @@
 package io.deepsense.deeplang.doperations.examples
 
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.ArrayType
+import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types.StructType
 
-import io.deepsense.deeplang.doperables.dataframe.{DataFrame, DataFrameBuilder}
+import io.deepsense.deeplang.doperables.dataframe.DataFrame
+import io.deepsense.deeplang.doperables.dataframe.DataFrameBuilder
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators.CountVectorizer
 
-class CountVectorizerExample extends AbstractOperationExample[CountVectorizer]{
+class CountVectorizerExample extends AbstractOperationExample[CountVectorizer] {
+
   override def dOperation: CountVectorizer = {
     val op = new CountVectorizer()
     op.estimator
@@ -21,9 +26,11 @@ class CountVectorizerExample extends AbstractOperationExample[CountVectorizer]{
       Row("a a a b b c c c d ".split(" ").toSeq),
       Row("c c c c c c".split(" ").toSeq),
       Row("a".split(" ").toSeq),
-      Row("e e e e e".split(" ").toSeq))
-    val rdd = sparkContext.parallelize(rows)
+      Row("e e e e e".split(" ").toSeq)
+    )
+    val rdd    = sparkContext.parallelize(rows)
     val schema = StructType(Seq(StructField("lines", ArrayType(StringType, containsNull = true))))
     Seq(DataFrameBuilder(sparkSQLSession).buildDataFrame(schema, rdd))
   }
+
 }

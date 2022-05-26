@@ -8,15 +8,13 @@ class WorkflowParamSpec extends AbstractParamSpec[JsObject, WorkflowParam] {
 
   override def paramFixture: (WorkflowParam, JsValue) = {
     val description = "Workflow parameter description"
-    val param = WorkflowParam(
-      name = "Workflow parameter name",
-      description = Some(description))
+    val param       = WorkflowParam(name = "Workflow parameter name", description = Some(description))
     val expectedJson = JsObject(
-      "type" -> JsString("workflow"),
-      "name" -> JsString(param.name),
+      "type"        -> JsString("workflow"),
+      "name"        -> JsString(param.name),
       "description" -> JsString(description),
       "isGriddable" -> JsFalse,
-      "default" -> JsNull
+      "default"     -> JsNull
     )
     (param, expectedJson)
   }
@@ -35,4 +33,5 @@ class WorkflowParamSpec extends AbstractParamSpec[JsObject, WorkflowParam] {
     )
     (value, value.copy())
   }
+
 }

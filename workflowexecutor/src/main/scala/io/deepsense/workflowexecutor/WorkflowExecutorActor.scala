@@ -2,7 +2,9 @@ package io.deepsense.workflowexecutor
 
 import akka.actor._
 
-import io.deepsense.commons.exception.{DeepSenseFailure, FailureCode, FailureDescription}
+import io.deepsense.commons.exception.DeepSenseFailure
+import io.deepsense.commons.exception.FailureCode
+import io.deepsense.commons.exception.FailureDescription
 import io.deepsense.commons.models.Entity
 import io.deepsense.commons.utils.Logging
 import io.deepsense.deeplang._
@@ -11,49 +13,49 @@ import io.deepsense.graph._
 import io.deepsense.models.json.graph.NodeStatusJsonProtocol
 import io.deepsense.models.workflows._
 import io.deepsense.reportlib.model.ReportContent
-import io.deepsense.workflowexecutor.WorkflowManagerClientActorProtocol.{SaveState, SaveWorkflow}
+import io.deepsense.workflowexecutor.WorkflowManagerClientActorProtocol.SaveState
+import io.deepsense.workflowexecutor.WorkflowManagerClientActorProtocol.SaveWorkflow
 import io.deepsense.workflowexecutor.partialexecution._
 
-/**
- * WorkflowExecutorActor coordinates execution of a workflow by distributing work to
- * WorkflowNodeExecutorActors and collecting results.
- */
+/** WorkflowExecutorActor coordinates execution of a workflow by distributing work to WorkflowNodeExecutorActors and
+  * collecting results.
+  */
 abstract class WorkflowExecutorActor(
     val executionContext: CommonExecutionContext,
     nodeExecutorFactory: GraphNodeExecutorFactory,
     workflowManagerClientActor: Option[ActorRef],
     publisher: Option[ActorRef],
     terminationListener: Option[ActorRef],
-    executionFactory: StatefulGraph => Execution)
-  extends Actor
-  with Logging
-  with NodeStatusJsonProtocol {
+    executionFactory: StatefulGraph => Execution
+) extends Actor
+    with Logging
+    with NodeStatusJsonProtocol {
 
   import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages._
 
   val progressReporter = WorkflowProgress()
+
   val workflowId = Workflow.Id.fromString(self.path.name)
 
   private[workflowexecutor] var statefulWorkflow: StatefulWorkflow = null
 
   def ready(): Receive = {
-    case Launch(nodes) => launch(nodes)
+    case Launch(nodes)          => launch(nodes)
     case UpdateStruct(workflow) => updateStruct(workflow)
-    case Synchronize() => synchronize()
+    case Synchronize()          => synchronize()
   }
 
-  def launched(): Receive = {
+  def launched(): Receive =
     waitingForFinish().orElse {
-      case Abort() => abort()
+      case Abort()         => abort()
       case NodeStarted(id) => nodeStarted(id)
     }
-  }
 
   def waitingForFinish(): PartialFunction[Any, Unit] = {
     case NodeCompleted(id, nodeExecutionResult) => nodeCompleted(id, nodeExecutionResult)
-    case NodeFailed(id, failureDescription) => nodeFailed(id, failureDescription)
-    case Synchronize() => synchronize()
-    case UpdateStruct(workflow) => updateStruct(workflow)
+    case NodeFailed(id, failureDescription)     => nodeFailed(id, failureDescription)
+    case Synchronize()                          => synchronize()
+    case UpdateStruct(workflow)                 => updateStruct(workflow)
     case l: Launch =>
       logger.info("It is illegal to Launch a graph when the execution is in progress.")
   }
@@ -74,19 +76,18 @@ abstract class WorkflowExecutorActor(
     val removedNodes = statefulWorkflow.getNodesRemovedByWorkflow(workflow)
     statefulWorkflow.updateStructure(workflow)
 
-    removedNodes.foreach (node => {
+    removedNodes.foreach { node =>
       val nodeRef = getGraphNodeExecutor(node, Vector.empty)
       nodeRef ! WorkflowNodeExecutorActor.Messages.Delete()
-    })
+    }
 
     val workflowWithResults: WorkflowWithResults = statefulWorkflow.workflowWithResults
     workflowManagerClientActor.foreach(_ ! SaveWorkflow(workflowWithResults))
     sendInferredState(statefulWorkflow.inferState)
   }
 
-  def sendInferredState(inferredState: InferredState): Unit = {
+  def sendInferredState(inferredState: InferredState): Unit =
     publisher.foreach(_ ! inferredState)
-  }
 
   private def abort(): Unit = {
     val startingPointExecution = statefulWorkflow.currentExecution
@@ -99,11 +100,11 @@ abstract class WorkflowExecutorActor(
 
   def launch(nodes: Set[Node.Id]): Unit = {
     val startingPointExecution = statefulWorkflow.currentExecution
-    val nodesToExecute = if (nodes.isEmpty) {
-      startingPointExecution.graph.notExecutedNodes
-    } else {
-      nodes
-    }
+    val nodesToExecute =
+      if (nodes.isEmpty)
+        startingPointExecution.graph.notExecutedNodes
+      else
+        nodes
     logger.debug("Launching nodes: {}", nodesToExecute)
     statefulWorkflow.launch(nodesToExecute)
     updateExecutionState(startingPointExecution)
@@ -138,8 +139,10 @@ abstract class WorkflowExecutorActor(
   }
 
   def sendExecutionReport(executionReport: ExecutionReport): Unit = {
-    logger.debug(s"Status for '$workflowId': Error: ${executionReport.error}, " +
-      s"States of nodes: ${executionReport.nodesStatuses.mkString("\n")}")
+    logger.debug(
+      s"Status for '$workflowId': Error: ${executionReport.error}, " +
+        s"States of nodes: ${executionReport.nodesStatuses.mkString("\n")}"
+    )
     publisher.foreach(_ ! executionReport)
     workflowManagerClientActor.foreach(_ ! SaveState(workflowId, executionReport))
   }
@@ -151,7 +154,7 @@ abstract class WorkflowExecutorActor(
     logger.debug("launchReadyNodes")
     val readyNodes: Seq[ReadyNode] = statefulWorkflow.startReadyNodes()
     readyNodes.foreach { readyNode =>
-      val input = readyNode.input.toVector
+      val input   = readyNode.input.toVector
       val nodeRef = getGraphNodeExecutor(readyNode.node, input)
       nodeRef ! WorkflowNodeExecutorActor.Messages.Start()
       logger.debug(s"Starting node $readyNode")
@@ -159,24 +162,22 @@ abstract class WorkflowExecutorActor(
   }
 
   private def getGraphNodeExecutor(node: DeeplangNode, dooperable: Vector[DOperable]): ActorRef = {
-    val nodeExecutionContext = executionContext.createExecutionContext(
-      workflowId, node.id)
+    val nodeExecutionContext = executionContext.createExecutionContext(workflowId, node.id)
     nodeExecutorFactory
       .createGraphNodeExecutor(context, nodeExecutionContext, node, dooperable)
   }
 
   def nodeStarted(id: Node.Id): Unit = logger.debug("{}", NodeStarted(id))
 
-  def nodeCompleted(
-      id: Node.Id,
-      nodeExecutionResults: NodeExecutionResults): Unit = {
+  def nodeCompleted(id: Node.Id, nodeExecutionResults: NodeExecutionResults): Unit = {
     logger.debug(s"Node ${statefulWorkflow.node(id)} completed!")
     val startingPointExecution = statefulWorkflow.currentExecution
     statefulWorkflow.nodeFinished(
       id,
       nodeExecutionResults.entitiesId,
       nodeExecutionResults.reports,
-      nodeExecutionResults.doperables)
+      nodeExecutionResults.doperables
+    )
     finalizeNodeExecutionEnd(startingPointExecution)
   }
 
@@ -192,20 +193,18 @@ abstract class WorkflowExecutorActor(
     updateExecutionState(startingPointExecution)
   }
 
-  def actionWithWorkflowId(id: Workflow.Id)(f: => Any): Any = {
-    if (id != workflowId) {
-      logger.warn(
-        s"Init for a wrong workflow received. Expected workflowId: $workflowId, received: $id.")
-    } else {
+  def actionWithWorkflowId(id: Workflow.Id)(f: => Any): Any =
+    if (id != workflowId)
+      logger.warn(s"Init for a wrong workflow received. Expected workflowId: $workflowId, received: $id.")
+    else
       f
-    }
-  }
 
   def getExecutionReport: ExecutionReport = statefulWorkflow.executionReport
 
   def execution: Execution = statefulWorkflow.currentExecution
 
   protected def onInitiated(): Unit = {}
+
 }
 
 object WorkflowExecutorActor {
@@ -213,37 +212,49 @@ object WorkflowExecutorActor {
   type Results = Map[Entity.Id, DOperable]
 
   object Messages {
+
     sealed trait Message
-    case class Launch(nodes: Set[Node.Id] = Set.empty)
-      extends Message
+
+    case class Launch(nodes: Set[Node.Id] = Set.empty) extends Message
+
     case class NodeStarted(nodeId: Node.Id) extends Message
+
     case class NodeCompleted(id: Node.Id, results: NodeExecutionResults) extends Message
+
     case class NodeFailed(id: Node.Id, cause: Exception) extends Message
+
     case class Abort() extends Message
+
     case class Init() extends Message
+
     case class UpdateStruct(workflow: Workflow) extends Message
+
     case class Synchronize() extends Message
+
   }
 
-  def inferenceErrorsDebugDescription(graphKnowledge: GraphKnowledge): FailureDescription = {
+  def inferenceErrorsDebugDescription(graphKnowledge: GraphKnowledge): FailureDescription =
     FailureDescription(
       DeepSenseFailure.Id.randomId,
       FailureCode.IncorrectWorkflow,
       title = "Incorrect workflow",
       message = Some("Provided workflow cannot be launched, because it contains errors"),
-      details = graphKnowledge.errors.map {
-        case (id, errors) => (id.toString, errors.map(_.toString).mkString("\n"))
+      details = graphKnowledge.errors.map { case (id, errors) =>
+        (id.toString, errors.map(_.toString).mkString("\n"))
       }
     )
-  }
+
 }
 
 trait GraphNodeExecutorFactory {
+
   def createGraphNodeExecutor(
-    context: ActorContext,
-    executionContext: ExecutionContext,
-    node: DeeplangNode,
-    input: Vector[DOperable]): ActorRef
+      context: ActorContext,
+      executionContext: ExecutionContext,
+      node: DeeplangNode,
+      input: Vector[DOperable]
+  ): ActorRef
+
 }
 
 class GraphNodeExecutorFactoryImpl extends GraphNodeExecutorFactory {
@@ -252,28 +263,34 @@ class GraphNodeExecutorFactoryImpl extends GraphNodeExecutorFactory {
       context: ActorContext,
       executionContext: ExecutionContext,
       node: DeeplangNode,
-      input: Vector[DOperable]): ActorRef = {
+      input: Vector[DOperable]
+  ): ActorRef = {
     val props = Props(new WorkflowNodeExecutorActor(executionContext, node, input))
       .withDispatcher("node-executor-dispatcher")
     context.actorOf(props, s"node-executor-${node.id.value.toString}")
   }
+
 }
 
 // This is a separate class in order to make logs look better.
 case class WorkflowProgress() extends Logging {
+
   def logProgress(execution: Execution): Unit = {
-    val states = execution.graph.states.values
+    val states    = execution.graph.states.values
     val completed = states.count(_.isCompleted)
     logger.info(
       s"$completed ${if (completed == 1) "node" else "nodes"} successfully completed, " +
-      s"${states.count(_.isFailed)} failed, " +
-      s"${states.count(_.isAborted)} aborted, " +
-      s"${states.count(_.isRunning)} running, " +
-      s"${states.count(_.isQueued)} queued.")
+        s"${states.count(_.isFailed)} failed, " +
+        s"${states.count(_.isAborted)} aborted, " +
+        s"${states.count(_.isRunning)} running, " +
+        s"${states.count(_.isQueued)} queued."
+    )
   }
+
 }
 
 case class NodeExecutionResults(
-  entitiesId: Seq[Entity.Id],
-  reports: Map[Entity.Id, ReportContent],
-  doperables: Map[Entity.Id, DOperable])
+    entitiesId: Seq[Entity.Id],
+    reports: Map[Entity.Id, ReportContent],
+    doperables: Map[Entity.Id, DOperable]
+)

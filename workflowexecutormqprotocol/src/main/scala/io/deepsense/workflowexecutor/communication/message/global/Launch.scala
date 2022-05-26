@@ -9,10 +9,10 @@ import io.deepsense.models.workflows.Workflow
 
 case class Launch(workflowId: Workflow.Id, nodesToExecute: Set[Node.Id])
 
-trait LaunchJsonProtocol extends DefaultJsonProtocol
-  with IdJsonProtocol
-  with SprayJsonSupport {
+trait LaunchJsonProtocol extends DefaultJsonProtocol with IdJsonProtocol with SprayJsonSupport {
+
   implicit val launchFormat = jsonFormat2(Launch)
+
 }
 
 object LaunchJsonProtocol extends LaunchJsonProtocol

@@ -25,7 +25,7 @@ object CommonSettingsPlugin extends AutoPlugin {
     crossScalaVersions := Seq(Version.scala),
     scalacOptions := Seq(
       "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
-      "-language:existentials", "-language:implicitConversions", "-Xfatal-warnings"
+      "-language:existentials", "-language:implicitConversions"
     ),
     javacOptions ++= Seq(
       "-source", Version.java,

@@ -2,29 +2,29 @@ package io.deepsense.deeplang.params.wrappers.spark
 
 import org.apache.spark.ml
 import org.apache.spark.ml.param._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
-class WrappersDefaultValidationSpec
-  extends WordSpec
-  with Matchers
-  with MockitoSugar {
+class WrappersDefaultValidationSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   class ExampleSparkParams extends ml.param.Params {
+
     override val uid: String = "id"
+
     val intSparkParam = new IntParam("", "name", "description")
+
     val floatSparkParam = new FloatParam("", "name", "description")
+
     val doubleSparkParam = new DoubleParam("", "name", "description")
 
     override def copy(extra: ParamMap): Params = ???
+
   }
 
   "IntParamWrapper" should {
 
-    val intParamWrapper = new IntParamWrapper[ExampleSparkParams](
-      "name",
-      Some("description"),
-      _.intSparkParam)
+    val intParamWrapper = new IntParamWrapper[ExampleSparkParams]("name", Some("description"), _.intSparkParam)
 
     "validate whole Int range" in {
       intParamWrapper.validate(Int.MinValue + 1) shouldBe empty
@@ -38,10 +38,7 @@ class WrappersDefaultValidationSpec
 
   "FloatParamWrapper" should {
 
-    val floatParamWrapper = new FloatParamWrapper[ExampleSparkParams](
-      "name",
-      Some("description"),
-      _.floatSparkParam)
+    val floatParamWrapper = new FloatParamWrapper[ExampleSparkParams]("name", Some("description"), _.floatSparkParam)
 
     "validate whole Float range" in {
       floatParamWrapper.validate(Float.MinValue + 1) shouldBe empty
@@ -55,12 +52,11 @@ class WrappersDefaultValidationSpec
 
   "DoubleParamWrapper" should {
     "validate whole Double range" in {
-      val doubleParamWrapper = new DoubleParamWrapper[ExampleSparkParams](
-        "name",
-        Some("description"),
-        _.doubleSparkParam)
+      val doubleParamWrapper =
+        new DoubleParamWrapper[ExampleSparkParams]("name", Some("description"), _.doubleSparkParam)
       doubleParamWrapper.validate(Double.MinValue + 1) shouldBe empty
       doubleParamWrapper.validate(Double.MinValue - 1) shouldBe empty
     }
   }
+
 }

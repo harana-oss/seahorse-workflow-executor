@@ -4,11 +4,10 @@ object DocUtils {
 
   def underscorize(input: String): String = input.toLowerCase.replace(' ', '_')
 
-  def forceDotAtEnd(s: String): String = {
-    if (s.charAt(s.length - 1) != '.') {
+  def forceDotAtEnd(s: String): String =
+    if (s.charAt(s.length - 1) != '.')
       s + "."
-    } else {
+    else
       s
-    }
-  }
+
 }

@@ -4,14 +4,17 @@ import java.util.UUID
 
 import io.deepsense.api.datasourcemanager.model.Datasource
 import io.deepsense.commons.serialization.Serialization
-import io.deepsense.commons.{StandardSpec, UnitTestSupport}
+import io.deepsense.commons.StandardSpec
+import io.deepsense.commons.UnitTestSupport
 
-class DatasourceInMemoryClientSpec extends StandardSpec
-  with UnitTestSupport
-  with Serialization {
+class DatasourceInMemoryClientSpec extends StandardSpec with UnitTestSupport with Serialization {
+
   val uuid = "123e4567-e89b-12d3-a456-426655440000"
+
   val notPresentUuid = "123e4567-e89b-12d3-a456-426655440001"
+
   val ds = getTestDatasource
+
   val testDatasourceList = List(ds)
 
   "DatasourceInMemoryClient" should {
@@ -31,4 +34,5 @@ class DatasourceInMemoryClientSpec extends StandardSpec
     ds.setId(uuid)
     ds
   }
+
 }

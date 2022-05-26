@@ -1,10 +1,12 @@
 package io.deepsense.deeplang
 
-import java.net.{Inet4Address, NetworkInterface}
+import java.net.Inet4Address
+import java.net.NetworkInterface
 import java.util.UUID
 
 import scala.sys.process.Process
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.time.SpanSugar._
 
@@ -17,12 +19,15 @@ import io.deepsense.sparkutils.SparkSQLSession
 object StandaloneSparkClusterForTests {
 
   private var hdfsAddress: String = _
+
   private var sparkMasterAddress: String = _
+
   private val runId = UUID.randomUUID().toString.substring(0, 8)
 
   // This env is used within docker-compose.yml and allows multiple instances of the cluster
   // to run simultaneously
   private val clusterIdEnv = "CLUSTER_ID" -> runId
+
   private val clusterManagementScript = "docker/spark-standalone-cluster-manage.sh"
 
   private val anIpAddress: String = {
@@ -31,9 +36,12 @@ object StandaloneSparkClusterForTests {
     NetworkInterface.getNetworkInterfaces.asScala.flatMap {
       _.getInetAddresses.asScala.map {
         case ip4: Inet4Address => Some(ip4.getHostAddress)
-        case _ => None
-      }.filter(_.isDefined)
-    }.next().get
+        case _                 => None
+      }
+        .filter(_.isDefined)
+    }
+      .next()
+      .get
   }
 
   private def address(container: String, port: Int) = {
@@ -52,7 +60,7 @@ object StandaloneSparkClusterForTests {
     // for this command.
     eventually(timeout(60.seconds), interval(1.second)) {
       val exec = Seq("docker", "exec", "-u", "root")
-      val cmd = Seq("/usr/local/hadoop/bin/hdfs", "dfsadmin", "-safemode", "leave")
+      val cmd  = Seq("/usr/local/hadoop/bin/hdfs", "dfsadmin", "-safemode", "leave")
       Process(exec ++ Seq(s"hdfs-$runId") ++ cmd, None, clusterIdEnv).!!
     }
 
@@ -67,16 +75,18 @@ object StandaloneSparkClusterForTests {
     FileScheme.HDFS.pathPrefix + s"$hdfsAddress/root/tmp/seahorse_tests/" + UUID.randomUUID()
 
   lazy val executionContext: ExecutionContext = {
-    import org.scalatest.mockito.MockitoSugar._
+    import org.scalatestplus.mockito.MockitoSugar._
 
     System.setProperty("HADOOP_USER_NAME", "root")
 
     val sparkConf: SparkConf = new SparkConf()
       .setMaster(s"spark://$sparkMasterAddress")
       .setAppName("TestApp")
-      .setJars(Seq(
-        s"./deeplang/target/scala-$majorScalaVersion/deepsense-seahorse-deeplang-assembly-${BuildInfo.version}.jar"
-      ))
+      .setJars(
+        Seq(
+          s"./deeplang/target/scala-$majorScalaVersion/deepsense-seahorse-deeplang-assembly-${BuildInfo.version}.jar"
+        )
+      )
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .registerKryoClasses(Array())
       .set("spark.executor.cores", "1")
@@ -115,4 +125,5 @@ object StandaloneSparkClusterForTests {
   private lazy val majorScalaVersion: String = util.Properties.versionNumberString.split('.').dropRight(1).mkString(".")
 
   private lazy val sparkVersion: String = org.apache.spark.SPARK_VERSION
+
 }

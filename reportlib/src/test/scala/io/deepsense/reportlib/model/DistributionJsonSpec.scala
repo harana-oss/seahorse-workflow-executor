@@ -1,17 +1,18 @@
 package io.deepsense.reportlib.model
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import spray.json._
 
 import io.deepsense.reportlib.model.factory.DistributionTestFactory
 
 class DistributionJsonSpec
-  extends WordSpec
-  with MockitoSugar
-  with DistributionTestFactory
-  with Matchers
-  with ReportJsonProtocol {
+    extends AnyWordSpec
+    with MockitoSugar
+    with DistributionTestFactory
+    with Matchers
+    with ReportJsonProtocol {
 
   "NoDistribution" should {
     val noDistribution: Distribution = NoDistribution(
@@ -19,9 +20,9 @@ class DistributionJsonSpec
       DistributionTestFactory.distributionDescription
     )
     val jsonNoDistribution: JsObject = JsObject(
-      "name" -> JsString(DistributionTestFactory.distributionName),
-      "subtype" -> JsString("no_distribution"),
-      "description" -> JsString(DistributionTestFactory.distributionDescription),
+      "name"          -> JsString(DistributionTestFactory.distributionName),
+      "subtype"       -> JsString("no_distribution"),
+      "description"   -> JsString(DistributionTestFactory.distributionDescription),
       "missingValues" -> JsNumber(0)
     )
     "serialize to Json" in {
@@ -36,9 +37,9 @@ class DistributionJsonSpec
 
   "DiscreteDistribution" should {
     val jsonCategoricalDistribution: JsObject = JsObject(
-      "name" -> JsString(DistributionTestFactory.distributionName),
-      "subtype" -> JsString("discrete"),
-      "description" -> JsString(DistributionTestFactory.distributionDescription),
+      "name"          -> JsString(DistributionTestFactory.distributionName),
+      "subtype"       -> JsString("discrete"),
+      "description"   -> JsString(DistributionTestFactory.distributionDescription),
       "missingValues" -> JsNumber(0),
       "buckets" ->
         JsArray(DistributionTestFactory.categoricalDistributionBuckets.map(JsString(_)).toVector),
@@ -56,13 +57,13 @@ class DistributionJsonSpec
   "ContinuousDistribution" should {
     val statistics = testStatistics
     val jsonContinuousDistribution: JsObject = JsObject(
-      "name" -> JsString(DistributionTestFactory.distributionName),
-      "subtype" -> JsString("continuous"),
-      "description" -> JsString(DistributionTestFactory.distributionDescription),
+      "name"          -> JsString(DistributionTestFactory.distributionName),
+      "subtype"       -> JsString("continuous"),
+      "description"   -> JsString(DistributionTestFactory.distributionDescription),
       "missingValues" -> JsNumber(0),
       "buckets" ->
         JsArray(DistributionTestFactory.continuousDistributionBuckets.map(JsString(_)).toVector),
-      "counts" -> JsArray(DistributionTestFactory.distributionCounts.map(JsNumber(_)).toVector),
+      "counts"     -> JsArray(DistributionTestFactory.distributionCounts.map(JsNumber(_)).toVector),
       "statistics" -> expectedStatisticsJson(statistics)
     )
     "serialize to Json" in {
@@ -73,23 +74,18 @@ class DistributionJsonSpec
       jsonContinuousDistribution.convertTo[Distribution] shouldBe testContinuousDistribution
     }
     "throw IllegalArgumentException" when {
-      def createContinousDistributionWith(
-        buckets: Seq[String], counts: Seq[Long]): ContinuousDistribution = {
+      def createContinousDistributionWith(buckets: Seq[String], counts: Seq[Long]): ContinuousDistribution =
         ContinuousDistribution("", "", 1, buckets, counts, testStatistics)
-      }
       "created with empty buckets and single count" in {
-        an[IllegalArgumentException] shouldBe thrownBy(
-          createContinousDistributionWith(Seq(), Seq(1)))
+        an[IllegalArgumentException] shouldBe thrownBy(createContinousDistributionWith(Seq(), Seq(1)))
       }
       "created with buckets of size one" in {
-        an[IllegalArgumentException] shouldBe thrownBy(
-          createContinousDistributionWith(Seq("1"), Seq()))
+        an[IllegalArgumentException] shouldBe thrownBy(createContinousDistributionWith(Seq("1"), Seq()))
       }
       "created with non empty buckets and counts of size != (buckets' size -1)" in {
         an[IllegalArgumentException] shouldBe thrownBy(
-          createContinousDistributionWith(
-            Seq("0.1", "0.2", "0.3"),
-            Seq(1)))
+          createContinousDistributionWith(Seq("0.1", "0.2", "0.3"), Seq(1))
+        )
       }
     }
   }
@@ -108,10 +104,11 @@ class DistributionJsonSpec
 
   private def expectedStatisticsJson(statistics: Statistics): JsObject =
     JsObject(
-      "max" -> jsStringOrNull(statistics.max),
-      "min" -> jsStringOrNull(statistics.min),
+      "max"  -> jsStringOrNull(statistics.max),
+      "min"  -> jsStringOrNull(statistics.min),
       "mean" -> jsStringOrNull(statistics.mean)
     )
 
   private def jsStringOrNull(s: Option[String]): JsValue = s.map(JsString(_)).getOrElse(JsNull)
+
 }

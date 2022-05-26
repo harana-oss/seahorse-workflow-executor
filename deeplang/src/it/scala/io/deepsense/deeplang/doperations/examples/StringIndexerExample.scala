@@ -8,4 +8,5 @@ class StringIndexerExample extends AbstractOperationExample[StringIndexer] {
     new StringIndexer().setSingleColumn("city", "city_indexed")
 
   override def fileNames: Seq[String] = Seq("example_city_price")
+
 }

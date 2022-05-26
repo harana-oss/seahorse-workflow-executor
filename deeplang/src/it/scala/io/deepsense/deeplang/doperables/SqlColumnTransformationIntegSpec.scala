@@ -11,18 +11,22 @@ import io.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerS
 import io.deepsense.deeplang.doperations.exceptions._
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
-class SqlColumnTransformationIntegSpec
-    extends DeeplangIntegTestSupport
-    with TransformerSerialization {
+class SqlColumnTransformationIntegSpec extends DeeplangIntegTestSupport with TransformerSerialization {
 
   import TransformerSerialization._
 
   val resultColumn = 3
+
   val delta = 0.01
+
   val column0 = "c0"
+
   val column1 = "c1"
+
   val column2 = "c2"
+
   val column3 = "c3"
+
   val column3needsEscaping = "c.strange name!"
 
   "SqlColumnTransformation" should {
@@ -78,8 +82,7 @@ class SqlColumnTransformationIntegSpec
     }
 
     "create Transformation that counts complex formulas properly" in {
-      runTest(s"MAXIMUM(SIN($column2) + 1.0, ABS($column1 - 2.0))", column1, column3,
-        Seq(1.19, 3.1, null, 3.3, null))
+      runTest(s"MAXIMUM(SIN($column2) + 1.0, ABS($column1 - 2.0))", column1, column3, Seq(1.19, 3.1, null, 3.3, null))
     }
   }
 
@@ -107,7 +110,8 @@ class SqlColumnTransformationIntegSpec
         SqlColumnTransformer()
           .setFormula("+++---")
           .setSingleOrMultiChoice(single)
-          ._transformSchema(schema))
+          ._transformSchema(schema)
+      )
     }
     "detect non-existent column during inference" in {
       a[ColumnsDoNotExistException] shouldBe thrownBy(
@@ -123,7 +127,8 @@ class SqlColumnTransformationIntegSpec
           .setFormula("c0")
           .setInputColumnAlias("c0")
           .setSingleOrMultiChoice(single)
-          ._transformSchema(schema))
+          ._transformSchema(schema)
+      )
     }
   }
 
@@ -133,20 +138,15 @@ class SqlColumnTransformationIntegSpec
     }
 
     "create Transformation that produces properly escaped column name" in {
-      val dataFrame = applyFormulaToDataFrame(
-        "COS(x)",
-        column1,
-        s"$column3needsEscaping",
-        "x",
-        prepareDataFrame())
-      val rows = dataFrame.sparkDataFrame.collect()
+      val dataFrame = applyFormulaToDataFrame("COS(x)", column1, s"$column3needsEscaping", "x", prepareDataFrame())
+      val rows      = dataFrame.sparkDataFrame.collect()
       validateColumn(rows, Seq(0.540, 0.453, 0.362, 0.267, null))
       val schema = dataFrame.sparkDataFrame.schema
       schema.fieldNames shouldBe Array(column0, column1, column2, column3needsEscaping)
     }
 
     // TODO: This is Spark bug. Test will be pending till SPARK-13297 is fixed.
-    "create Transformation that works on DataFrame with backtics in column names" is pending
+    "create Transformation that works on DataFrame with backtics in column names".is(pending)
 
     // Regression test
     "create Transformation that works on DataFrame with non-standard column names" in {
@@ -154,25 +154,20 @@ class SqlColumnTransformationIntegSpec
       val column1 = "c-2"
       val column2 = "c - 2"
       def prepareDataFrame(): DataFrame = {
-        val schema: StructType = StructType(List(
-          StructField(column0, StringType),
-          StructField(column1, DoubleType),
-          StructField(column2, DoubleType)))
+        val schema: StructType = StructType(
+          List(StructField(column0, StringType), StructField(column1, DoubleType), StructField(column2, DoubleType))
+        )
         val manualRowsSeq: Seq[Row] = Seq(
           Row("aaa", 1.0, 0.2),
           Row("bbb", -1.1, 2.2),
           Row("ccc", 1.2, null),
           Row("ddd", -1.3, 4.2),
-          Row("eee", null, null))
+          Row("eee", null, null)
+        )
         createDataFrame(manualRowsSeq, schema)
       }
-      val dataFrame = applyFormulaToDataFrame(
-        "COS(x)",
-        column1,
-        s"$column3needsEscaping",
-        "x",
-        prepareDataFrame())
-      val rows = dataFrame.sparkDataFrame.collect()
+      val dataFrame = applyFormulaToDataFrame("COS(x)", column1, s"$column3needsEscaping", "x", prepareDataFrame())
+      val rows      = dataFrame.sparkDataFrame.collect()
       validateColumn(rows, Seq(0.540, 0.453, 0.362, 0.267, null))
       val schema = dataFrame.sparkDataFrame.schema
       schema.fieldNames shouldBe Array(column0, column1, column2, column3needsEscaping)
@@ -180,14 +175,9 @@ class SqlColumnTransformationIntegSpec
 
     "fail when 2 comma-separated formulas are provided" in {
       intercept[SqlColumnExpressionSyntaxException] {
-        val dataFrame = applyFormulaToDataFrame(
-          "MAXIMUM(x), SIN(x)",
-          column1,
-          "name",
-          "x",
-          prepareDataFrame())
+        val dataFrame = applyFormulaToDataFrame("MAXIMUM(x), SIN(x)", column1, "name", "x", prepareDataFrame())
         dataFrame.sparkDataFrame.collect()
-      };()
+      }; ()
     }
 
     "fail when formula is not correct" in {
@@ -195,7 +185,7 @@ class SqlColumnTransformationIntegSpec
         val dataFrame =
           applyFormulaToDataFrame("MAXIMUM(", "name", column1, "x", prepareDataFrame())
         dataFrame.sparkDataFrame.collect()
-      };()
+      }; ()
     }
 
     "produce NaN if the argument given to the function is not correct" in {
@@ -203,7 +193,7 @@ class SqlColumnTransformationIntegSpec
       val dataFrame =
         applyFormulaToDataFrame("LN(x)", column1, column3, "x", prepareDataFrame())
       val rowWithNegativeValue = 1
-      val rowWithNaN = dataFrame.sparkDataFrame.collect()(rowWithNegativeValue)
+      val rowWithNaN           = dataFrame.sparkDataFrame.collect()(rowWithNegativeValue)
       rowWithNaN.getDouble(resultColumn).isNaN shouldBe true
     }
 
@@ -217,14 +207,10 @@ class SqlColumnTransformationIntegSpec
       inputColumnName: String,
       outputColumnName: String,
       expectedValues: Seq[Any],
-      columnAlias: String = "x") : Unit = {
-    val dataFrame = applyFormulaToDataFrame(
-      formula,
-      inputColumnName,
-      outputColumnName,
-      columnAlias,
-      prepareDataFrame())
-    val rows = dataFrame.sparkDataFrame.collect()
+      columnAlias: String = "x"
+  ): Unit = {
+    val dataFrame = applyFormulaToDataFrame(formula, inputColumnName, outputColumnName, columnAlias, prepareDataFrame())
+    val rows      = dataFrame.sparkDataFrame.collect()
     validateSchema(dataFrame.sparkDataFrame.schema)
     validateColumn(rows, expectedValues)
   }
@@ -234,21 +220,22 @@ class SqlColumnTransformationIntegSpec
       inputColumnName: String,
       outputColumnName: String,
       columnAlias: String,
-      df: DataFrame): DataFrame = {
+      df: DataFrame
+  ): DataFrame = {
     val transformation =
       prepareTransformation(formula, inputColumnName, outputColumnName, columnAlias)
     applyTransformation(transformation, df)
   }
 
-  def applyTransformation(transformation: SqlColumnTransformer, df: DataFrame): DataFrame = {
+  def applyTransformation(transformation: SqlColumnTransformer, df: DataFrame): DataFrame =
     transformation.applyTransformationAndSerialization(tempDir, df)
-  }
 
   def prepareTransformation(
       formula: String,
       inputColumnName: String,
       outputColumnName: String,
-      columnAlias: String): SqlColumnTransformer = {
+      columnAlias: String
+  ): SqlColumnTransformer = {
     val inPlace = NoInPlaceChoice()
       .setOutputColumn(outputColumnName)
     val single = SingleColumnChoice()
@@ -272,20 +259,15 @@ class SqlColumnTransformationIntegSpec
     schema.fields(3) shouldBe 'nullable
   }
 
-  /**
-   * Check if produced column matches the expected values
-   */
-  def validateColumn(
-    rows: Array[Row], expectedValues: Seq[Any], column: Integer = resultColumn): Unit = {
-    forAll(expectedValues.zipWithIndex) {
-      case (expectedVal, i) =>
-        val value = rows(i).get(column)
-        value match {
-          case d: Double => d should equal (expectedVal.asInstanceOf[Double] +- delta)
-          case _ => expectedVal shouldBe value
-        }
+  /** Check if produced column matches the expected values */
+  def validateColumn(rows: Array[Row], expectedValues: Seq[Any], column: Integer = resultColumn): Unit =
+    forAll(expectedValues.zipWithIndex) { case (expectedVal, i) =>
+      val value = rows(i).get(column)
+      value match {
+        case d: Double => d should equal(expectedVal.asInstanceOf[Double] +- delta)
+        case _         => expectedVal shouldBe value
+      }
     }
-  }
 
   def prepareDataFrame(): DataFrame = {
     val manualRowsSeq: Seq[Row] = Seq(
@@ -293,12 +275,13 @@ class SqlColumnTransformationIntegSpec
       Row("bbb", -1.1, 2.2),
       Row("ccc", 1.2, null),
       Row("ddd", -1.3, 4.2),
-      Row("eee", null, null))
+      Row("eee", null, null)
+    )
     createDataFrame(manualRowsSeq, schema)
   }
 
-  val schema: StructType = StructType(List(
-    StructField(column0, StringType),
-    StructField(column1, DoubleType),
-    StructField(column2, DoubleType)))
+  val schema: StructType = StructType(
+    List(StructField(column0, StringType), StructField(column1, DoubleType), StructField(column2, DoubleType))
+  )
+
 }

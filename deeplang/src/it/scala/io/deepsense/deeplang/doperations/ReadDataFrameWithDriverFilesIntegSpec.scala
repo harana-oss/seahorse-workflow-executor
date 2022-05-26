@@ -7,39 +7,37 @@ import org.scalatest.BeforeAndAfter
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.report.Report
 import io.deepsense.deeplang.doperations.exceptions.BacktickInColumnNameException
-import io.deepsense.deeplang.doperations.inout.{CsvParameters, InputFileFormatChoice, InputStorageTypeChoice}
+import io.deepsense.deeplang.doperations.inout.CsvParameters
+import io.deepsense.deeplang.doperations.inout.InputFileFormatChoice
+import io.deepsense.deeplang.doperations.inout.InputStorageTypeChoice
 import io.deepsense.deeplang.doperations.readwritedataframe.filestorage.ParquetNotSupported
-import io.deepsense.deeplang.doperations.readwritedataframe.{FileScheme, UnknownFileSchemaForPath}
-import io.deepsense.deeplang.{DOperable, DeeplangIntegTestSupport, TestFiles}
+import io.deepsense.deeplang.doperations.readwritedataframe.FileScheme
+import io.deepsense.deeplang.doperations.readwritedataframe.UnknownFileSchemaForPath
+import io.deepsense.deeplang.DOperable
+import io.deepsense.deeplang.DeeplangIntegTestSupport
+import io.deepsense.deeplang.TestFiles
 
-class ReadDataFrameWithDriverFilesIntegSpec
-  extends DeeplangIntegTestSupport with BeforeAndAfter with TestFiles {
+class ReadDataFrameWithDriverFilesIntegSpec extends DeeplangIntegTestSupport with BeforeAndAfter with TestFiles {
 
   import DeeplangIntegTestSupport._
 
-  val csvContent = Seq(
-    Row("a1", "b1", "c1"),
-    Row("a2", "b2", "c2"),
-    Row("a3", "b3", "c3"))
+  val csvContent = Seq(Row("a1", "b1", "c1"), Row("a2", "b2", "c2"), Row("a3", "b3", "c3"))
 
-  val csvContentWithEmptyStrings = Seq(
-    Row("", "b1", "c1"),
-    Row("a2", "", "c2"),
-    Row("a3", "b3", ""))
+  val csvContentWithEmptyStrings = Seq(Row("", "b1", "c1"), Row("a2", "", "c2"), Row("a3", "b3", ""))
 
   val threeStringsSchema = schemaWithDefaultColumnNames(Seq(StringType, StringType, StringType))
 
   "ReadDataFrame" should {
     "read simple csv file with strings" in {
-      val dataFrame = readDataFrame(
-        fileName = "sample.csv",
-        csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
-        csvNamesIncluded = false,
-        csvConvertToBoolean = true)
+      val dataFrame =
+        readDataFrame(
+          fileName = "sample.csv",
+          csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
+          csvNamesIncluded = false,
+          csvConvertToBoolean = true
+        )
 
-      assertDataFramesEqual(
-        dataFrame,
-        expectedDataFrame(csvContent, threeStringsSchema))
+      assertDataFramesEqual(dataFrame, expectedDataFrame(csvContent, threeStringsSchema))
     }
 
     "read simple csv file containing empty strings" in {
@@ -47,23 +45,22 @@ class ReadDataFrameWithDriverFilesIntegSpec
         fileName = "sample_with_empty_strings.csv",
         csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
         csvNamesIncluded = false,
-        csvConvertToBoolean = true)
+        csvConvertToBoolean = true
+      )
 
-      assertDataFramesEqual(
-        dataFrame,
-        expectedDataFrame(csvContentWithEmptyStrings, threeStringsSchema))
+      assertDataFramesEqual(dataFrame, expectedDataFrame(csvContentWithEmptyStrings, threeStringsSchema))
     }
 
     "read csv with lines separated by Windows CR+LF" in {
-      val dataFrame = readDataFrame(
-        fileName = "win_sample.csv",
-        csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
-        csvNamesIncluded = false,
-        csvConvertToBoolean = true)
+      val dataFrame =
+        readDataFrame(
+          fileName = "win_sample.csv",
+          csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
+          csvNamesIncluded = false,
+          csvConvertToBoolean = true
+        )
 
-      assertDataFramesEqual(
-        dataFrame,
-        expectedDataFrame(csvContent, threeStringsSchema))
+      assertDataFramesEqual(dataFrame, expectedDataFrame(csvContent, threeStringsSchema))
     }
 
     "read csv with column names" in {
@@ -71,7 +68,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
         fileName = "with_column_names.csv",
         csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
         csvNamesIncluded = true,
-        csvConvertToBoolean = true)
+        csvConvertToBoolean = true
+      )
 
       assertDataFramesEqual(
         dataFrame,
@@ -81,7 +79,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
             Seq("column_A", "column_B", "column_C"),
             Seq(StringType, StringType, StringType)
           )
-        ))
+        )
+      )
     }
 
     "throw on csv with column names containing backticks" in {
@@ -89,7 +88,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
         fileName = "with_column_names_containing_backticks.csv",
         csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
         csvNamesIncluded = true,
-        csvConvertToBoolean = true)
+        csvConvertToBoolean = true
+      )
     }
 
     "trim white spaces for not quoted column names and values in CSV" in {
@@ -97,7 +97,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
         fileName = "with_white_spaces.csv",
         csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
         csvNamesIncluded = true,
-        csvConvertToBoolean = true)
+        csvConvertToBoolean = true
+      )
 
       assertDataFramesEqual(
         dataFrame,
@@ -106,8 +107,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
             Row(" a2", " b2 ", " c2"),
             Row(" a3", " b3 ", " c3")
           ),
-          schemaOf(Seq("a1", "b1", "c1"),
-            Seq(StringType, StringType, StringType)))
+          schemaOf(Seq("a1", "b1", "c1"), Seq(StringType, StringType, StringType))
+        )
       )
     }
 
@@ -116,7 +117,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
         fileName = "empty.csv",
         csvColumnSeparator = CsvParameters.ColumnSeparatorChoice.Comma(),
         csvNamesIncluded = false,
-        csvConvertToBoolean = true)
+        csvConvertToBoolean = true
+      )
     }
 
     "infer column types with conversion to Boolean" in {
@@ -138,7 +140,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
           schemaWithDefaultColumnNames(
             Seq(BooleanType)
           )
-        ))
+        )
+      )
     }
 
     "infer column types without conversion to Boolean" in {
@@ -160,7 +163,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
           schemaWithDefaultColumnNames(
             Seq(DoubleType)
           )
-        ))
+        )
+      )
     }
 
     "read file so that obtained dataframe can provide report without throwing an exception" in {
@@ -181,9 +185,10 @@ class ReadDataFrameWithDriverFilesIntegSpec
         .setStorageType(
           new InputStorageTypeChoice.File()
             .setSourceFile(FileScheme.File.pathPrefix + "/some_path/some_file.parquet")
-            .setFileFormat(new InputFileFormatChoice.Parquet()))
+            .setFileFormat(new InputFileFormatChoice.Parquet())
+        )
 
-      an [ParquetNotSupported.type] shouldBe thrownBy {
+      an[ParquetNotSupported.type] shouldBe thrownBy {
         rdf.inferKnowledgeUntyped(Vector())(executionContext.inferContext)
       }
     }
@@ -193,9 +198,10 @@ class ReadDataFrameWithDriverFilesIntegSpec
         .setStorageType(
           new InputStorageTypeChoice.File()
             .setSourceFile("invalidscheme://some_path/some_file.json")
-            .setFileFormat(new InputFileFormatChoice.Json()))
+            .setFileFormat(new InputFileFormatChoice.Json())
+        )
 
-      an [UnknownFileSchemaForPath] shouldBe thrownBy {
+      an[UnknownFileSchemaForPath] shouldBe thrownBy {
         rdf.inferKnowledgeUntyped(Vector())(executionContext.inferContext)
       }
     }
@@ -206,7 +212,8 @@ class ReadDataFrameWithDriverFilesIntegSpec
       fileName: String,
       csvColumnSeparator: CsvParameters.ColumnSeparatorChoice,
       csvNamesIncluded: Boolean,
-      csvConvertToBoolean: Boolean) : DataFrame = {
+      csvConvertToBoolean: Boolean
+  ): DataFrame =
     ReadDataFrame(
       absoluteTestsDirPath.fullPath + fileName,
       csvColumnSeparator,
@@ -215,16 +222,17 @@ class ReadDataFrameWithDriverFilesIntegSpec
     ).executeUntyped(Vector.empty[DOperable])(executionContext)
       .head
       .asInstanceOf[DataFrame]
-  }
 
-  def expectedDataFrame(rows: Seq[Row], schema: StructType) : DataFrame =
+  def expectedDataFrame(rows: Seq[Row], schema: StructType): DataFrame =
     createDataFrame(rows, schema)
 
   def generatedColumnNames(n: Int): Seq[String] = for (i <- 0 until n) yield s"unnamed_$i"
 
   def schemaOf(columns: Seq[String], types: Seq[DataType]): StructType = StructType(
-    columns.zip(types).map { case (colName, colType) => StructField(colName, colType)})
+    columns.zip(types).map { case (colName, colType) => StructField(colName, colType) }
+  )
 
   def schemaWithDefaultColumnNames(types: Seq[DataType]): StructType =
     schemaOf(generatedColumnNames(types.length), types)
+
 }

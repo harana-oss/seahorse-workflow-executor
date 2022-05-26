@@ -5,26 +5,28 @@ import java.util.concurrent.atomic.AtomicReference
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Promise}
+import scala.concurrent.Await
+import scala.concurrent.Promise
 
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 
 import io.deepsense.commons.utils.Logging
 import io.deepsense.deeplang._
 import io.deepsense.sparkutils.SparkSQLSession
 
-/**
-  * An entry point to our application designed to be accessible by custom code processes.
-  */
+/** An entry point to our application designed to be accessible by custom code processes. */
 class CustomCodeEntryPoint(
     val sparkContext: SparkContext,
     val sparkSQLSession: SparkSQLSession,
     val dataFrameStorage: DataFrameStorage,
-    val operationExecutionDispatcher: OperationExecutionDispatcher)
-  extends Logging {
+    val operationExecutionDispatcher: OperationExecutionDispatcher
+) extends Logging {
+
   import io.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint._
+
   def getSparkContext: JavaSparkContext = sparkContext
 
   def getSparkSQLSession: SparkSQLSession = sparkSQLSession
@@ -57,8 +59,7 @@ class CustomCodeEntryPoint(
   def retrieveOutputDataFrame(workflowId: String, nodeId: String, portNumber: Int): DataFrame =
     dataFrameStorage.getOutputDataFrame(workflowId, nodeId, portNumber).get
 
-  def registerOutputDataFrame(
-      workflowId: String, nodeId: String, portNumber: Int, dataFrame: DataFrame): Unit =
+  def registerOutputDataFrame(workflowId: String, nodeId: String, portNumber: Int, dataFrame: DataFrame): Unit =
     dataFrameStorage.setOutputDataFrame(workflowId, nodeId, portNumber, dataFrame)
 
   def executionCompleted(workflowId: String, nodeId: String): Unit =
@@ -66,26 +67,27 @@ class CustomCodeEntryPoint(
 
   def executionFailed(workflowId: String, nodeId: String, error: String): Unit =
     operationExecutionDispatcher.executionEnded(workflowId, nodeId, Left(error))
+
 }
 
 object CustomCodeEntryPoint {
+
   private case class PromiseReplacedException() extends Exception
 
   @tailrec
-  private def getFromPromise[T](promise: => Promise[T], timeout: Duration): T = {
-    try {
+  private def getFromPromise[T](promise: => Promise[T], timeout: Duration): T =
+    try
       Await.result(promise.future, timeout)
-    } catch {
-      case e: TimeoutException => throw e
+    catch {
+      case e: TimeoutException         => throw e
       case e: PromiseReplacedException => getFromPromise(promise, timeout)
     }
-  }
 
   private def replacePromise[T](promise: AtomicReference[Promise[T]], newValue: T): Unit = {
     val oldPromise = promise.getAndSet(Promise.successful(newValue))
-    try {
+    try
       oldPromise.failure(new PromiseReplacedException)
-    } catch {
+    catch {
       // The oldPromise will have been completed always, except for the first time.
       // The illegal state is expected, but we have to complete the oldPromise,
       // since someone might be waiting on it.
@@ -93,6 +95,6 @@ object CustomCodeEntryPoint {
     }
   }
 
-  case class CustomCodeEntryPointConfig(
-    pyExecutorSetupTimeout: Duration = 5.seconds)
+  case class CustomCodeEntryPointConfig(pyExecutorSetupTimeout: Duration = 5.seconds)
+
 }

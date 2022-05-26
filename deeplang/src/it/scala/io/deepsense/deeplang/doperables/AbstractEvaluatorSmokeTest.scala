@@ -1,11 +1,15 @@
 package io.deepsense.deeplang.doperables
 
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.DoubleType
+import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types.StructType
 
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.params.ParamPair
-import io.deepsense.deeplang.{DKnowledge, DeeplangIntegTestSupport}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DeeplangIntegTestSupport
 import io.deepsense.sparkutils.Linalg.Vectors
 
 abstract class AbstractEvaluatorSmokeTest extends DeeplangIntegTestSupport {
@@ -16,12 +20,14 @@ abstract class AbstractEvaluatorSmokeTest extends DeeplangIntegTestSupport {
 
   val evaluatorParams: Seq[ParamPair[_]]
 
-  val inputDataFrameSchema = StructType(Seq(
-    StructField("s", StringType),
-    StructField("prediction", DoubleType),
-    StructField("rawPrediction", new io.deepsense.sparkutils.Linalg.VectorUDT),
-    StructField("label", DoubleType)
-  ))
+  val inputDataFrameSchema = StructType(
+    Seq(
+      StructField("s", StringType),
+      StructField("prediction", DoubleType),
+      StructField("rawPrediction", new io.deepsense.sparkutils.Linalg.VectorUDT),
+      StructField("label", DoubleType)
+    )
+  )
 
   val inputDataFrame: DataFrame = {
     val rowSeq = Seq(
@@ -45,4 +51,5 @@ abstract class AbstractEvaluatorSmokeTest extends DeeplangIntegTestSupport {
       evaluator.set(evaluatorParams: _*).report
     }
   }
+
 }

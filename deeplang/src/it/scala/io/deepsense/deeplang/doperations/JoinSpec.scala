@@ -5,36 +5,42 @@ import org.apache.spark.sql.types._
 
 import io.deepsense.deeplang._
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
-import io.deepsense.deeplang.doperations.exceptions.{ColumnDoesNotExistException, ColumnsDoNotExistException, DuplicatedColumnsException, WrongColumnTypeException}
+import io.deepsense.deeplang.doperations.exceptions.ColumnDoesNotExistException
+import io.deepsense.deeplang.doperations.exceptions.ColumnsDoNotExistException
+import io.deepsense.deeplang.doperations.exceptions.DuplicatedColumnsException
+import io.deepsense.deeplang.doperations.exceptions.WrongColumnTypeException
 import io.deepsense.deeplang.inference.InferContext
-import io.deepsense.deeplang.params.selections.{IndexSingleColumnSelection, NameSingleColumnSelection}
+import io.deepsense.deeplang.params.selections.IndexSingleColumnSelection
+import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
 class JoinSpec extends DeeplangIntegTestSupport {
 
   import DeeplangIntegTestSupport._
+
   val defaultJoinType = JoinTypeChoice.LeftOuter()
+
   val leftTablePrefix = Some("leftTable_")
+
   val rightTablePrefix = Some("rightTable_")
 
   "Join operation" should {
     // Smoke test. Each row from both tables is matched so the output is the same for all types.
     "execute for all types" in {
-        val (ldf, rdf, expected, joinColumns) = oneColumnFixture()
-        val joinTypes =
-          joinWithMultipleColumnSelection(joinColumns, Set.empty, joinType = defaultJoinType)
-            .joinType.choiceInstances
+      val (ldf, rdf, expected, joinColumns) = oneColumnFixture()
+      val joinTypes =
+        joinWithMultipleColumnSelection(joinColumns, Set.empty, joinType = defaultJoinType).joinType.choiceInstances
 
-        for (joinType <- joinTypes){
-          val join = joinWithMultipleColumnSelection(joinColumns, Set.empty, joinType = joinType)
-          val joinDF = executeOperation(join, ldf, rdf)
-          assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
-        }
+      for (joinType <- joinTypes) {
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty, joinType = joinType)
+        val joinDF = executeOperation(join, ldf, rdf)
+        assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
       }
+    }
     "LEFT JOIN two DataFrames" when {
       "based upon a single column selection by name" in {
         val (ldf, rdf, expected, joinColumns) = oneColumnFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = executeOperation(join, ldf, rdf)
 
         assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
@@ -42,7 +48,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "based upon a single column selection by index" in {
         val (ldf, rdf, expected, joinColumnIds) = oneColumnByIndicesFixture()
 
-        val join = joinWithMultipleColumnSelection(Set.empty, joinColumnIds)
+        val join   = joinWithMultipleColumnSelection(Set.empty, joinColumnIds)
         val joinDF = executeOperation(join, ldf, rdf)
 
         assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
@@ -50,8 +56,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "based upon a single column selection with colliding join column" in {
         val (ldf, rdf, expected, joinColumns) = oneColumnFixture(None, None)
 
-        val join = joinWithMultipleColumnSelection(
-          joinColumns, Set.empty, leftPrefix = None, rightPrefix = None)
+        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty, leftPrefix = None, rightPrefix = None)
 
         val joinDF = executeOperation(join, ldf, rdf)
 
@@ -60,7 +65,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "based upon two columns" in {
         val (ldf, rdf, expected, joinColumns) = twoColumnsFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = executeOperation(join, ldf, rdf)
 
         assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
@@ -76,7 +81,8 @@ class JoinSpec extends DeeplangIntegTestSupport {
           Vector.empty,
           leftPrefix = None,
           rightPrefix = None,
-          joinType = defaultJoinType)
+          joinType = defaultJoinType
+        )
 
         val joinDF = executeOperation(join, ldf, rdf)
 
@@ -93,7 +99,8 @@ class JoinSpec extends DeeplangIntegTestSupport {
           rightJoinIndices,
           leftPrefix = None,
           rightPrefix = None,
-          joinType = defaultJoinType)
+          joinType = defaultJoinType
+        )
 
         val joinDF = executeOperation(join, ldf, rdf)
 
@@ -102,7 +109,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "some rows from left dataframe have no corresponding values in the right one" in {
         val (ldf, rdf, expected, joinColumns) = noSomeRightValuesFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = executeOperation(join, ldf, rdf)
 
         assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
@@ -110,7 +117,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "dataframes have no matching values" in {
         val (ldf, rdf, expected, joinColumns) = noMatchingValuesFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = executeOperation(join, ldf, rdf)
 
         assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
@@ -118,7 +125,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "some column values are null" in {
         val (ldf, rdf, expected, joinColumns) = nullFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = executeOperation(join, ldf, rdf)
 
         assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
@@ -126,13 +133,13 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "with null values only in left DataFrame" in {
         val (ldf, rdf, expected, joinColumns) = nullValuesInLeftDataFrameFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = executeOperation(join, ldf, rdf)
 
         assertDataFramesEqual(joinDF, expected, checkRowOrder = false)
       }
-      "with null values only in both DataFrames" is pending
-      "with empty join column selection" is pending
+      "with null values only in both DataFrames".is(pending)
+      "with empty join column selection".is(pending)
     }
     "throw an exception" when {
       "with columns of the same name in both and no join on them" in {
@@ -193,7 +200,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "based upon a single column selection by name" in {
         val (ldf, rdf, expected, joinColumns) = oneColumnFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = inferSchema(join, ldf, rdf)
 
         joinDF shouldBe expected.sparkDataFrame.schema
@@ -201,7 +208,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "based upon a single column selection by index" in {
         val (ldf, rdf, expected, joinColumnIds) = oneColumnByIndicesFixture()
 
-        val join = joinWithMultipleColumnSelection(Set.empty, joinColumnIds)
+        val join   = joinWithMultipleColumnSelection(Set.empty, joinColumnIds)
         val joinDF = inferSchema(join, ldf, rdf)
 
         joinDF shouldBe expected.sparkDataFrame.schema
@@ -209,8 +216,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "based upon a single column selection with colliding join column" in {
         val (ldf, rdf, expected, joinColumns) = oneColumnFixture(None, None)
 
-        val join = joinWithMultipleColumnSelection(
-          joinColumns, Set.empty, leftPrefix = None, rightPrefix = None)
+        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty, leftPrefix = None, rightPrefix = None)
 
         val joinDF = inferSchema(join, ldf, rdf)
 
@@ -219,7 +225,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "based upon two columns" in {
         val (ldf, rdf, expected, joinColumns) = twoColumnsFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = inferSchema(join, ldf, rdf)
 
         joinDF shouldBe expected.sparkDataFrame.schema
@@ -235,7 +241,8 @@ class JoinSpec extends DeeplangIntegTestSupport {
           Vector.empty,
           leftPrefix = None,
           rightPrefix = None,
-          joinType = defaultJoinType)
+          joinType = defaultJoinType
+        )
 
         val joinDF = inferSchema(join, ldf, rdf)
 
@@ -252,7 +259,8 @@ class JoinSpec extends DeeplangIntegTestSupport {
           rightJoinIndices,
           leftPrefix = None,
           rightPrefix = None,
-          joinType = defaultJoinType)
+          joinType = defaultJoinType
+        )
 
         val joinDF = inferSchema(join, ldf, rdf)
 
@@ -261,7 +269,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "some rows from left dataframe have no corresponding values in the right one" in {
         val (ldf, rdf, expected, joinColumns) = noSomeRightValuesFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = inferSchema(join, ldf, rdf)
 
         joinDF shouldBe expected.sparkDataFrame.schema
@@ -269,7 +277,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "dataframes have no matching values" in {
         val (ldf, rdf, expected, joinColumns) = noMatchingValuesFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = inferSchema(join, ldf, rdf)
 
         joinDF shouldBe expected.sparkDataFrame.schema
@@ -277,7 +285,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "some column values are null" in {
         val (ldf, rdf, expected, joinColumns) = nullFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = inferSchema(join, ldf, rdf)
 
         joinDF shouldBe expected.sparkDataFrame.schema
@@ -285,13 +293,13 @@ class JoinSpec extends DeeplangIntegTestSupport {
       "with null values only in left DataFrame" in {
         val (ldf, rdf, expected, joinColumns) = nullValuesInLeftDataFrameFixture()
 
-        val join = joinWithMultipleColumnSelection(joinColumns, Set.empty)
+        val join   = joinWithMultipleColumnSelection(joinColumns, Set.empty)
         val joinDF = inferSchema(join, ldf, rdf)
 
         joinDF shouldBe expected.sparkDataFrame.schema
       }
-      "with null values only in both DataFrames" is pending
-      "with empty join column selection" is pending
+      "with null values only in both DataFrames".is(pending)
+      "with empty join column selection".is(pending)
     }
     "not report error" when {
       "column prefixes are empty" in {
@@ -361,19 +369,21 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
   def oneColumnFixture(
       leftPrefix: Option[String] = leftTablePrefix,
-      rightPrefix: Option[String] = rightTablePrefix)
-      : (DataFrame, DataFrame, DataFrame, Set[String]) = {
-    val column1 = "column1"
+      rightPrefix: Option[String] = rightTablePrefix
+  ): (DataFrame, DataFrame, DataFrame, Set[String]) = {
+    val column1     = "column1"
     val joinColumns = Set(column1)
 
     // Left dataframe
     val colsL = Vector("column2", "column3", column1, "column4")
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType),
-      StructField(colsL(1), StringType),
-      StructField(colsL(2), DoubleType),
-      StructField(colsL(3), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType),
+        StructField(colsL(1), StringType),
+        StructField(colsL(2), DoubleType),
+        StructField(colsL(3), DoubleType)
+      )
+    )
     val rowsL = Seq(
       (3.5, "a", 1.5, 5.0),
       (3.6, "b", 1.6, 6.0),
@@ -385,11 +395,13 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector(column1, "column22", "column5")
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType),
-      StructField(colsR(2), StringType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType),
+        StructField(colsR(2), StringType)
+      )
+    )
     val rowsR = Seq(
       (1.6, 2.6, "two"),
       (1.7, 2.7, "three"),
@@ -410,10 +422,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
     ).map(Row.fromTuple)
     val joinSchema = StructType(
       appendPrefix(schemaL.fields, leftPrefix) ++
-      appendPrefix(Seq(
-          StructField(colsR(1), DoubleType),
-          StructField(colsR(2), StringType)),
-        rightPrefix)
+        appendPrefix(Seq(StructField(colsR(1), DoubleType), StructField(colsR(2), StringType)), rightPrefix)
     )
     val edf = createDataFrame(joinRows, joinSchema)
 
@@ -421,19 +430,21 @@ class JoinSpec extends DeeplangIntegTestSupport {
   }
 
   def oneColumnByIndicesFixture(
-                        leftPrefix: Option[String] = leftTablePrefix,
-                        rightPrefix: Option[String] = rightTablePrefix)
-  : (DataFrame, DataFrame, DataFrame, Set[Int]) = {
+      leftPrefix: Option[String] = leftTablePrefix,
+      rightPrefix: Option[String] = rightTablePrefix
+  ): (DataFrame, DataFrame, DataFrame, Set[Int]) = {
     val column1 = "column1"
 
     // Left dataframe
     val colsL = Vector(column1, "column2", "column3", "column4")
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType),
-      StructField(colsL(1), DoubleType),
-      StructField(colsL(2), StringType),
-      StructField(colsL(3), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType),
+        StructField(colsL(1), DoubleType),
+        StructField(colsL(2), StringType),
+        StructField(colsL(3), DoubleType)
+      )
+    )
     val rowsL = Seq(
       (1.5, 3.5, "a", 5.0),
       (1.6, 3.6, "b", 6.0),
@@ -445,11 +456,13 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector(column1, "column22", "column5")
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType),
-      StructField(colsR(2), StringType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType),
+        StructField(colsR(2), StringType)
+      )
+    )
     val rowsR = Seq(
       (1.6, 2.6, "two"),
       (1.7, 2.7, "three"),
@@ -470,10 +483,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
     ).map(Row.fromTuple)
     val joinSchema = StructType(
       appendPrefix(schemaL.fields, leftPrefix) ++
-        appendPrefix(Seq(
-          StructField(colsR(1), DoubleType),
-          StructField(colsR(2), StringType)),
-          rightPrefix)
+        appendPrefix(Seq(StructField(colsR(1), DoubleType), StructField(colsR(2), StringType)), rightPrefix)
     )
     val edf = createDataFrame(joinRows, joinSchema)
 
@@ -481,18 +491,20 @@ class JoinSpec extends DeeplangIntegTestSupport {
   }
 
   def twoColumnsFixture(): (DataFrame, DataFrame, DataFrame, Set[String]) = {
-    val column1 = "column1"
-    val column2 = "column2"
+    val column1     = "column1"
+    val column2     = "column2"
     val joinColumns = Set(column1, column2)
 
     // Left dataframe
     val colsL = Vector(column2, "column3", column1, "column4")
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType),
-      StructField(colsL(1), StringType),
-      StructField(colsL(2), DoubleType),
-      StructField(colsL(3), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType),
+        StructField(colsL(1), StringType),
+        StructField(colsL(2), DoubleType),
+        StructField(colsL(3), DoubleType)
+      )
+    )
     val rowsL = Seq(
       (2.5, "a", 1.5, 5.0),
       (3.6, "b", 1.6, 6.0),
@@ -502,11 +514,13 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector(column1, column2, "column5")
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType),
-      StructField(colsR(2), StringType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType),
+        StructField(colsR(2), StringType)
+      )
+    )
     val rowsR = Seq(
       (1.5, 2.5, "one"),
       (1.5, 3.6, "two"),
@@ -522,24 +536,25 @@ class JoinSpec extends DeeplangIntegTestSupport {
     ).map(Row.fromTuple)
     val joinSchema = StructType(
       appendPrefix(schemaL.fields, leftTablePrefix) ++
-      appendPrefix(Seq(StructField(colsR(2), StringType)), rightTablePrefix)
+        appendPrefix(Seq(StructField(colsR(2), StringType)), rightTablePrefix)
     )
     val edf = createDataFrame(joinRows, joinSchema)
 
     (ldf, rdf, edf, joinColumns)
   }
 
-  def twoColumnsDifferentNamesFixture(): (
-    DataFrame, DataFrame, DataFrame, Vector[String], Vector[String]) = {
+  def twoColumnsDifferentNamesFixture(): (DataFrame, DataFrame, DataFrame, Vector[String], Vector[String]) = {
 
     // Left dataframe
     val colsL = Vector("a", "b", "c", "d")
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType),
-      StructField(colsL(1), StringType),
-      StructField(colsL(2), DoubleType),
-      StructField(colsL(3), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType),
+        StructField(colsL(1), StringType),
+        StructField(colsL(2), DoubleType),
+        StructField(colsL(3), DoubleType)
+      )
+    )
     val rowsL = Seq(
       (2.5, "a", 1.5, 5.0),
       (3.6, "b", 1.6, 6.0),
@@ -549,11 +564,13 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector("e", "f", "g")
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType),
-      StructField(colsR(2), StringType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType),
+        StructField(colsR(2), StringType)
+      )
+    )
     val rowsR = Seq(
       (1.5, 2.5, "one"),
       (1.5, 3.6, "two"),
@@ -575,17 +592,18 @@ class JoinSpec extends DeeplangIntegTestSupport {
     (ldf, rdf, edf, Vector("c", "a"), Vector("e", "f"))
   }
 
-  def twoColumnsDifferentIndicesFixture(): (
-    DataFrame, DataFrame, DataFrame, Vector[Int], Vector[Int]) = {
+  def twoColumnsDifferentIndicesFixture(): (DataFrame, DataFrame, DataFrame, Vector[Int], Vector[Int]) = {
 
     // Left dataframe
     val colsL = Vector("a", "b", "c", "d")
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType),
-      StructField(colsL(1), StringType),
-      StructField(colsL(2), DoubleType),
-      StructField(colsL(3), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType),
+        StructField(colsL(1), StringType),
+        StructField(colsL(2), DoubleType),
+        StructField(colsL(3), DoubleType)
+      )
+    )
     val rowsL = Seq(
       (2.5, "a", 1.5, 5.0),
       (3.6, "b", 1.6, 6.0),
@@ -595,11 +613,13 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector("e", "f", "g")
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType),
-      StructField(colsR(2), StringType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType),
+        StructField(colsR(2), StringType)
+      )
+    )
     val rowsR = Seq(
       (1.5, 2.5, "one"),
       (1.5, 3.6, "two"),
@@ -622,7 +642,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
   }
 
   def differentTypesFixture(): (DataFrame, DataFrame, DataFrame, Set[String]) = {
-    val column1 = "column1"
+    val column1     = "column1"
     val joinColumns = Set(column1)
 
     // Left dataframe
@@ -632,12 +652,14 @@ class JoinSpec extends DeeplangIntegTestSupport {
       (1.6, 2.6, "b", 3.6),
       (1.7, 2.7, "c", 3.7)
     ).map(Row.fromTuple)
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType),
-      StructField(colsL(1), DoubleType),
-      StructField(colsL(2), StringType),
-      StructField(colsL(3), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType),
+        StructField(colsL(1), DoubleType),
+        StructField(colsL(2), StringType),
+        StructField(colsL(3), DoubleType)
+      )
+    )
     val ldf = createDataFrame(rowsL, schemaL)
 
     // Right dataframe
@@ -647,10 +669,12 @@ class JoinSpec extends DeeplangIntegTestSupport {
       ("1.6", 0.6),
       ("1.7", 0.7)
     ).map(Row.fromTuple)
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), StringType),
-      StructField(colsR(1), DoubleType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), StringType),
+        StructField(colsR(1), DoubleType)
+      )
+    )
     val rdf = createDataFrame(rowsR, schemaR)
 
     val ignored = mock[DataFrame]
@@ -668,12 +692,14 @@ class JoinSpec extends DeeplangIntegTestSupport {
       (1.6, 2.6, "b", 3.6),
       (1.7, 2.7, "c", 3.7)
     ).map(Row.fromTuple)
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType),
-      StructField(colsL(1), DoubleType),
-      StructField(colsL(2), StringType),
-      StructField(colsL(3), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType),
+        StructField(colsL(1), DoubleType),
+        StructField(colsL(2), StringType),
+        StructField(colsL(3), DoubleType)
+      )
+    )
     val ldf = createDataFrame(rowsL, schemaL)
 
     // Right dataframe
@@ -683,10 +709,12 @@ class JoinSpec extends DeeplangIntegTestSupport {
       ("1.6", 0.6),
       ("1.7", 0.7)
     ).map(Row.fromTuple)
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), StringType),
-      StructField(colsR(1), DoubleType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), StringType),
+        StructField(colsR(1), DoubleType)
+      )
+    )
     val rdf = createDataFrame(rowsR, schemaR)
 
     val ignored = mock[DataFrame]
@@ -695,7 +723,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
   }
 
   def noSomeRightValuesFixture(): (DataFrame, DataFrame, DataFrame, Set[String]) = {
-    val column1 = "column1"
+    val column1     = "column1"
     val joinColumns = Set(column1)
 
     // Left dataframe
@@ -705,9 +733,11 @@ class JoinSpec extends DeeplangIntegTestSupport {
       1.6,
       1.7
     ).map(Seq(_)).map(Row.fromSeq)
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType)
+      )
+    )
     val ldf = createDataFrame(rowsL, schemaL)
 
     // Right dataframe
@@ -716,10 +746,12 @@ class JoinSpec extends DeeplangIntegTestSupport {
       (1.4, 0.5),
       (1.7, 2.7)
     ).map(Row.fromTuple)
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType)
+      )
+    )
     val rdf = createDataFrame(rowsR, schemaR)
 
     // join dataframe
@@ -730,21 +762,24 @@ class JoinSpec extends DeeplangIntegTestSupport {
     ).map(Row.fromTuple)
     val joinSchema = StructType(
       appendPrefix(schemaL.fields, leftTablePrefix) ++
-      appendPrefix(schemaR.fields.filterNot(_.name == column1), rightTablePrefix))
+        appendPrefix(schemaR.fields.filterNot(_.name == column1), rightTablePrefix)
+    )
     val edf = createDataFrame(joinRows, joinSchema)
 
     (ldf, rdf, edf, joinColumns)
   }
 
   def noMatchingValuesFixture(): (DataFrame, DataFrame, DataFrame, Set[String]) = {
-    val column1 = "column1"
+    val column1     = "column1"
     val joinColumns = Set(column1)
 
     // Left dataframe
     val colsL = Vector(column1)
-    val schemaL = StructType(Seq(
-      StructField(column1, DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(column1, DoubleType)
+      )
+    )
     val rowsL = Seq(
       1.5,
       1.6,
@@ -754,10 +789,12 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector(column1, "column2")
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType)
+      )
+    )
     val rowsR = Seq(
       (1.4, 0.5),
       (1.8, 1.7)
@@ -772,14 +809,15 @@ class JoinSpec extends DeeplangIntegTestSupport {
     ).map(Row.fromTuple)
     val joinSchema = StructType(
       appendPrefix(schemaL.fields, leftTablePrefix) ++
-      appendPrefix(schemaR.fields.tail, rightTablePrefix))
+        appendPrefix(schemaR.fields.tail, rightTablePrefix)
+    )
     val edf = createDataFrame(joinRows, joinSchema)
 
     (ldf, rdf, edf, joinColumns)
   }
 
   def nullFixture(): (DataFrame, DataFrame, DataFrame, Set[String]) = {
-    val column1 = "column1"
+    val column1     = "column1"
     val joinColumns = Set(column1)
 
     // Left dataframe
@@ -789,9 +827,11 @@ class JoinSpec extends DeeplangIntegTestSupport {
       1.6,
       null
     ).map(Seq(_)).map(Row.fromSeq)
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), DoubleType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), DoubleType)
+      )
+    )
     val ldf = createDataFrame(rowsL, schemaL)
 
     // Right dataframe
@@ -801,10 +841,12 @@ class JoinSpec extends DeeplangIntegTestSupport {
       (null, 0.7),
       (1.6, null)
     ).map(Row.fromTuple)
-    val schemaR = StructType(Seq(
-      StructField(colsR(0), DoubleType),
-      StructField(colsR(1), DoubleType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsR(0), DoubleType),
+        StructField(colsR(1), DoubleType)
+      )
+    )
     val rdf = createDataFrame(rowsR, schemaR)
 
     // join dataframe
@@ -815,7 +857,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
     ).map(Row.fromTuple)
     val joinSchema = StructType(
       appendPrefix(schemaL.fields, leftTablePrefix) ++
-      appendPrefix(schemaR.fields.filterNot(_.name == column1), rightTablePrefix)
+        appendPrefix(schemaR.fields.filterNot(_.name == column1), rightTablePrefix)
     )
     val edf = createDataFrame(joinRows, joinSchema)
 
@@ -823,14 +865,16 @@ class JoinSpec extends DeeplangIntegTestSupport {
   }
 
   def nullValuesInLeftDataFrameFixture(): (DataFrame, DataFrame, DataFrame, Set[String]) = {
-    val column1 = "nulls"
+    val column1     = "nulls"
     val joinColumns = Set(column1)
 
     // Left dataframe
     val colsL = Vector(column1)
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), StringType)
-    ))
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), StringType)
+      )
+    )
     val rowsL = Seq(
       null
     ).map(Seq(_)).map(Row.fromSeq)
@@ -838,10 +882,12 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector(column1, "owner")
-    val schemaR = StructType(Seq(
-      StructField(colsL(0), StringType),
-      StructField(colsR(1), StringType)
-    ))
+    val schemaR = StructType(
+      Seq(
+        StructField(colsL(0), StringType),
+        StructField(colsR(1), StringType)
+      )
+    )
     val rowsR = Seq(
       ("kot", "Wojtek"),
       ("wiewiorka", "Jacek"),
@@ -854,10 +900,8 @@ class JoinSpec extends DeeplangIntegTestSupport {
       (null, null)
     ).map(Row.fromTuple)
     val joinSchema = StructType(
-      appendPrefix(
-        Seq(StructField(colsL(0), StringType)) ++ schemaL.fields.tail, leftTablePrefix) ++
-      appendPrefix(
-        schemaR.fields.filterNot(_.name == column1), rightTablePrefix)
+      appendPrefix(Seq(StructField(colsL(0), StringType)) ++ schemaL.fields.tail, leftTablePrefix) ++
+        appendPrefix(schemaR.fields.filterNot(_.name == column1), rightTablePrefix)
     )
     val edf = createDataFrame(joinRows, joinSchema)
 
@@ -865,7 +909,7 @@ class JoinSpec extends DeeplangIntegTestSupport {
   }
 
   private def sameColumnNamesFixture(): (DataFrame, DataFrame, Set[String]) = {
-    val column1 = "nulls"
+    val column1     = "nulls"
     val joinColumns = Set(column1)
 
     val sameNameColumns = Seq(
@@ -883,9 +927,11 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Left dataframe
     val colsL = Vector(column1) ++ sameNameColumns.map { case (name, _) => name }
-    val schemaL = StructType(Seq(
-      StructField(colsL(0), StringType)
-    ) ++ sameNameColumns.map { case (name, tpe) => StructField(name, tpe) })
+    val schemaL = StructType(
+      Seq(
+        StructField(colsL(0), StringType)
+      ) ++ sameNameColumns.map { case (name, tpe) => StructField(name, tpe) }
+    )
     val rowsL = Seq(
       null +: sameNameColumns.map { case (_, t) => generate(t) }
     ).map(Row.fromSeq)
@@ -893,10 +939,12 @@ class JoinSpec extends DeeplangIntegTestSupport {
 
     // Right dataframe
     val colsR = Vector(column1, "owner") ++ sameNameColumns.map { case (name, _) => name }
-    val schemaR = StructType(Seq(
-      StructField(colsL(0), StringType),
-      StructField(colsR(1), StringType)
-    ) ++ sameNameColumns.map { case (name, tpe) => StructField(name, tpe) })
+    val schemaR = StructType(
+      Seq(
+        StructField(colsL(0), StringType),
+        StructField(colsR(1), StringType)
+      ) ++ sameNameColumns.map { case (name, tpe) => StructField(name, tpe) }
+    )
     val rowsR = Seq(
       Seq("kot", "Wojtek") ++ sameNameColumns.map { case (_, t) => generate(t) },
       Seq("wiewiorka", "Jacek") ++ sameNameColumns.map { case (_, t) => generate(t) },
@@ -914,21 +962,28 @@ class JoinSpec extends DeeplangIntegTestSupport {
       idsRight: Vector[Int],
       leftPrefix: Option[String],
       rightPrefix: Option[String],
-      joinType: JoinTypeChoice.Option): Join = {
+      joinType: JoinTypeChoice.Option
+  ): Join = {
     val operation = new Join
 
     val paramsByName: Seq[Join.ColumnPair] =
-      namesLeft.zip(namesRight).map({ case (leftColName, rightColName) =>
-        Join.ColumnPair()
-          .setLeftColumn(NameSingleColumnSelection(leftColName))
-          .setRightColumn(NameSingleColumnSelection(rightColName))
-      })
+      namesLeft
+        .zip(namesRight)
+        .map { case (leftColName, rightColName) =>
+          Join
+            .ColumnPair()
+            .setLeftColumn(NameSingleColumnSelection(leftColName))
+            .setRightColumn(NameSingleColumnSelection(rightColName))
+        }
 
-    val paramsById = idsLeft.zip(idsRight).map({ case (leftColId, rightColId) =>
-      Join.ColumnPair()
-        .setLeftColumn(IndexSingleColumnSelection(leftColId))
-        .setRightColumn(IndexSingleColumnSelection(rightColId))
-    })
+    val paramsById = idsLeft
+      .zip(idsRight)
+      .map { case (leftColId, rightColId) =>
+        Join
+          .ColumnPair()
+          .setLeftColumn(IndexSingleColumnSelection(leftColId))
+          .setRightColumn(IndexSingleColumnSelection(rightColId))
+      }
 
     operation.setJoinType(joinType)
     operation.setJoinColumns(paramsByName ++ paramsById)
@@ -939,32 +994,31 @@ class JoinSpec extends DeeplangIntegTestSupport {
   }
 
   private def joinWithMultipleColumnSelection(
-      names: Set[String], ids: Set[Int],
+      names: Set[String],
+      ids: Set[Int],
       leftPrefix: Option[String] = leftTablePrefix,
       rightPrefix: Option[String] = rightTablePrefix,
-      joinType: JoinTypeChoice.Option = defaultJoinType): Join = {
+      joinType: JoinTypeChoice.Option = defaultJoinType
+  ): Join = {
     val namesVector = names.toVector
-    val idsVector = ids.toVector
-    joinWithMultipleColumnSelection(
-      namesVector, idsVector, namesVector, idsVector,
-      leftPrefix, rightPrefix, joinType)
+    val idsVector   = ids.toVector
+    joinWithMultipleColumnSelection(namesVector, idsVector, namesVector, idsVector, leftPrefix, rightPrefix, joinType)
   }
 
-  private def appendPrefix(schema: Seq[StructField], prefix: Option[String]) = {
+  private def appendPrefix(schema: Seq[StructField], prefix: Option[String]) =
     schema.map(field => field.copy(name = prefix.getOrElse("") + field.name))
-  }
 
-  private def inferSchema(
-      operation: Join,
-      leftDataFrame: DataFrame,
-      rightDataFrame: DataFrame): StructType = {
+  private def inferSchema(operation: Join, leftDataFrame: DataFrame, rightDataFrame: DataFrame): StructType = {
 
-    val (knowledge, _) = operation.inferKnowledgeUntyped(Vector(
-      DKnowledge(DataFrame.forInference(leftDataFrame.sparkDataFrame.schema)),
-      DKnowledge(DataFrame.forInference(rightDataFrame.sparkDataFrame.schema))
-    ))(mock[InferContext])
+    val (knowledge, _) = operation.inferKnowledgeUntyped(
+      Vector(
+        DKnowledge(DataFrame.forInference(leftDataFrame.sparkDataFrame.schema)),
+        DKnowledge(DataFrame.forInference(rightDataFrame.sparkDataFrame.schema))
+      )
+    )(mock[InferContext])
 
     val dataFrameKnowledge = knowledge.head.single.asInstanceOf[DataFrame]
     dataFrameKnowledge.schema.get
   }
+
 }

@@ -4,21 +4,22 @@ import java.net.URL
 import java.util.UUID
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.language.postfixOps
 
 import akka.actor.ActorSystem
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
 import spray.http._
 
 import io.deepsense.commons.models.Id
 import io.deepsense.commons.utils.RetryActor.RetryLimitReachedException
+import org.scalatest.wordspec.AnyWordSpec
 
-class NotebookRestClientSpec
-  extends WordSpec
-  with Matchers {
+class NotebookRestClientSpec extends AnyWordSpec with Matchers {
 
   implicit val as = ActorSystem()
+
   val uutName: String = classOf[NotebookRestClient].getSimpleName.filterNot(_ == '$')
 
   private class NotebookRestClientWithMockedHttp(
@@ -40,49 +41,39 @@ class NotebookRestClientSpec
           if (nbDataRequestCount >= requestsCountNeededForData) {
             nbDataRequestCount = 0
             HttpResponse(entity = HttpEntity(data = HttpData(notebookData)))
-          } else {
+          } else
             HttpResponse(status = StatusCodes.NotFound)
-          }
         case HttpMethods.POST =>
           HttpResponse()
       }
     }
+
   }
 
   private trait Setup {
+
     val workflowId = UUID.randomUUID()
+
     val nodeId = UUID.randomUUID()
 
     val notebookData = "This is notebook data".getBytes()
+
     val serverAddress = new URL("http", "localhost", 6011, "")
 
     def generateUUTWithHttpErrors(reqPredicate: HttpRequest => Boolean, statusCode: StatusCode): NotebookRestClient =
-      new NotebookRestClientWithMockedHttp (
-          serverAddress,
-          workflowId,
-          nodeId,
-          1 nano,
-          1000,
-          1,
-          notebookData) {
-        override def fetchHttpResponse(req: HttpRequest): Future[HttpResponse] = {
-          if (reqPredicate(req)) {
+      new NotebookRestClientWithMockedHttp(serverAddress, workflowId, nodeId, 1 nano, 1000, 1, notebookData) {
+
+        override def fetchHttpResponse(req: HttpRequest): Future[HttpResponse] =
+          if (reqPredicate(req))
             Future.successful(HttpResponse(status = statusCode))
-          } else {
+          else
             super.fetchHttpResponse(req)
-          }
-        }
+
       }
 
     def generateUUT(requestsCountNeededForData: Int, retryLimit: Int): NotebookRestClient =
-      new NotebookRestClientWithMockedHttp(
-        serverAddress,
-        workflowId,
-        nodeId,
-        1 nano,
-        retryLimit,
-        requestsCountNeededForData,
-        notebookData)
+      new NotebookRestClientWithMockedHttp(serverAddress, workflowId, nodeId, 1 nano, retryLimit,
+        requestsCountNeededForData, notebookData)
 
   }
 
@@ -91,9 +82,7 @@ class NotebookRestClientSpec
       "queries succeed within retry limits" in {
         new Setup {
           val uut = generateUUT(2, 5)
-          Await.result(
-            uut.generateAndPollNbData("python"),
-            Duration.Inf) shouldBe "This is notebook data".getBytes()
+          Await.result(uut.generateAndPollNbData("python"), Duration.Inf) shouldBe "This is notebook data".getBytes()
         }
       }
     }
@@ -101,11 +90,11 @@ class NotebookRestClientSpec
     "fail" when {
       "queries need more tries than retry limit" in {
         new Setup {
-          val uut = generateUUT(4, 2 /* means 3 requests until error - 1 original and 2 retries */)
+          val uut = generateUUT(4, 2 /* means 3 requests until error - 1 original and 2 retries */ )
           Await.result(
             uut.generateAndPollNbData("python").failed,
             Duration.Inf
-          ) shouldBe a [RetryLimitReachedException]
+          ) shouldBe a[RetryLimitReachedException]
         }
       }
 
@@ -118,7 +107,7 @@ class NotebookRestClientSpec
             Duration.Inf
           )
 
-          exception shouldBe a [NotebookHttpException]
+          exception shouldBe a[NotebookHttpException]
           exception.asInstanceOf[NotebookHttpException].httpResponse.status.intValue shouldBe 501
 
         }
@@ -133,11 +122,12 @@ class NotebookRestClientSpec
             Duration.Inf
           )
 
-          exception shouldBe a [NotebookHttpException]
+          exception shouldBe a[NotebookHttpException]
           exception.asInstanceOf[NotebookHttpException].httpResponse.status.intValue shouldBe 500
 
         }
       }
     }
   }
+
 }

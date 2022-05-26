@@ -2,7 +2,9 @@ package io.deepsense.deeplang.params
 
 import spray.json._
 
-import io.deepsense.deeplang.params.validators.{ArrayLengthValidator, ComplexArrayValidator, RangeValidator}
+import io.deepsense.deeplang.params.validators.ArrayLengthValidator
+import io.deepsense.deeplang.params.validators.ComplexArrayValidator
+import io.deepsense.deeplang.params.validators.RangeValidator
 
 class MultipleNumericParamSpec extends AbstractParamSpec[Array[Double], MultipleNumericParam] {
 
@@ -36,21 +38,22 @@ class MultipleNumericParamSpec extends AbstractParamSpec[Array[Double], Multiple
       description = Some(description),
       validator = ComplexArrayValidator(
         rangeValidator = RangeValidator(1.0, 3.0, beginIncluded = true, endIncluded = false),
-        lengthValidator = ArrayLengthValidator(min = 2, max = 4)))
+        lengthValidator = ArrayLengthValidator(min = 2, max = 4)
+      )
+    )
     val json = JsObject(
-      "type" -> JsString("multipleNumeric"),
-      "name" -> JsString(param.name),
-      "description" -> JsString(
-        description + param.constraints),
-      "default" -> JsNull,
+      "type"        -> JsString("multipleNumeric"),
+      "name"        -> JsString(param.name),
+      "description" -> JsString(description + param.constraints),
+      "default"     -> JsNull,
       "isGriddable" -> JsFalse,
       "validator" -> JsObject(
         "type" -> JsString("range"),
         "configuration" -> JsObject(
-          "begin" -> JsNumber(1.0),
-          "end" -> JsNumber(3.0),
+          "begin"         -> JsNumber(1.0),
+          "end"           -> JsNumber(3.0),
           "beginIncluded" -> JsBoolean(true),
-          "endIncluded" -> JsBoolean(false)
+          "endIncluded"   -> JsBoolean(false)
         )
       )
     )
@@ -75,4 +78,5 @@ class MultipleNumericParamSpec extends AbstractParamSpec[Array[Double], Multiple
     )
     (value, jsonValue)
   }
+
 }

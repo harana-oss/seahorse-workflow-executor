@@ -8,7 +8,7 @@ abstract class WriteReadTransformerIntegTest extends DeeplangIntegTestSupport {
   def writeReadTransformer(transformer: Transformer, outputFile: String): Unit = {
 
     val writeTransformer: WriteTransformer = WriteTransformer(outputFile).setShouldOverwrite(true)
-    val readTransformer: ReadTransformer = ReadTransformer(outputFile)
+    val readTransformer: ReadTransformer   = ReadTransformer(outputFile)
 
     writeTransformer.executeUntyped(Vector(transformer))(executionContext)
     val deserializedTransformer =
@@ -21,4 +21,5 @@ abstract class WriteReadTransformerIntegTest extends DeeplangIntegTestSupport {
     val writeTransformer: WriteTransformer = WriteTransformer(outputFile).setShouldOverwrite(overwrite)
     writeTransformer.executeUntyped(Vector(transformer))(executionContext)
   }
+
 }

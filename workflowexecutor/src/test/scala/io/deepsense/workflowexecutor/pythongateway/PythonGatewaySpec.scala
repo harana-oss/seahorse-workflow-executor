@@ -1,39 +1,39 @@
 package io.deepsense.workflowexecutor.pythongateway
 
 import java.io.PrintStream
-import java.net.{InetAddress, ServerSocket, Socket}
+import java.net.InetAddress
+import java.net.ServerSocket
+import java.net.Socket
 
 import scala.concurrent.duration
 import scala.concurrent.duration.FiniteDuration
 import scala.io.BufferedSource
-import scala.util.{Success, Try}
+import scala.util.Success
+import scala.util.Try
 import org.apache.spark.SparkContext
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.Eventually._
-import org.scalatest.concurrent.{TimeLimits, Timeouts}
-import org.scalatest.mockito.MockitoSugar
+import org.scalatest.concurrent.TimeLimits
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.time.SpanSugar._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import io.deepsense.deeplang.DataFrameStorage
 import io.deepsense.sparkutils.SparkSQLSession
 import io.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 import io.deepsense.workflowexecutor.pythongateway.PythonGateway.GatewayConfig
 
+class PythonGatewaySpec extends AnyWordSpec with MockitoSugar with Matchers with TimeLimits {
 
-class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with TimeLimits {
-
-  val gatewayConfig = {
+  val gatewayConfig =
     GatewayConfig(FiniteDuration(500, duration.MILLISECONDS))
-  }
 
   def attemptConnection(port: Option[Int]): Try[Socket] =
     port.fold {
-      Try[Socket] { throw new IllegalStateException("Listening port should be present") }
-    }{
-      port => Try[Socket] { new Socket("127.0.0.1", port) }
-    }
+      Try[Socket](throw new IllegalStateException("Listening port should be present"))
+    }(port => Try[Socket](new Socket("127.0.0.1", port)))
 
   "Gateway" should {
     val localhost = InetAddress.getByName("127.0.0.1")
@@ -45,11 +45,12 @@ class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with Ti
         mock[SparkSQLSession],
         mock[DataFrameStorage],
         mock[CustomCodeEntryPoint],
-        localhost)
+        localhost
+      )
       gateway.start()
 
       val connectionAttempt = attemptConnection(gateway.listeningPort)
-      connectionAttempt shouldBe a [Success[_]]
+      connectionAttempt shouldBe a[Success[_]]
 
       gateway.stop()
     }
@@ -61,10 +62,11 @@ class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with Ti
         mock[SparkSQLSession],
         mock[DataFrameStorage],
         mock[CustomCodeEntryPoint],
-        localhost)
+        localhost
+      )
       gateway.start()
       gateway.stop()
-      eventually (timeout(5.seconds), interval(400.millis)) {
+      eventually(timeout(5.seconds), interval(400.millis)) {
         gateway.listeningPort shouldBe None
       }
     }
@@ -76,7 +78,8 @@ class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with Ti
         mock[SparkSQLSession],
         mock[DataFrameStorage],
         mock[CustomCodeEntryPoint],
-        localhost)
+        localhost
+      )
 
       gateway.listeningPort shouldBe None
     }
@@ -90,12 +93,12 @@ class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with Ti
         mock[SparkSQLSession],
         mock[DataFrameStorage],
         customCodeEntryPoint,
-        localhost)
-
+        localhost
+      )
 
       gateway.start()
 
-      val command = "Hello!"
+      val command  = "Hello!"
       val response = "Hello back!"
 
       // This thread acts as Python callback server
@@ -103,11 +106,10 @@ class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with Ti
       val callbackServer = new Thread(new Runnable {
         override def run(): Unit = {
           val s = callbackServerSocket.accept()
-          val message = new BufferedSource(s.getInputStream)
-            .iter
+          val message = new BufferedSource(s.getInputStream).iter
             .take(command.length)
-            .foldLeft("") {
-              case (s: String, c: Char) => s + c
+            .foldLeft("") { case (s: String, c: Char) =>
+              s + c
             }
           message shouldBe command
           new PrintStream(s.getOutputStream).print(response + "\n")
@@ -135,4 +137,5 @@ class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with Ti
       gateway.stop()
     }
   }
+
 }

@@ -1,4 +1,3 @@
 package io.deepsense.deeplang.params.exceptions
 
-case object EmptyColumnNameException
-  extends ValidationException("Column name cannot be empty.")
+case object EmptyColumnNameException extends ValidationException("Column name cannot be empty.")

@@ -16,14 +16,9 @@ import io.deepsense.commons.utils.Logging
 import io.deepsense.sparkutils
 import io.deepsense.workflowexecutor.exception.UnexpectedHttpResponseException
 
-class WorkflowDownloadClient(
-    val address: String,
-    val path: String,
-    val timeout: Int)
-  extends Logging {
+class WorkflowDownloadClient(val address: String, val path: String, val timeout: Int) extends Logging {
 
-  val downloadUrl = (workflowId: String) =>
-    s"$address/$path/$workflowId/download"
+  val downloadUrl = (workflowId: String) => s"$address/$path/$workflowId/download"
 
   def downloadWorkflow(workflowId: String): Future[String] = {
 
@@ -34,7 +29,7 @@ class WorkflowDownloadClient(
     implicit val timeoutSeconds = timeout.seconds
 
     val pipeline: HttpRequest => Future[HttpResponse] = sendReceive
-    val futureResponse = pipeline(Get(downloadUrl(workflowId)))
+    val futureResponse                                = pipeline(Get(downloadUrl(workflowId)))
 
     futureResponse.onComplete { _ =>
       Try(IO(Http).ask(Http.CloseAll)(1.second).await)
@@ -43,12 +38,16 @@ class WorkflowDownloadClient(
     futureResponse.map(handleResponse)
   }
 
-  private def handleResponse(response: HttpResponse): String = {
+  private def handleResponse(response: HttpResponse): String =
     response.status match {
       case StatusCodes.OK =>
         response.entity.data.asString
-      case _ => throw UnexpectedHttpResponseException(
-        "Workflow download failed", response.status, response.entity.data.asString)
+      case _ =>
+        throw UnexpectedHttpResponseException(
+          "Workflow download failed",
+          response.status,
+          response.entity.data.asString
+        )
     }
-  }
+
 }

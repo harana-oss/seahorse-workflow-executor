@@ -4,17 +4,18 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 
 import io.deepsense.deeplang.exceptions.DeepLangException
-import io.deepsense.deeplang.params.validators.{ComplexArrayValidator, Validator}
+import io.deepsense.deeplang.params.validators.ComplexArrayValidator
+import io.deepsense.deeplang.params.validators.Validator
 
 case class MultipleNumericParam(
     override val name: String,
     override val description: Option[String],
-    validator: Validator[Array[Double]] = ComplexArrayValidator.all)
-  extends Param[Array[Double]] {
+    validator: Validator[Array[Double]] = ComplexArrayValidator.all
+) extends Param[Array[Double]] {
 
   override val parameterType = ParameterType.MultipleNumeric
 
-  def valueToJson(value: Array[Double]): JsValue = {
+  def valueToJson(value: Array[Double]): JsValue =
     JsObject(
       "values" -> JsArray(
         JsObject(
@@ -25,17 +26,22 @@ case class MultipleNumericParam(
         )
       )
     )
-  }
 
   override def valueFromJson(jsValue: JsValue): Array[Double] = jsValue match {
     case JsObject(map) =>
       map("values")
-        .asInstanceOf[JsArray].elements(0)
-        .asJsObject.fields("value")
-        .asJsObject.fields("sequence")
+        .asInstanceOf[JsArray]
+        .elements(0)
+        .asJsObject
+        .fields("value")
+        .asJsObject
+        .fields("sequence")
         .convertTo[Array[Double]]
-    case _ => throw new DeserializationException(s"Cannot fill choice parameter with $jsValue:" +
-      s" object expected.")
+    case _ =>
+      throw new DeserializationException(
+        s"Cannot fill choice parameter with $jsValue:" +
+          s" object expected."
+      )
   }
 
   override def replicate(name: String): MultipleNumericParam = copy(name = name)
@@ -43,7 +49,7 @@ case class MultipleNumericParam(
   override protected def extraJsFields: Map[String, JsValue] =
     super.extraJsFields ++ Map("validator" -> validator.toJson)
 
-  override def validate(values: Array[Double]): Vector[DeepLangException] = {
+  override def validate(values: Array[Double]): Vector[DeepLangException] =
     validator.validate(name, values)
-  }
+
 }

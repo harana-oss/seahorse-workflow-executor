@@ -1,7 +1,8 @@
 package io.deepsense.deeplang.doperables.spark.wrappers.transformers
 
 import io.deepsense.sparkutils.Linalg.Vectors
-import org.apache.spark.sql.types.{DataType, DoubleType}
+import org.apache.spark.sql.types.DataType
+import org.apache.spark.sql.types.DoubleType
 
 import io.deepsense.deeplang.doperables.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice
 import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
@@ -9,7 +10,7 @@ import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
 class OneHotEncoderSmokeTest
     extends AbstractTransformerWrapperSmokeTest[OneHotEncoder]
-    with MultiColumnTransformerWrapperTestSupport  {
+    with MultiColumnTransformerWrapperTestSupport {
 
   override def transformerWithParams: OneHotEncoder = {
     val inPlace = NoInPlaceChoice()
@@ -19,13 +20,11 @@ class OneHotEncoderSmokeTest
       .setInPlace(inPlace)
 
     val oneHotEncoder = new OneHotEncoder()
-    oneHotEncoder.set(
-      oneHotEncoder.singleOrMultiChoiceParam -> single,
-      oneHotEncoder.dropLast -> false)
+    oneHotEncoder.set(oneHotEncoder.singleOrMultiChoiceParam -> single, oneHotEncoder.dropLast -> false)
   }
 
   override def testValues: Seq[(Any, Any)] = {
-    val inputNumbers = Seq(0.0, 1.0)
+    val inputNumbers  = Seq(0.0, 1.0)
     val outputNumbers = Seq(Vectors.dense(1.0, 0.0), Vectors.dense(0.0, 1.0))
     inputNumbers.zip(outputNumbers)
   }
@@ -33,4 +32,5 @@ class OneHotEncoderSmokeTest
   override def inputType: DataType = DoubleType
 
   override def outputType: DataType = new io.deepsense.sparkutils.Linalg.VectorUDT
+
 }

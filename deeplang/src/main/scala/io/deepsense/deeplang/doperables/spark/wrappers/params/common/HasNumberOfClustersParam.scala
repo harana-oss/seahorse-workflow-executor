@@ -14,6 +14,9 @@ trait HasNumberOfClustersParam extends Params {
     name = "k",
     description = Some("The number of clusters to create."),
     sparkParamGetter = _.k,
-    validator = RangeValidator(begin = 2.0, end = Int.MaxValue, step = Some(1.0)))
+    validator = RangeValidator(begin = 2.0, end = Int.MaxValue, step = Some(1.0))
+  )
+
   setDefault(k, 2.0)
+
 }

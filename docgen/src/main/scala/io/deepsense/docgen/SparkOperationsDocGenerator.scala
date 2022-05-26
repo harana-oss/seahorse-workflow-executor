@@ -2,30 +2,28 @@ package io.deepsense.docgen
 
 import java.util.Scanner
 
-/**
- * This app generates Seahorse documentation for Spark ported operations.
- * It is capable of generating redirects and documentation pages automatically.
- * To achieve that, it uses CatalogRecorder and reflection.
- *
- * Link generation for operation menu and operation subpage is semi-automatic. The app
- * prints links to System.out and the user is responsible for inserting them
- * into proper places in operations.md and operationsmenu.html files.
- *
- * The typical use case consists of:
- *   1. Running the app in link generation mode for new operations.
- *   2. Manually inserting generated links to operations.md and operationsmenu.html files.
- *   3. Running the app in documentation page & redirect creation mode (for new operations).
- *
- * Order of operations is important, because link generation recognizes new operations
- * by non-existence of their documentation pages.
- */
+/** This app generates Seahorse documentation for Spark ported operations. It is capable of generating redirects and
+  * documentation pages automatically. To achieve that, it uses CatalogRecorder and reflection.
+  *
+  * Link generation for operation menu and operation subpage is semi-automatic. The app prints links to System.out and
+  * the user is responsible for inserting them into proper places in operations.md and operationsmenu.html files.
+  *
+  * The typical use case consists of:
+  *   1. Running the app in link generation mode for new operations. 2. Manually inserting generated links to
+  *      operations.md and operationsmenu.html files. 3. Running the app in documentation page & redirect creation mode
+  *      (for new operations).
+  *
+  * Order of operations is important, because link generation recognizes new operations by non-existence of their
+  * documentation pages.
+  */
 object SparkOperationsDocGenerator
-  extends DocPageCreator
-  with SparkOperationsExtractor
-  with RedirectCreator
-  with LinkPrinter {
+    extends DocPageCreator
+    with SparkOperationsExtractor
+    with RedirectCreator
+    with LinkPrinter {
 
   val sparkVersion = org.apache.spark.SPARK_VERSION
+
   val scalaDocPrefix = s"https://spark.apache.org/docs/$sparkVersion/api/scala/index.html#"
 
   // scalastyle:off println
@@ -49,7 +47,7 @@ object SparkOperationsDocGenerator
         sc.nextLine().toLowerCase match {
           case "a" => printLinks(true)
           case "n" => printLinks(false)
-          case _ => wrongInputExit()
+          case _   => wrongInputExit()
         }
       case "c" =>
         println("Do you want to [R]ecreate all pages and redirects or [U]pdate for new operations?")
@@ -57,7 +55,7 @@ object SparkOperationsDocGenerator
         sc.nextLine().toLowerCase match {
           case "r" => createDocPagesAndRedirects(true)
           case "u" => createDocPagesAndRedirects(false)
-          case _ => wrongInputExit()
+          case _   => wrongInputExit()
         }
       case _ => wrongInputExit()
     }
@@ -75,20 +73,19 @@ object SparkOperationsDocGenerator
   }
 
   private def createDocPagesAndRedirects(forceUpdate: Boolean): Unit = {
-    val sparkOps = sparkOperations()
+    val sparkOps      = sparkOperations()
     val redirectCount = createRedirects(sparkOps, forceUpdate)
-    val pageCount = createDocPages(sparkOps, forceUpdate)
+    val pageCount     = createDocPages(sparkOps, forceUpdate)
 
-    if(redirectCount == 0) {
+    if (redirectCount == 0)
       println("No redirects updated.")
-    } else {
+    else
       println(s"Updated $redirectCount redirects.")
-    }
-    if(pageCount == 0) {
+    if (pageCount == 0)
       println("No pages updated.")
-    } else {
+    else
       println(s"Updated $pageCount pages.")
-    }
   }
   // scalastyle:on println
+
 }

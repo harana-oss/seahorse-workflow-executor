@@ -6,11 +6,12 @@ import io.deepsense.deeplang.documentation.SparkOperationDocumentation
 import io.deepsense.deeplang.doperables.spark.wrappers.estimators.LDA
 import io.deepsense.deeplang.doperations.EstimatorAsFactory
 
-class CreateLDA extends EstimatorAsFactory[LDA]
-    with SparkOperationDocumentation {
+class CreateLDA extends EstimatorAsFactory[LDA] with SparkOperationDocumentation {
 
   override val id: Id = "a385f8fe-c64e-4d71-870a-9d5048747a3c"
+
   override val name: String = "LDA"
+
   override val description: String =
     """Latent Dirichlet Allocation (LDA), a topic model designed for text documents. LDA is given a
       |collection of documents as input data, via the `features column` parameter. Each document is
@@ -20,5 +21,7 @@ class CreateLDA extends EstimatorAsFactory[LDA]
 
   override protected[this] val docsGuideLocation =
     Some("ml-clustering.html#latent-dirichlet-allocation-lda")
+
   override val since: Version = Version(1, 1, 0)
+
 }

@@ -16,13 +16,11 @@ class MultipleValuesParamJsonSpec extends UnitSpec with BasicFormats {
   val json = JsObject(
     "values" -> JsArray(
       JsObject(
-        "type" -> JsString("seq"),
-        "value" -> JsObject(
-          "sequence" -> JsArray(JsNumber(1), JsNumber(2.0), JsNumber(3), JsNumber(4)))),
-      JsObject(
-        "type" -> JsString("seq"),
-        "value" -> JsObject(
-          "sequence" -> JsArray(JsNumber(4), JsNumber(5.0))))
+        "type"  -> JsString("seq"),
+        "value" -> JsObject("sequence" -> JsArray(JsNumber(1), JsNumber(2.0), JsNumber(3), JsNumber(4)))
+      ),
+      JsObject("type" -> JsString("seq"), "value" -> JsObject("sequence" -> JsArray(JsNumber(4), JsNumber(5.0))))
     )
   )
+
 }

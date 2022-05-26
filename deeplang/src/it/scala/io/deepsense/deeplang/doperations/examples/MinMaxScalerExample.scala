@@ -6,6 +6,7 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators.MinMaxScaler
 
 class MinMaxScalerExample extends AbstractOperationExample[MinMaxScaler] {
+
   override def dOperation: MinMaxScaler = {
     val op = new MinMaxScaler()
     op.estimator
@@ -25,4 +26,5 @@ class MinMaxScalerExample extends AbstractOperationExample[MinMaxScaler] {
     ).map(Tuple1(_))
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("features")))
   }
+
 }

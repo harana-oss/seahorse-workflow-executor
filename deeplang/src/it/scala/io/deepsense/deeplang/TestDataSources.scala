@@ -7,7 +7,8 @@ import org.joda.time.DateTime
 import io.deepsense.api.datasourcemanager.model._
 import io.deepsense.commons.rest.client.datasources.DatasourceInMemoryClient
 import io.deepsense.deeplang.doperations.inout.InputFileFormatChoice
-import io.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
+import io.deepsense.deeplang.doperations.readwritedataframe.FilePath
+import io.deepsense.deeplang.doperations.readwritedataframe.FileScheme
 
 trait TestDataSources {
   self: TestFiles =>
@@ -17,6 +18,7 @@ trait TestDataSources {
   )
 
   lazy val someDatasourcesForReading = List(someExternalJsonDatasource, someExternalCsvDatasource)
+
   lazy val someDatasourcesForWriting = List(someLibraryCsvDatasource, someLibraryJsonDatasource)
 
   private lazy val someLibraryJsonDatasource = {
@@ -28,13 +30,15 @@ trait TestDataSources {
       .creationDateTime(new DateTime)
       .ownerId(UUID.randomUUID().toString)
       .ownerName("SomeOwner")
-      .params(new DatasourceParams()
-        .name("test-library-json-file")
-        .datasourceType(DatasourceType.LIBRARYFILE)
-        .libraryFileParams(new LibraryFileParams()
-          .fileFormat(FileFormat.JSON)
-          .libraryPath(libraryFilePath.fullPath)
-        )
+      .params(
+        new DatasourceParams()
+          .name("test-library-json-file")
+          .datasourceType(DatasourceType.LIBRARYFILE)
+          .libraryFileParams(
+            new LibraryFileParams()
+              .fileFormat(FileFormat.JSON)
+              .libraryPath(libraryFilePath.fullPath)
+          )
       )
   }
 
@@ -47,17 +51,21 @@ trait TestDataSources {
       .creationDateTime(new DateTime)
       .ownerId(UUID.randomUUID().toString)
       .ownerName("SomeOwner")
-      .params(new DatasourceParams()
-        .name("test-library-csv-file")
-        .datasourceType(DatasourceType.LIBRARYFILE)
-        .libraryFileParams(new LibraryFileParams()
-          .fileFormat(FileFormat.CSV)
-          .libraryPath(libraryFilePath.fullPath)
-            .csvFileFormatParams(new CsvFileFormatParams()
-              .convert01ToBoolean(true)
-              .includeHeader(true)
-              .separatorType(CsvSeparatorType.COMMA))
-        )
+      .params(
+        new DatasourceParams()
+          .name("test-library-csv-file")
+          .datasourceType(DatasourceType.LIBRARYFILE)
+          .libraryFileParams(
+            new LibraryFileParams()
+              .fileFormat(FileFormat.CSV)
+              .libraryPath(libraryFilePath.fullPath)
+              .csvFileFormatParams(
+                new CsvFileFormatParams()
+                  .convert01ToBoolean(true)
+                  .includeHeader(true)
+                  .separatorType(CsvSeparatorType.COMMA)
+              )
+          )
       )
   }
 
@@ -73,13 +81,15 @@ trait TestDataSources {
       .creationDateTime(new DateTime)
       .ownerId(UUID.randomUUID().toString)
       .ownerName("SomeOwner")
-      .params(new DatasourceParams()
-        .name("test-external-json-file")
-        .datasourceType(DatasourceType.EXTERNALFILE)
-        .externalFileParams(new ExternalFileParams()
-          .fileFormat(FileFormat.JSON)
-          .url(externalFileUrl)
-        )
+      .params(
+        new DatasourceParams()
+          .name("test-external-json-file")
+          .datasourceType(DatasourceType.EXTERNALFILE)
+          .externalFileParams(
+            new ExternalFileParams()
+              .fileFormat(FileFormat.JSON)
+              .url(externalFileUrl)
+          )
       )
   }
 
@@ -95,18 +105,21 @@ trait TestDataSources {
       .creationDateTime(new DateTime)
       .ownerId(UUID.randomUUID().toString)
       .ownerName("SomeOwner")
-      .params(new DatasourceParams()
-        .name("test-external-csv-file")
-        .datasourceType(DatasourceType.EXTERNALFILE)
-        .externalFileParams(new ExternalFileParams()
-          .fileFormat(FileFormat.CSV)
-          .url(externalFileUrl)
-          .csvFileFormatParams(new CsvFileFormatParams()
-            .separatorType(CsvSeparatorType.COMMA)
-            .convert01ToBoolean(true)
-            .includeHeader(true)
+      .params(
+        new DatasourceParams()
+          .name("test-external-csv-file")
+          .datasourceType(DatasourceType.EXTERNALFILE)
+          .externalFileParams(
+            new ExternalFileParams()
+              .fileFormat(FileFormat.CSV)
+              .url(externalFileUrl)
+              .csvFileFormatParams(
+                new CsvFileFormatParams()
+                  .separatorType(CsvSeparatorType.COMMA)
+                  .convert01ToBoolean(true)
+                  .includeHeader(true)
+              )
           )
-        )
       )
   }
 

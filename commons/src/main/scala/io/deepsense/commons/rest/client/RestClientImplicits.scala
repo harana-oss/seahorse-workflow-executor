@@ -8,6 +8,9 @@ import akka.util.Timeout
 trait RestClientImplicits {
 
   implicit val ctx: ExecutionContext
+
   implicit val as: ActorSystem
+
   implicit val timeout: Timeout
+
 }

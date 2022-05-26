@@ -3,8 +3,12 @@ package io.deepsense.docgen
 import io.deepsense.deeplang.catalogs.doperations.DOperationCategory
 import io.deepsense.deeplang.doperables._
 import io.deepsense.deeplang.doperables.stringindexingwrapper.StringIndexingEstimatorWrapper
-import io.deepsense.deeplang.doperations.{EstimatorAsFactory, EstimatorAsOperation, EvaluatorAsFactory, TransformerAsOperation}
-import io.deepsense.deeplang.{CatalogRecorder, DOperation}
+import io.deepsense.deeplang.doperations.EstimatorAsFactory
+import io.deepsense.deeplang.doperations.EstimatorAsOperation
+import io.deepsense.deeplang.doperations.EvaluatorAsFactory
+import io.deepsense.deeplang.doperations.TransformerAsOperation
+import io.deepsense.deeplang.CatalogRecorder
+import io.deepsense.deeplang.DOperation
 
 trait SparkOperationsExtractor {
 
@@ -12,13 +16,16 @@ trait SparkOperationsExtractor {
 
   def sparkOperations(): Seq[OperationWithSparkClassName] = {
     val operationIds = catalog.operations.keys
-    operationIds.map(operationId => catalog.createDOperation(operationId))
+    operationIds
+      .map(operationId => catalog.createDOperation(operationId))
       .flatMap(operation =>
         sparkClassName(operation)
-          .map(OperationWithSparkClassName(operation.asInstanceOf[DocumentedOperation], _))).toSeq
+          .map(OperationWithSparkClassName(operation.asInstanceOf[DocumentedOperation], _))
+      )
+      .toSeq
   }
 
-  private def sparkClassName(operation: DOperation): Option[String] = {
+  private def sparkClassName(operation: DOperation): Option[String] =
     operation match {
       case (t: TransformerAsOperation[_]) =>
         t.transformer match {
@@ -56,23 +63,25 @@ trait SparkOperationsExtractor {
         }
       case _ => None
     }
-  }
 
-  def mapByCategory(operations: Seq[OperationWithSparkClassName])
-      : Map[DOperationCategory, Seq[OperationWithSparkClassName]] = {
+  def mapByCategory(
+      operations: Seq[OperationWithSparkClassName]
+  ): Map[DOperationCategory, Seq[OperationWithSparkClassName]] = {
 
-    val operationsWithCategories = operations.map(operationWithName => {
+    val operationsWithCategories = operations.map { operationWithName =>
       val category = catalog.operations(operationWithName.op.id).category
       OperationWithCategory(category, operationWithName)
-    })
+    }
 
     val categories = operationsWithCategories.map(_.category).toSet
 
-    Map(categories.toList.sortBy(_.name).map(category =>
-      category -> operationsWithCategories.filter(_.category == category).map(_.op)): _*)
+    Map(
+      categories.toList
+        .sortBy(_.name)
+        .map(category => category -> operationsWithCategories.filter(_.category == category).map(_.op)): _*
+    )
   }
 
-  private case class OperationWithCategory(
-    category: DOperationCategory,
-    op: OperationWithSparkClassName)
+  private case class OperationWithCategory(category: DOperationCategory, op: OperationWithSparkClassName)
+
 }

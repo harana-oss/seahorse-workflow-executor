@@ -6,18 +6,18 @@ import org.apache.spark.ml
 
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.params.wrappers.spark.ParamsWithSparkWrappers
-import io.deepsense.deeplang.{DKnowledge, ExecutionContext, TypeUtils}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.ExecutionContext
+import io.deepsense.deeplang.TypeUtils
 
-/**
- * Wrapper for creating deeplang Evaluators from spark ml Evaluators.
- * It is parametrized by evaluator type.
- *
- * @tparam E Type of wrapped ml.evaluation.Evaluator
- */
-abstract class SparkEvaluatorWrapper[E <: ml.evaluation.Evaluator]
-    (implicit val evaluatorTag: TypeTag[E])
-  extends Evaluator
-  with ParamsWithSparkWrappers {
+/** Wrapper for creating deeplang Evaluators from spark ml Evaluators. It is parametrized by evaluator type.
+  *
+  * @tparam E
+  *   Type of wrapped ml.evaluation.Evaluator
+  */
+abstract class SparkEvaluatorWrapper[E <: ml.evaluation.Evaluator](implicit val evaluatorTag: TypeTag[E])
+    extends Evaluator
+    with ParamsWithSparkWrappers {
 
   val sparkEvaluator: E = createEvaluatorInstance()
 
@@ -25,7 +25,7 @@ abstract class SparkEvaluatorWrapper[E <: ml.evaluation.Evaluator]
 
   override def _evaluate(context: ExecutionContext, dataFrame: DataFrame): MetricValue = {
     val sparkParams = sparkParamMap(sparkEvaluator, dataFrame.sparkDataFrame.schema)
-    val value = sparkEvaluator.evaluate(dataFrame.sparkDataFrame, sparkParams)
+    val value       = sparkEvaluator.evaluate(dataFrame.sparkDataFrame, sparkParams)
     MetricValue(getMetricName, value)
   }
 
@@ -37,4 +37,5 @@ abstract class SparkEvaluatorWrapper[E <: ml.evaluation.Evaluator]
   def createEvaluatorInstance(): E = TypeUtils.instanceOfType(evaluatorTag)
 
   override def isLargerBetter: Boolean = sparkEvaluator.isLargerBetter
+
 }

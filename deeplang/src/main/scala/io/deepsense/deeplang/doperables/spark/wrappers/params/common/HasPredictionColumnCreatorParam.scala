@@ -10,10 +10,12 @@ import io.deepsense.deeplang.params.wrappers.spark.SingleColumnCreatorParamWrapp
 trait HasPredictionColumnCreatorParam extends Params {
 
   val predictionColumn =
-    new SingleColumnCreatorParamWrapper[
-      ml.param.Params { val predictionCol: ml.param.Param[String] }](
+    new SingleColumnCreatorParamWrapper[ml.param.Params { val predictionCol: ml.param.Param[String] }](
       name = "prediction column",
       description = Some("The prediction column created during model scoring."),
-      sparkParamGetter = _.predictionCol)
+      sparkParamGetter = _.predictionCol
+    )
+
   setDefault(predictionColumn, "prediction")
+
 }

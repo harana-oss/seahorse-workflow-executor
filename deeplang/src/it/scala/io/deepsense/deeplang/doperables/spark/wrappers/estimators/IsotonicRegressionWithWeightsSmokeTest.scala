@@ -4,8 +4,7 @@ import io.deepsense.deeplang.doperables.spark.wrappers.params.common.OptionalWei
 import io.deepsense.deeplang.params.ParamPair
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
-class IsotonicRegressionWithWeightsSmokeTest
-  extends AbstractEstimatorModelWrapperSmokeTest {
+class IsotonicRegressionWithWeightsSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
 
   override def className: String = "IsotonicRegression"
 
@@ -15,26 +14,26 @@ class IsotonicRegressionWithWeightsSmokeTest
 
   val weightColumnName = "myWeight"
 
-  val weightColumnChoice = OptionalWeightColumnChoice.WeightColumnYesOption()
+  val weightColumnChoice = OptionalWeightColumnChoice
+    .WeightColumnYesOption()
     .setWeightColumn(NameSingleColumnSelection(weightColumnName))
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    featureIndex -> 1,
-    featuresColumn -> NameSingleColumnSelection("myFeatures"),
-    isotonic -> true,
-    labelColumn -> NameSingleColumnSelection("myLabel"),
-    predictionColumn -> "isotonicPrediction",
-    optionalWeightColumn -> weightColumnChoice)
+    featureIndex         -> 1,
+    featuresColumn       -> NameSingleColumnSelection("myFeatures"),
+    isotonic             -> true,
+    labelColumn          -> NameSingleColumnSelection("myLabel"),
+    predictionColumn     -> "isotonicPrediction",
+    optionalWeightColumn -> weightColumnChoice
+  )
 
   className should {
     "pass weight column value to wrapped model" in {
       val estimatorWithParams = estimator.set(estimatorParams: _*)
-      val sparkEstimator = estimatorWithParams.sparkEstimator
-      val sparkParamMap = estimatorWithParams.sparkParamMap(
-        sparkEstimator,
-        dataFrame.sparkDataFrame.schema)
-      sparkParamMap.get(
-        estimator.sparkEstimator.weightCol) shouldBe Some(weightColumnName)
+      val sparkEstimator      = estimatorWithParams.sparkEstimator
+      val sparkParamMap       = estimatorWithParams.sparkParamMap(sparkEstimator, dataFrame.sparkDataFrame.schema)
+      sparkParamMap.get(estimator.sparkEstimator.weightCol) shouldBe Some(weightColumnName)
     }
   }
+
 }

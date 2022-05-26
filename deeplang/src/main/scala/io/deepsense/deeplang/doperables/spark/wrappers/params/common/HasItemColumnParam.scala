@@ -11,11 +11,13 @@ import io.deepsense.deeplang.params.wrappers.spark.SingleColumnSelectorParamWrap
 trait HasItemColumnParam extends Params {
 
   val itemColumn =
-    new SingleColumnSelectorParamWrapper[
-      ml.param.Params { val itemCol: ml.param.Param[String] }](
+    new SingleColumnSelectorParamWrapper[ml.param.Params { val itemCol: ml.param.Param[String] }](
       name = "item column",
       description = Some("The column for item ids."),
       sparkParamGetter = _.itemCol,
-      portIndex = 0)
+      portIndex = 0
+    )
+
   setDefault(itemColumn, NameSingleColumnSelection("item"))
+
 }

@@ -1,20 +1,20 @@
 package io.deepsense.commons.json.envelope
 
-import org.scalatest.{FlatSpec, Matchers}
 import spray.json._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class EnvelopeSpec
-  extends FlatSpec
-  with Matchers
-  with DefaultJsonProtocol {
+class EnvelopeSpec extends AnyFlatSpec with Matchers with DefaultJsonProtocol {
 
   val StringLabel = "ExampleOfStringLabel"
+
   val WrongStringLabel = "WrongExampleOfStringLabel"
+
   val EnvelopeStringJsonFormat = new EnvelopeJsonFormat[String](StringLabel)
 
   "Envelope[String]" should "be encoded to and decoded from JSON" in {
-    val exampleString = "Johny Bravo"
-    val envelope = Envelope(exampleString)
+    val exampleString   = "Johny Bravo"
+    val envelope        = Envelope(exampleString)
     val encodedEnvelope = EnvelopeStringJsonFormat.write(envelope)
     encodedEnvelope shouldBe JsObject(StringLabel -> JsString(exampleString))
     val decodedEnvelope = EnvelopeStringJsonFormat.read(encodedEnvelope.toJson)
@@ -29,7 +29,7 @@ class EnvelopeSpec
 
   "Wrongly labeled Envelope[String] JSON" should "throw exception during decoding" in {
     val wrongLabeledJson = JsObject(WrongStringLabel -> JsString(""))
-    an[DeserializationException] should be thrownBy EnvelopeStringJsonFormat.read(
-      wrongLabeledJson.toJson)
+    an[DeserializationException] should be thrownBy EnvelopeStringJsonFormat.read(wrongLabeledJson.toJson)
   }
+
 }

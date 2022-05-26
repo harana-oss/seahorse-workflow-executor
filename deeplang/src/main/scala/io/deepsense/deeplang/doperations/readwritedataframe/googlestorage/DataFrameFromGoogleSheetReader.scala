@@ -7,17 +7,21 @@ import org.apache.spark.sql._
 
 import io.deepsense.commons.utils.Logging
 import io.deepsense.deeplang.ExecutionContext
-import io.deepsense.deeplang.doperations.inout.{InputFileFormatChoice, InputStorageTypeChoice}
+import io.deepsense.deeplang.doperations.inout.InputFileFormatChoice
+import io.deepsense.deeplang.doperations.inout.InputStorageTypeChoice
 import io.deepsense.deeplang.doperations.readwritedataframe.filestorage.DataFrameFromFileReader
-import io.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
+import io.deepsense.deeplang.doperations.readwritedataframe.FilePath
+import io.deepsense.deeplang.doperations.readwritedataframe.FileScheme
 
 object DataFrameFromGoogleSheetReader extends Logging {
 
-  def readFromGoogleSheet(googleSheet: InputStorageTypeChoice.GoogleSheet)
-                         (implicit context: ExecutionContext): DataFrame = {
+  def readFromGoogleSheet(
+      googleSheet: InputStorageTypeChoice.GoogleSheet
+  )(implicit context: ExecutionContext): DataFrame = {
     val id = googleSheet.getGoogleSheetId()
     val tmpPath = FilePath(
-      FileScheme.File, s"/tmp/seahorse/google_sheet_${id}__${UUID.randomUUID()}.csv"
+      FileScheme.File,
+      s"/tmp/seahorse/google_sheet_${id}__${UUID.randomUUID()}.csv"
     )
 
     GoogleDriveClient.downloadGoogleSheetAsCsvFile(
@@ -32,7 +36,8 @@ object DataFrameFromGoogleSheetReader extends Logging {
           .setCsvColumnSeparator(GoogleDriveClient.googleSheetCsvSeparator)
           .setShouldConvertToBoolean(googleSheet.getShouldConvertToBoolean)
           .setNamesIncluded(googleSheet.getNamesIncluded)
-      ).setSourceFile(tmpPath.fullPath)
+      )
+      .setSourceFile(tmpPath.fullPath)
 
     DataFrameFromFileReader.readFromFile(readDownloadedGoogleFileParams)
   }

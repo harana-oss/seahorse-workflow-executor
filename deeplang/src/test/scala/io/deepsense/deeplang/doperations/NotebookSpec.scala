@@ -7,24 +7,24 @@ import scala.concurrent.Future
 import scala.util.Try
 
 import akka.actor.ActorSystem
-import org.mockito.Matchers.{eq => eqMatcher, _}
+import org.mockito.ArgumentMatchers.{eq => eqMatcher, _}
 import org.mockito.Mockito._
-import org.mockito.{ArgumentCaptor, Mockito}
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito
 import org.scalatest.concurrent.Eventually
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import io.deepsense.commons.mail.EmailSender
 import io.deepsense.commons.rest.client.NotebookRestClient
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
-import io.deepsense.deeplang.doperations.Notebook.{EmailAddressChoice, SendEmailChoice}
-import io.deepsense.deeplang.{ContextualDataFrameStorage, ExecutionContext}
+import io.deepsense.deeplang.doperations.Notebook.EmailAddressChoice
+import io.deepsense.deeplang.doperations.Notebook.SendEmailChoice
+import io.deepsense.deeplang.ContextualDataFrameStorage
+import io.deepsense.deeplang.ExecutionContext
 
-class NotebookSpec extends WordSpec
-  with Matchers
-  with MockitoSugar
-  with Eventually {
-
+class NotebookSpec extends AnyWordSpec with Matchers with MockitoSugar with Eventually {
 
   def uutName(uut: Notebook): String = uut.getClass.getSimpleName.filterNot(_ == '$')
 
@@ -37,44 +37,52 @@ class NotebookSpec extends WordSpec
     val executionContext: ExecutionContext = mock[ExecutionContext]
 
     val notebookClient: NotebookRestClient = mock[NotebookRestClient]
+
     val actorSystem = ActorSystem()
+
     when(notebookClient.as).thenReturn(actorSystem)
-    when(notebookClient.generateAndPollNbData(any())).thenReturn(
-      Future.successful("This should be notebook data".getBytes()))
+
+    when(notebookClient.generateAndPollNbData(any()))
+      .thenReturn(Future.successful("This should be notebook data".getBytes()))
 
     val dataFrameStorage: ContextualDataFrameStorage = mock[ContextualDataFrameStorage]
 
     val emailSender: EmailSender = mock[EmailSender]
 
     val message: Message = mock[Message]
+
     val messageWithAttachment: Message = mock[Message]
 
     when(executionContext.notebooksClient).thenReturn(Some(notebookClient))
+
     when(executionContext.dataFrameStorage).thenReturn(dataFrameStorage)
+
     when(executionContext.emailSender).thenReturn(Some(emailSender))
 
     when(emailSender.createPlainMessage(any(), any(), any())).thenReturn(message)
+
     when(emailSender.attachAttachment(eqMatcher(message), any(), any(), any())).thenReturn(messageWithAttachment)
+
     when(emailSender.sendEmail(any())).thenReturn(None)
 
-
     val sendEmailChoice: SendEmailChoice = SendEmailChoice
+
     val emailAddressChoice: EmailAddressChoice = EmailAddressChoice
+
     emailAddressChoice.setEmailAddress("john@example.com")
+
     sendEmailChoice.setSendEmail(Set(emailAddressChoice))
 
-    def setFullEmailParams(uut: Notebook): Unit = {
+    def setFullEmailParams(uut: Notebook): Unit =
       uut.setShouldExecute(Set(sendEmailChoice))
-    }
 
     def setDontSendEmail(uut: Notebook): Unit = {
       uut.setShouldExecute(Set(sendEmailChoice))
       uut.getShouldExecute.head.setSendEmail(Set())
     }
 
-    def runUut(uut: Notebook): Unit = {
+    def runUut(uut: Notebook): Unit =
       uut.executeUntyped(Vector(dataFrame))(executionContext)
-    }
 
   }
 
@@ -110,9 +118,9 @@ class NotebookSpec extends WordSpec
 
             verify(emailSender).attachAttachment(any(), dataStream.capture(), any(), any())
 
-            val bytes = collection.mutable.ArrayBuffer[Byte]()
+            val bytes  = collection.mutable.ArrayBuffer[Byte]()
             val stream = dataStream.getValue
-            var byte = stream.read()
+            var byte   = stream.read()
 
             while (byte != -1) {
               bytes += byte.toByte
@@ -155,18 +163,17 @@ class NotebookSpec extends WordSpec
         "fail with notebook server's exception" in {
           new Setup {
             val serverException = new RuntimeException("test exception")
-            when(notebookClient.generateAndPollNbData(any())).thenReturn(
-              Future.failed(serverException))
+            when(notebookClient.generateAndPollNbData(any())).thenReturn(Future.failed(serverException))
 
             setFullEmailParams(uut)
-            the [RuntimeException] thrownBy runUut(uut) should have message serverException.getMessage
+            (the[RuntimeException] thrownBy runUut(uut) should have).message(serverException.getMessage)
           }
         }
 
         "try to send email" in {
           new Setup {
-            when(notebookClient.generateAndPollNbData(any())).thenReturn(
-              Future.failed(new RuntimeException("test exception")))
+            when(notebookClient.generateAndPollNbData(any()))
+              .thenReturn(Future.failed(new RuntimeException("test exception")))
 
             setFullEmailParams(uut)
             Try {
@@ -181,4 +188,5 @@ class NotebookSpec extends WordSpec
       }
     }
   }
+
 }

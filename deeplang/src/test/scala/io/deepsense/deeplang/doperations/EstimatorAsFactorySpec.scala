@@ -6,18 +6,23 @@ import io.deepsense.commons.utils.Version
 import io.deepsense.deeplang.DOperation.Id
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.report.Report
-import io.deepsense.deeplang.doperables.{Estimator, Transformer}
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
-import io.deepsense.deeplang.params.{NumericParam, Param}
-import io.deepsense.deeplang.{ExecutionContext, UnitSpec}
+import io.deepsense.deeplang.doperables.Estimator
+import io.deepsense.deeplang.doperables.Transformer
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
+import io.deepsense.deeplang.params.NumericParam
+import io.deepsense.deeplang.params.Param
+import io.deepsense.deeplang.ExecutionContext
+import io.deepsense.deeplang.UnitSpec
 
 class EstimatorAsFactorySpec extends UnitSpec {
+
   import EstimatorAsFactorySpec._
 
   "EstimatorAsFactory" should {
     "have the same parameters as the Estimator" in {
       val mockEstimator = new MockEstimator
-      val mockFactory = new MockEstimatorFactory
+      val mockFactory   = new MockEstimatorFactory
       mockFactory.extractParamMap() shouldBe mockEstimator.extractParamMap()
       mockFactory.params shouldBe mockEstimator.params
     }
@@ -59,23 +64,35 @@ class EstimatorAsFactorySpec extends UnitSpec {
 
   private def execute(factory: MockEstimatorFactory): MockEstimator =
     factory.executeUntyped(Vector.empty)(mock[ExecutionContext]).head.asInstanceOf[MockEstimator]
+
 }
 
 object EstimatorAsFactorySpec {
 
   class MockEstimator extends Estimator[Transformer] {
+
     val param = NumericParam("b", Some("desc"))
+
     setDefault(param -> 5)
+
     override val params: Array[Param[_]] = Array(param)
 
     override private[deeplang] def _fit(ctx: ExecutionContext, df: DataFrame): Transformer = ???
+
     override private[deeplang] def _fit_infer(schema: Option[StructType]): Transformer = ???
+
     override def report: Report = ???
+
   }
 
   class MockEstimatorFactory extends EstimatorAsFactory[MockEstimator] {
+
     override val id: Id = Id.randomId
+
     override val name: String = "Mock Estimator factory used for tests purposes"
+
     override val description: String = "Description"
+
   }
+
 }

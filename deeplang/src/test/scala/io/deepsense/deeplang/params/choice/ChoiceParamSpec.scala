@@ -15,10 +15,10 @@ class ChoiceParamSpec extends AbstractChoiceParamSpec[ChoiceABC, ChoiceParam[Cho
         "B" -> JsObject(),
         "C" -> JsObject()
       )
-      an [DeserializationException] should be thrownBy param.valueFromJson(twoChoicesJson)
+      an[DeserializationException] should be thrownBy param.valueFromJson(twoChoicesJson)
     }
     "serialize default values properly" in {
-      val choices = Seq(OptionA(), OptionB(), OptionC())
+      val choices  = Seq(OptionA(), OptionB(), OptionC())
       val expected = Seq("A", "B", "C").map(JsString(_))
       choices.map(serializeDefaultValue) should contain theSameElementsAs expected
     }
@@ -33,12 +33,13 @@ class ChoiceParamSpec extends AbstractChoiceParamSpec[ChoiceABC, ChoiceParam[Cho
   override def paramFixture: (ChoiceParam[ChoiceABC], JsValue) = {
     val singleChoiceParam = ChoiceParam[ChoiceABC]("name", Some("description"))
     val singleChoiceExpectedJson = JsObject(
-      "type" -> JsString("choice"),
-      "name" -> JsString(singleChoiceParam.name),
+      "type"        -> JsString("choice"),
+      "name"        -> JsString(singleChoiceParam.name),
       "description" -> JsString("description"),
       "isGriddable" -> JsFalse,
-      "default" -> JsNull,
-      ChoiceFixtures.values)
+      "default"     -> JsNull,
+      ChoiceFixtures.values
+    )
     (singleChoiceParam, singleChoiceExpectedJson)
   }
 
@@ -54,8 +55,7 @@ class ChoiceParamSpec extends AbstractChoiceParamSpec[ChoiceABC, ChoiceParam[Cho
 
   override def serializeDefaultValue(default: ChoiceABC): JsValue = JsString(default.name)
 
-  override protected def createChoiceParam[V <: Choice : TypeTag](
-      name: String,
-      description: String): ChoiceParam[V] =
+  override protected def createChoiceParam[V <: Choice: TypeTag](name: String, description: String): ChoiceParam[V] =
     ChoiceParam[V](name, Some(description))
+
 }

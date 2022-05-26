@@ -8,8 +8,8 @@ import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTra
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
 class NormalizerSmokeTest
-  extends AbstractTransformerWrapperSmokeTest[Normalizer]
-  with MultiColumnTransformerWrapperTestSupport {
+    extends AbstractTransformerWrapperSmokeTest[Normalizer]
+    with MultiColumnTransformerWrapperTestSupport {
 
   override def transformerWithParams: Normalizer = {
     val inPlace = NoInPlaceChoice()
@@ -20,10 +20,12 @@ class NormalizerSmokeTest
       .setInPlace(inPlace)
 
     val transformer = new Normalizer()
-    transformer.set(Seq(
-      transformer.singleOrMultiChoiceParam -> single,
-      transformer.p -> 1.0
-    ): _*)
+    transformer.set(
+      Seq(
+        transformer.singleOrMultiChoiceParam -> single,
+        transformer.p                        -> 1.0
+      ): _*
+    )
   }
 
   override def testValues: Seq[(Any, Any)] = {
@@ -43,4 +45,5 @@ class NormalizerSmokeTest
   override def inputType: DataType = new io.deepsense.sparkutils.Linalg.VectorUDT
 
   override def outputType: DataType = new io.deepsense.sparkutils.Linalg.VectorUDT
+
 }

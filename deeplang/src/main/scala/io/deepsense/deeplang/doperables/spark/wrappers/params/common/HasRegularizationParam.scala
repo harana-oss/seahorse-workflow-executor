@@ -10,11 +10,13 @@ import io.deepsense.deeplang.params.wrappers.spark.DoubleParamWrapper
 
 trait HasRegularizationParam extends Params {
 
-  val regularizationParam = new DoubleParamWrapper[
-      ml.param.Params { val regParam: ml.param.DoubleParam }](
+  val regularizationParam = new DoubleParamWrapper[ml.param.Params { val regParam: ml.param.DoubleParam }](
     name = "regularization param",
     description = Some("The regularization parameter."),
     sparkParamGetter = _.regParam,
-    validator = RangeValidator(0.0, Double.MaxValue))
+    validator = RangeValidator(0.0, Double.MaxValue)
+  )
+
   setDefault(regularizationParam, 0.0)
+
 }

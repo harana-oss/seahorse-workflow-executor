@@ -13,6 +13,9 @@ trait HasThreshold extends Params {
     name = "threshold",
     description = Some("The threshold in binary classification prediction."),
     sparkParamGetter = _.threshold,
-    validator = RangeValidator(0.0, 1.0))
+    validator = RangeValidator(0.0, 1.0)
+  )
+
   setDefault(threshold, 0.5)
+
 }

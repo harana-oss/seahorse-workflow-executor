@@ -2,7 +2,8 @@ package io.deepsense.workflowexecutor
 
 import scala.util.control.NonFatal
 
-import akka.actor.{Actor, PoisonPill}
+import akka.actor.Actor
+import akka.actor.PoisonPill
 
 import io.deepsense.commons.models.Entity
 import io.deepsense.commons.utils.Logging
@@ -10,23 +11,21 @@ import io.deepsense.deeplang._
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.graph.DeeplangGraph.DeeplangNode
 import io.deepsense.reportlib.model.ReportContent
-import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.{NodeCompleted, NodeFailed, NodeStarted}
+import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeCompleted
+import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeFailed
+import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeStarted
 
-/**
- * WorkflowNodeExecutorActor is responsible for execution of single node.
- * Sends NodeStarted at the beginning and NodeCompleted or NodeFailed
- * at the end of execution depending on whether the execution succeeded or failed.
- */
-class WorkflowNodeExecutorActor(
-    executionContext: ExecutionContext,
-    node: DeeplangNode,
-    input: Vector[DOperable])
-  extends Actor
-  with Logging {
+/** WorkflowNodeExecutorActor is responsible for execution of single node. Sends NodeStarted at the beginning and
+  * NodeCompleted or NodeFailed at the end of execution depending on whether the execution succeeded or failed.
+  */
+class WorkflowNodeExecutorActor(executionContext: ExecutionContext, node: DeeplangNode, input: Vector[DOperable])
+    extends Actor
+    with Logging {
 
   import io.deepsense.workflowexecutor.WorkflowNodeExecutorActor.Messages._
 
   val nodeDescription = s"'${node.value.name}-${node.id}'"
+
   var executionStart: Long = _
 
   override def receive: Receive = {
@@ -34,16 +33,16 @@ class WorkflowNodeExecutorActor(
       executionStart = System.currentTimeMillis()
       logger.info(s"Starting execution of node $nodeDescription")
       sendStarted()
-      try {
+      try
         asSparkJobGroup {
-          val resultVector = executeOperation()
+          val resultVector         = executeOperation()
           val nodeExecutionResults = nodeExecutionResultsFrom(resultVector)
           sendCompleted(nodeExecutionResults)
         }
-      } catch {
+      catch {
         case SparkExceptionAsDeeplangException(deeplangEx) => sendFailed(deeplangEx)
-        case e: Exception => sendFailed(e)
-        case NonFatal(e) => sendFailed(new RuntimeException(e))
+        case e: Exception                                  => sendFailed(e)
+        case NonFatal(e)                                   => sendFailed(new RuntimeException(e))
         case fatal: Throwable =>
           logger.error(s"FATAL ERROR. MSG: ${fatal.getMessage}", fatal)
           fatal.printStackTrace()
@@ -78,32 +77,29 @@ class WorkflowNodeExecutorActor(
   }
 
   def nodeExecutionResultsFrom(operationResults: Vector[DOperable]): NodeExecutionResults = {
-    val registeredResults: Seq[(Entity.Id, DOperable)] = registerResults(operationResults)
+    val registeredResults: Seq[(Entity.Id, DOperable)]  = registerResults(operationResults)
     val registeredResultsMap: Map[Entity.Id, DOperable] = registeredResults.toMap
-    val reports: Map[Entity.Id, ReportContent] = collectReports(registeredResultsMap)
+    val reports: Map[Entity.Id, ReportContent]          = collectReports(registeredResultsMap)
     NodeExecutionResults(registeredResults.map(_._1), reports, registeredResultsMap)
   }
 
   private def registerResults(operables: Seq[DOperable]): Seq[(Entity.Id, DOperable)] = {
     logger.debug(s"Registering data from operation output ports in node ${node.id}")
-    val results: Seq[(Entity.Id, DOperable)] = operables.map { dOperable =>
-      (Entity.Id.randomId, dOperable)
-    }
+    val results: Seq[(Entity.Id, DOperable)] = operables.map(dOperable => (Entity.Id.randomId, dOperable))
     logger.debug(s"Data registered for $nodeDescription: results=$results")
     results
   }
 
   def collectReports(results: Map[Entity.Id, DOperable]): Map[Entity.Id, ReportContent] = {
     logger.debug(s"Collecting reports for ${node.id}")
-    results.map {
-      case (id, dOperable) =>
-        (id, dOperable.report.content)
+    results.map { case (id, dOperable) =>
+      (id, dOperable.report.content)
     }
   }
 
   def executeOperation(): Vector[DOperable] = {
     logger.debug(s"$nodeDescription inputVector.size = ${input.size}")
-    val inputKnowledge = input.map { dOperable => DKnowledge(dOperable) }
+    val inputKnowledge = input.map(dOperable => DKnowledge(dOperable))
     // if inference throws, we do not perform execution
     node.value.inferKnowledgeUntyped(inputKnowledge)(executionContext.inferContext)
 
@@ -127,17 +123,22 @@ class WorkflowNodeExecutorActor(
       interruptOnCancel = false
     )
     sparkCode
-  } finally {
+  } finally
     // clear job group, because this thread will be used by other actors
     executionContext.sparkContext.clearJobGroup()
-  }
 
 }
 
 object WorkflowNodeExecutorActor {
+
   object Messages {
+
     sealed trait Message
+
     case class Start() extends Message
+
     case class Delete() extends Message
+
   }
+
 }

@@ -6,6 +6,7 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators.IDF
 
 class IDFExample extends AbstractOperationExample[IDF] {
+
   override def dOperation: IDF = {
     val op = new IDF()
     op.estimator
@@ -23,4 +24,5 @@ class IDFExample extends AbstractOperationExample[IDF] {
     ).map(Tuple1(_))
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("features")))
   }
+
 }

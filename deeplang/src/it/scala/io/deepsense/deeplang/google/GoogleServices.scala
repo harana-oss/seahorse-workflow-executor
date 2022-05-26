@@ -10,11 +10,10 @@ object GoogleServices {
 
   def serviceAccountJson: Option[String] = {
     val file = new File(credentialsJsonFilePath())
-    if(file.exists()) {
+    if (file.exists())
       Some(Source.fromFile(file).mkString)
-    } else {
+    else
       None
-    }
   }
 
   def credentialsJsonFilePath(): String =
@@ -24,8 +23,8 @@ object GoogleServices {
 
   def serviceAccountNotExistsException() = new IllegalStateException(
     s"""Google service account json does not exist.
-        |Create file with google service credential json under path:
-        |${GoogleServices.credentialsJsonFilePath()}""".stripMargin
+       |Create file with google service credential json under path:
+       |${GoogleServices.credentialsJsonFilePath()}""".stripMargin
   )
 
 }

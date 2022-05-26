@@ -1,9 +1,11 @@
 package io.deepsense.deeplang
 
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll}
+import org.scalatest.BeforeAndAfter
+import org.scalatest.BeforeAndAfterAll
 
 import io.deepsense.deeplang.doperations.inout.InputFileFormatChoice
-import io.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
+import io.deepsense.deeplang.doperations.readwritedataframe.FilePath
+import io.deepsense.deeplang.doperations.readwritedataframe.FileScheme
 
 trait TestFiles { self: BeforeAndAfter with BeforeAndAfterAll =>
 
@@ -20,12 +22,12 @@ trait TestFiles { self: BeforeAndAfter with BeforeAndAfterAll =>
   }
 
   def testFile(fileFormat: InputFileFormatChoice, fileScheme: FileScheme): String = {
-    val format = fileFormat.getClass.getSimpleName.toLowerCase()
+    val format   = fileFormat.getClass.getSimpleName.toLowerCase()
     val fileName = s"some_$format.$format"
     val path = fileScheme match {
       case FileScheme.HTTPS => "https://s3.amazonaws.com/workflowexecutor/test_data/"
-      case FileScheme.File => absoluteTestsDirPath.fullPath
-      case other => throw new IllegalStateException(s"$other not supported")
+      case FileScheme.File  => absoluteTestsDirPath.fullPath
+      case other            => throw new IllegalStateException(s"$other not supported")
     }
     val fullPath = path + fileName
     fullPath
@@ -36,6 +38,7 @@ trait TestFiles { self: BeforeAndAfter with BeforeAndAfterAll =>
   private val testsDir = "target/tests"
 
   def absoluteTestsDirPath: FilePath = FilePath(FileScheme.File, rawAbsoluteTestsDirPath)
+
   private def rawAbsoluteTestsDirPath = new java.io.File(testsDir).getAbsoluteFile.toString + "/"
 
 }

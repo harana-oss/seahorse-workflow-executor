@@ -1,14 +1,16 @@
 package io.deepsense.deeplang.doperables.spark.wrappers.transformers
 
-import org.apache.spark.sql.types.{ArrayType, DataType, StringType}
+import org.apache.spark.sql.types.ArrayType
+import org.apache.spark.sql.types.DataType
+import org.apache.spark.sql.types.StringType
 
 import io.deepsense.deeplang.doperables.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice
 import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
 class NGramTransformerSmokeTest
-  extends AbstractTransformerWrapperSmokeTest[NGramTransformer]
-  with MultiColumnTransformerWrapperTestSupport {
+    extends AbstractTransformerWrapperSmokeTest[NGramTransformer]
+    with MultiColumnTransformerWrapperTestSupport {
 
   override def transformerWithParams: NGramTransformer = {
     val inPlace = NoInPlaceChoice()
@@ -19,10 +21,12 @@ class NGramTransformerSmokeTest
       .setInPlace(inPlace)
 
     val transformer = new NGramTransformer()
-    transformer.set(Seq(
-      transformer.singleOrMultiChoiceParam -> single,
-      transformer.n -> 2
-    ): _*)
+    transformer.set(
+      Seq(
+        transformer.singleOrMultiChoiceParam -> single,
+        transformer.n                        -> 2
+      ): _*
+    )
   }
 
   override def testValues: Seq[(Any, Any)] = {
@@ -41,4 +45,5 @@ class NGramTransformerSmokeTest
   override def inputType: DataType = new ArrayType(StringType, true)
 
   override def outputType: DataType = new ArrayType(StringType, false)
+
 }

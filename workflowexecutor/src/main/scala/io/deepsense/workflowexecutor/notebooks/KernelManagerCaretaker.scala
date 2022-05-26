@@ -3,10 +3,15 @@ package io.deepsense.workflowexecutor.notebooks
 import java.util.concurrent.atomic.AtomicReference
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future, Promise, TimeoutException}
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.Promise
+import scala.concurrent.TimeoutException
 import scala.sys.process._
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.Actor
+import akka.actor.ActorSystem
+import akka.actor.Props
 import com.typesafe.config.ConfigFactory
 
 import io.deepsense.commons.utils.Logging
@@ -17,28 +22,32 @@ import io.deepsense.workflowexecutor.communication.mq.MQCommunication
 import io.deepsense.workflowexecutor.pyspark.PythonPathGenerator
 
 class KernelManagerCaretaker(
-  private val actorSystem: ActorSystem,
-  private val pythonBinary: String,
-  private val pythonPathGenerator: PythonPathGenerator,
-  private val communicationFactory: MQCommunicationFactory,
-  private val kernelManagerPath: String,
-  private val gatewayHost: String,
-  private val gatewayPort: Int,
-  private val rBackendHost: String,
-  private val rBackendPort: Int,
-  private val mqHost: String,
-  private val mqPort: Int,
-  private val mqUser: String,
-  private val mqPass: String,
-  private val sessionId: String,
-  private val workflowId: Workflow.Id
+    private val actorSystem: ActorSystem,
+    private val pythonBinary: String,
+    private val pythonPathGenerator: PythonPathGenerator,
+    private val communicationFactory: MQCommunicationFactory,
+    private val kernelManagerPath: String,
+    private val gatewayHost: String,
+    private val gatewayPort: Int,
+    private val rBackendHost: String,
+    private val rBackendPort: Int,
+    private val mqHost: String,
+    private val mqPort: Int,
+    private val mqUser: String,
+    private val mqPass: String,
+    private val sessionId: String,
+    private val workflowId: Workflow.Id
 ) extends Logging {
 
   private val config = ConfigFactory.load.getConfig("kernelmanagercaretaker")
+
   private val startupScript = config.getString("startup-script")
+
   private val startupTimeout: Duration = config.getInt("timeout").seconds
+
   private val startPromise: Promise[Unit] = Promise()
-  private implicit val executionContext = actorSystem.dispatcher
+
+  implicit private val executionContext = actorSystem.dispatcher
 
   def start(): Unit = {
     sys.addShutdownHook {
@@ -46,29 +55,27 @@ class KernelManagerCaretaker(
     }
 
     val extractedKernelManagerPath = s"$kernelManagerPath/$startupScript"
-    val process = runKernelManager(extractedKernelManagerPath, kernelManagerPath)
+    val process                    = runKernelManager(extractedKernelManagerPath, kernelManagerPath)
     val exited = Future(process.exitValue()).map { code =>
-      startPromise.failure(
-        new RuntimeException(s"Kernel Manager finished prematurely (with exit code $code)!"))
+      startPromise.failure(new RuntimeException(s"Kernel Manager finished prematurely (with exit code $code)!"))
       ()
     }
     kernelManagerProcess.set(Some(process))
 
-    try {
+    try
       waitForKernelManager(exited)
-    } catch {
+    catch {
       case e: Exception =>
         stop()
         throw e
     }
   }
 
-  def stop(): Unit = {
+  def stop(): Unit =
     destroyPythonProcess()
-  }
 
   private def waitForKernelManager(exited: Future[Unit]): Unit = {
-    val startup = subscribe().flatMap { _ => startPromise.future }
+    val startup = subscribe().flatMap(_ => startPromise.future)
     logger.debug("startup initiated")
     try {
       Await.result(startup, startupTimeout)
@@ -105,22 +112,24 @@ class KernelManagerCaretaker(
   }
 
   private val kernelManagerProcess = new AtomicReference[Option[Process]](None)
-  private def destroyPythonProcess(): Unit = kernelManagerProcess.get foreach { _.destroy() }
 
+  private def destroyPythonProcess(): Unit = kernelManagerProcess.get.foreach(_.destroy())
 
   def subscribe(): Future[Unit] = {
-    val props = Props(new KernelManagerSubscriber)
+    val props           = Props(new KernelManagerSubscriber)
     val subscriberActor = actorSystem.actorOf(props, "KernelManagerSubscriber")
-    communicationFactory.registerSubscriber(
-      MQCommunication.Topic.kernelManagerSubscriptionTopic(workflowId, sessionId),
-      subscriberActor).map(_ => ())
+    communicationFactory
+      .registerSubscriber(MQCommunication.Topic.kernelManagerSubscriptionTopic(workflowId, sessionId), subscriberActor)
+      .map(_ => ())
   }
 
   private class KernelManagerSubscriber extends Actor with Logging {
-    override def receive: Receive = {
-      case KernelManagerReady() =>
-        logger.debug("Received KernelManagerReady!")
-        startPromise.success(Unit)
+
+    override def receive: Receive = { case KernelManagerReady() =>
+      logger.debug("Received KernelManagerReady!")
+      startPromise.success(Unit)
     }
+
   }
+
 }

@@ -4,8 +4,7 @@ import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTra
 import io.deepsense.deeplang.params.ParamPair
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
-class StandardScalerEstimatorSmokeTest
-  extends AbstractEstimatorModelWrapperSmokeTest {
+class StandardScalerEstimatorSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
 
   override def className: String = "StandardScaler"
 
@@ -14,9 +13,10 @@ class StandardScalerEstimatorSmokeTest
   import estimator._
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    withMean -> false,
-    withStd -> true,
-    inputColumn -> NameSingleColumnSelection("myFeatures"),
+    withMean            -> false,
+    withStd             -> true,
+    inputColumn         -> NameSingleColumnSelection("myFeatures"),
     singleInPlaceChoice -> NoInPlaceChoice().setOutputColumn("testOutputColumn")
   )
+
 }

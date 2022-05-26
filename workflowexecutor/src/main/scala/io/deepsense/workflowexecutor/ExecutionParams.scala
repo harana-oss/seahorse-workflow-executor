@@ -22,7 +22,8 @@ case class ExecutionParams(
     datasourceServerAddress: Option[URL] = None,
     depsZip: Option[String] = None,
     userId: Option[String] = None,
-    tempPath: Option[String] = None)
+    tempPath: Option[String] = None
+)
 
 // It's a separate case class because in Scala 2.10 case classes cannot have more than 22 params.
 case class MailParams(
@@ -30,4 +31,5 @@ case class MailParams(
     mailServerPort: Option[Int] = None,
     mailServerUser: Option[String] = None,
     mailServerPassword: Option[String] = None,
-    mailServerSender: Option[String] = None)
+    mailServerSender: Option[String] = None
+)

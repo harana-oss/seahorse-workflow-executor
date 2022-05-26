@@ -12,6 +12,7 @@ case class Abort(workflowId: Workflow.Id)
 trait AbortJsonProtocol extends Logging {
 
   implicit val abortFormat: RootJsonFormat[Abort] = jsonFormat1(Abort.apply)
+
 }
 
 object AbortJsonProtocol extends AbortJsonProtocol

@@ -1,34 +1,27 @@
 package io.deepsense.models.json.graph
 
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
-import spray.json.{DefaultJsonProtocol, JsObject}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+import spray.json.DefaultJsonProtocol
+import spray.json.JsObject
 
 import io.deepsense.deeplang.DOperation
 import io.deepsense.graph.Endpoint
 
-trait GraphJsonTestSupport
-  extends WordSpec
-  with MockitoSugar
-  with DefaultJsonProtocol
-  with Matchers {
+trait GraphJsonTestSupport extends AnyWordSpec with MockitoSugar with DefaultJsonProtocol with Matchers {
 
   def assertEndpointMatchesJsObject(edgeEnd: Endpoint, edgeEndJs: JsObject): Unit = {
     assert(edgeEndJs.fields("nodeId").convertTo[String] == edgeEnd.nodeId.value.toString)
     assert(edgeEndJs.fields("portIndex").convertTo[Int] == edgeEnd.portIndex)
   }
 
-  def endpointMatchesJsObject(edgeEnd: Endpoint, edgeEndJs: JsObject): Boolean = {
+  def endpointMatchesJsObject(edgeEnd: Endpoint, edgeEndJs: JsObject): Boolean =
     edgeEndJs.fields("nodeId").convertTo[String] == edgeEnd.nodeId.value.toString &&
-    edgeEndJs.fields("portIndex").convertTo[Int] == edgeEnd.portIndex
-  }
+      edgeEndJs.fields("portIndex").convertTo[Int] == edgeEnd.portIndex
 
-  def mockOperation(
-      inArity: Int,
-      outArity: Int,
-      id: DOperation.Id,
-      name: String): DOperation = {
+  def mockOperation(inArity: Int, outArity: Int, id: DOperation.Id, name: String): DOperation = {
 
     val dOperation = mock[DOperation]
     when(dOperation.inArity).thenReturn(inArity)
@@ -37,4 +30,5 @@ trait GraphJsonTestSupport
     when(dOperation.name).thenReturn(name)
     dOperation
   }
+
 }

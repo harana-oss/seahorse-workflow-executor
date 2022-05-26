@@ -4,18 +4,24 @@ import io.deepsense.commons.utils.Version
 import io.deepsense.deeplang.DOperation._
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.report.Report
-import io.deepsense.deeplang.doperables.{Evaluator, MetricValue}
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
-import io.deepsense.deeplang.params.{NumericParam, Param}
-import io.deepsense.deeplang.{DKnowledge, ExecutionContext, UnitSpec}
+import io.deepsense.deeplang.doperables.Evaluator
+import io.deepsense.deeplang.doperables.MetricValue
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
+import io.deepsense.deeplang.params.NumericParam
+import io.deepsense.deeplang.params.Param
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.ExecutionContext
+import io.deepsense.deeplang.UnitSpec
 
 class EvaluatorAsFactorySpec extends UnitSpec {
+
   import EvaluatorAsFactorySpec._
 
   "EvaluatorAsFactory" should {
     "have the same parameters as the Evaluator" in {
       val mockEvaluator = new MockEvaluator
-      val mockFactory = new MockEvaluatorFactory
+      val mockFactory   = new MockEvaluatorFactory
       mockFactory.extractParamMap() shouldBe mockEvaluator.extractParamMap()
       mockFactory.params shouldBe mockEvaluator.params
     }
@@ -60,28 +66,40 @@ class EvaluatorAsFactorySpec extends UnitSpec {
 
   private def execute(factory: MockEvaluatorFactory): MockEvaluator =
     factory.executeUntyped(Vector.empty)(mock[ExecutionContext]).head.asInstanceOf[MockEvaluator]
+
 }
 
 object EvaluatorAsFactorySpec {
 
   class MockEvaluator extends Evaluator {
+
     val param = NumericParam("b", Some("desc"))
+
     setDefault(param -> 5)
+
     override val params: Array[Param[_]] = Array(param)
 
     override private[deeplang] def _evaluate(ctx: ExecutionContext, df: DataFrame): MetricValue =
       ???
+
     override private[deeplang] def _infer(k: DKnowledge[DataFrame]): MetricValue =
       ???
+
     override def report: Report =
       ???
 
     override def isLargerBetter: Boolean = ???
+
   }
 
   class MockEvaluatorFactory extends EvaluatorAsFactory[MockEvaluator] {
+
     override val id: Id = Id.randomId
+
     override val name: String = "Mock Evaluator factory used for tests purposes"
+
     override val description: String = "Description"
+
   }
+
 }

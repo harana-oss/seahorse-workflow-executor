@@ -2,7 +2,8 @@ package io.deepsense.commons.mail.templates.instances
 
 import java.io.File
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory
 
 class ScalateTemplateConfig(val masterConfig: Config) {
 
@@ -18,7 +19,9 @@ class ScalateTemplateConfig(val masterConfig: Config) {
 object ScalateTemplateConfig {
 
   def apply(masterConfig: Config): ScalateTemplateConfig = new ScalateTemplateConfig(masterConfig)
+
   def apply(): ScalateTemplateConfig = new ScalateTemplateConfig()
 
   val scalateTemplateSubConfigPath = "scalate-templates"
+
 }

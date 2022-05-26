@@ -8,8 +8,8 @@ import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTra
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
 class DiscreteCosineTransformerSmokeTest
-  extends AbstractTransformerWrapperSmokeTest[DiscreteCosineTransformer]
-  with MultiColumnTransformerWrapperTestSupport {
+    extends AbstractTransformerWrapperSmokeTest[DiscreteCosineTransformer]
+    with MultiColumnTransformerWrapperTestSupport {
 
   override def transformerWithParams: DiscreteCosineTransformer = {
     val inPlace = NoInPlaceChoice()
@@ -20,10 +20,12 @@ class DiscreteCosineTransformerSmokeTest
       .setInPlace(inPlace)
 
     val transformer = new DiscreteCosineTransformer()
-    transformer.set(Seq(
-      transformer.singleOrMultiChoiceParam -> single,
-      transformer.inverse -> false
-    ): _*)
+    transformer.set(
+      Seq(
+        transformer.singleOrMultiChoiceParam -> single,
+        transformer.inverse                  -> false
+      ): _*
+    )
   }
 
   override def testValues: Seq[(Any, Any)] = {
@@ -43,4 +45,5 @@ class DiscreteCosineTransformerSmokeTest
   override def inputType: DataType = new io.deepsense.sparkutils.Linalg.VectorUDT
 
   override def outputType: DataType = new io.deepsense.sparkutils.Linalg.VectorUDT
+
 }

@@ -1,19 +1,25 @@
 package io.deepsense.workflowexecutor.executor
 
 import java.io.File
-import java.net.{InetAddress, URL}
+import java.net.InetAddress
+import java.net.URL
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.language.postfixOps
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.ActorRef
+import akka.actor.ActorSystem
+import akka.actor.Props
 import akka.routing._
 import com.rabbitmq.client.ConnectionFactory
-import com.thenewmotion.akka.rabbitmq._
+import com.newmotion.akka.rabbitmq._
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.SparkContext
 
-import io.deepsense.commons.mail.{EmailSender, EmailSenderAuthorizationConfig, EmailSenderConfig}
+import io.deepsense.commons.mail.EmailSender
+import io.deepsense.commons.mail.EmailSenderAuthorizationConfig
+import io.deepsense.commons.mail.EmailSenderConfig
 import io.deepsense.deeplang._
 import io.deepsense.commons.rest.client.NotebooksClientFactory
 import io.deepsense.commons.rest.client.datasources.DatasourceRestClientFactory
@@ -21,22 +27,24 @@ import io.deepsense.deeplang.catalogs.CatalogPair
 import io.deepsense.deeplang.catalogs.doperable.DOperableCatalog
 import io.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import io.deepsense.models.workflows.Workflow
-import io.deepsense.sparkutils.{AkkaUtils, SparkSQLSession}
+import io.deepsense.sparkutils.AkkaUtils
+import io.deepsense.sparkutils.SparkSQLSession
 import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.Init
 import io.deepsense.workflowexecutor.communication.mq.MQCommunication
-import io.deepsense.workflowexecutor.communication.mq.json.Global.{GlobalMQDeserializer, GlobalMQSerializer}
-import io.deepsense.workflowexecutor.communication.mq.serialization.json.{ProtocolJsonDeserializer, ProtocolJsonSerializer}
+import io.deepsense.workflowexecutor.communication.mq.json.Global.GlobalMQDeserializer
+import io.deepsense.workflowexecutor.communication.mq.json.Global.GlobalMQSerializer
+import io.deepsense.workflowexecutor.communication.mq.serialization.json.ProtocolJsonDeserializer
+import io.deepsense.workflowexecutor.communication.mq.serialization.json.ProtocolJsonSerializer
 import io.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 import io.deepsense.workflowexecutor.executor.session.LivyKeepAliveActor
 import io.deepsense.workflowexecutor.notebooks.KernelManagerCaretaker
 import io.deepsense.workflowexecutor.pyspark.PythonPathGenerator
 import io.deepsense.workflowexecutor.rabbitmq._
 import io.deepsense.workflowexecutor.session.storage.DataFrameStorageImpl
-import io.deepsense.workflowexecutor.{WorkflowManagerClientActor, _}
+import io.deepsense.workflowexecutor.WorkflowManagerClientActor
+import io.deepsense.workflowexecutor._
 
-/**
- * SessionExecutor waits for user instructions in an infinite loop.
- */
+/** SessionExecutor waits for user instructions in an infinite loop. */
 case class SessionExecutor(
     messageQueueHost: String,
     messageQueuePort: Int,
@@ -56,29 +64,35 @@ case class SessionExecutor(
     depsZip: String,
     workflowOwnerId: String,
     tempPath: String,
-    pythonBinaryPath: Option[String])
-  extends Executor {
+    pythonBinaryPath: Option[String]
+) extends Executor {
 
   private val workflowIdObject = Workflow.Id.fromString(workflowId)
+
   private val config = ConfigFactory.load
+
   private val subscriptionTimeout = config.getInt("subscription-timeout").seconds
+
   private val keepAliveInterval = config.getInt("keep-alive.interval").seconds
+
   private val heartbeatInterval = config.getInt("heartbeat.interval").seconds
+
   private val workflowManagerTimeout = config.getInt("workflow-manager.timeout")
+
   private val wmWorkflowsPath = config.getString("workflow-manager.workflows.path")
+
   private val wmReportsPath = config.getString("workflow-manager.reports.path")
+
   val CatalogPair(dOperableCatalog, dOperationsCatalog) =
     CatalogRecorder.resourcesCatalogRecorder.catalogs
 
   val graphReader = new GraphReader(dOperationsCatalog)
 
-  /**
-   * WARNING: Performs an infinite loop.
-   */
+  /** WARNING: Performs an infinite loop. */
   def execute(): Unit = {
     logger.info(s"SessionExecutor for '$workflowId' starts...")
-    val sparkContext = createSparkContext()
-    val sparkSQLSession = createSparkSQLSession(sparkContext)
+    val sparkContext     = createSparkContext()
+    val sparkSQLSession  = createSparkSQLSession(sparkContext)
     val dataFrameStorage = new DataFrameStorageImpl
 
     val hostAddress: InetAddress = HostAddressResolver.findHostAddress()
@@ -98,8 +112,8 @@ case class SessionExecutor(
 
     val operationExecutionDispatcher = new OperationExecutionDispatcher
 
-    val customCodeEntryPoint = new CustomCodeEntryPoint(sparkContext,
-      sparkSQLSession, dataFrameStorage, operationExecutionDispatcher)
+    val customCodeEntryPoint =
+      new CustomCodeEntryPoint(sparkContext, sparkSQLSession, dataFrameStorage, operationExecutionDispatcher)
 
     val pythonExecutionCaretaker = new PythonExecutionCaretaker(
       s"$tempPath/pyexecutor/pyexecutor.py",
@@ -109,45 +123,39 @@ case class SessionExecutor(
       sparkSQLSession,
       dataFrameStorage,
       customCodeEntryPoint,
-      hostAddress)
+      hostAddress
+    )
     pythonExecutionCaretaker.start()
 
-    val rExecutionCaretaker = new RExecutionCaretaker(s"$tempPath/r_executor.R",
-      customCodeEntryPoint)
+    val rExecutionCaretaker = new RExecutionCaretaker(s"$tempPath/r_executor.R", customCodeEntryPoint)
     rExecutionCaretaker.start()
 
-    val customCodeExecutionProvider = CustomCodeExecutionProvider(
-      pythonExecutionCaretaker.pythonCodeExecutor,
-      rExecutionCaretaker.rCodeExecutor,
-      operationExecutionDispatcher)
+    val customCodeExecutionProvider =
+      CustomCodeExecutionProvider(
+        pythonExecutionCaretaker.pythonCodeExecutor,
+        rExecutionCaretaker.rCodeExecutor,
+        operationExecutionDispatcher
+      )
 
     implicit val system = ActorSystem()
     setupLivyKeepAliveLogging(system, keepAliveInterval)
-    val workflowManagerClientActor = system.actorOf(
-      WorkflowManagerClientActor.props(
-        workflowOwnerId,
-        wmUsername,
-        wmPassword,
-        wmAddress,
-        wmWorkflowsPath,
-        wmReportsPath,
-        graphReader))
+    val workflowManagerClientActor =
+      system.actorOf(
+        WorkflowManagerClientActor.props(workflowOwnerId, wmUsername, wmPassword, wmAddress, wmWorkflowsPath,
+          wmReportsPath, graphReader)
+      )
 
     val communicationFactory: MQCommunicationFactory = createCommunicationFactory(system)
 
     val workflowsSubscriberActor: ActorRef = createWorkflowsSubscriberActor(
-      sparkContext,
-      sparkSQLSession,
-      dOperableCatalog,
-      dataFrameStorage,
-      customCodeExecutionProvider,
-      system,
-      workflowManagerClientActor,
-      communicationFactory)
+      sparkContext, sparkSQLSession, dOperableCatalog, dataFrameStorage, customCodeExecutionProvider, system,
+      workflowManagerClientActor, communicationFactory
+    )
 
     val workflowsSubscriberReady = communicationFactory.registerSubscriber(
       MQCommunication.Topic.allWorkflowsSubscriptionTopic(workflowId),
-      workflowsSubscriberActor)
+      workflowsSubscriberActor
+    )
 
     waitUntilSubscribersAreReady(Seq(workflowsSubscriberReady))
 
@@ -189,13 +197,15 @@ case class SessionExecutor(
       customCodeExecutionProvider: CustomCodeExecutionProvider,
       system: ActorSystem,
       workflowManagerClientActor: ActorRef,
-      communicationFactory: MQCommunicationFactory): ActorRef = {
+      communicationFactory: MQCommunicationFactory
+  ): ActorRef = {
 
     def createHeartbeatPublisher: ActorRef = {
       val seahorsePublisher = communicationFactory.createPublisher(
         // TODO: Currently sessionId == workflowId
         MQCommunication.Topic.seahorsePublicationTopic(workflowId),
-        MQCommunication.Actor.Publisher.seahorse)
+        MQCommunication.Actor.Publisher.seahorse
+      )
 
       val heartbeatWorkflowBroadcaster = communicationFactory.createBroadcaster(
         MQCommunication.Exchange.heartbeats(workflowIdObject),
@@ -208,10 +218,7 @@ case class SessionExecutor(
       )
 
       val routeePaths = scala.collection.immutable
-        .Iterable(
-          seahorsePublisher,
-          heartbeatWorkflowBroadcaster,
-          heartbeatAllBroadcaster)
+        .Iterable(seahorsePublisher, heartbeatWorkflowBroadcaster, heartbeatAllBroadcaster)
         .map(_.path.toString)
 
       val heartbeatPublisher = system.actorOf(
@@ -228,9 +235,8 @@ case class SessionExecutor(
         smtpHost = mailServerHost,
         smtpPort = mailServerPort,
         from = mailServerSender,
-        authorizationConfig = Some(EmailSenderAuthorizationConfig(
-          user = mailServerUser,
-          password = mailServerPassword)))
+        authorizationConfig = Some(EmailSenderAuthorizationConfig(user = mailServerUser, password = mailServerPassword))
+      )
       EmailSender(emailSenderConfig)
     }
     val notebooksClientFactory = new NotebooksClientFactory(notebookServerAddress, 1 second, 3600)(system)
@@ -243,50 +249,51 @@ case class SessionExecutor(
       executionMode = ExecutionMode.Interactive,
       notebooksClientFactory = Some(notebooksClientFactory),
       emailSender = Some(emailSender),
-      datasourceClientFactory = new DatasourceRestClientFactory(
-        datasourceServerAddress, workflowOwnerId),
+      datasourceClientFactory = new DatasourceRestClientFactory(datasourceServerAddress, workflowOwnerId),
       customCodeExecutionProvider = customCodeExecutionProvider,
       sparkContext = sparkContext,
       sparkSQLSession = sparkSQLSession,
       tempPath = tempPath,
       libraryPath = libraryPath,
-      dOperableCatalog = Some(dOperableCatalog))
+      dOperableCatalog = Some(dOperableCatalog)
+    )
 
-    val readyBroadcaster = communicationFactory.createBroadcaster(
-      MQCommunication.Exchange.ready(workflowIdObject),
-      MQCommunication.Actor.Publisher.ready(workflowIdObject))
+    val readyBroadcaster =
+      communicationFactory.createBroadcaster(
+        MQCommunication.Exchange.ready(workflowIdObject),
+        MQCommunication.Actor.Publisher.ready(workflowIdObject)
+      )
 
     val publisher: ActorRef = communicationFactory.createPublisher(
       // TODO: Currently sessionId == workflowId
       MQCommunication.Topic.workflowPublicationTopic(workflowIdObject, workflowId),
-      MQCommunication.Actor.Publisher.workflow(workflowIdObject))
+      MQCommunication.Actor.Publisher.workflow(workflowIdObject)
+    )
 
     val actorProvider = new SessionWorkflowExecutorActorProvider(
-      executionContext,
-      workflowManagerClientActor,
-      heartbeatPublisher,
-      readyBroadcaster,
-      workflowManagerTimeout,
+      executionContext, workflowManagerClientActor, heartbeatPublisher, readyBroadcaster, workflowManagerTimeout,
       publisher,
       // TODO: Currently sessionId == workflowId
-      workflowId,
-      heartbeatInterval)
+      workflowId, heartbeatInterval
+    )
 
     val workflowsSubscriberActor = system.actorOf(
       WorkflowTopicSubscriber.props(
         actorProvider,
         // TODO: Currently sessionId == workflowId
         workflowId,
-        workflowIdObject),
-      MQCommunication.Actor.Subscriber.workflows)
+        workflowIdObject
+      ),
+      MQCommunication.Actor.Subscriber.workflows
+    )
 
     workflowsSubscriberActor
   }
 
   private def createCommunicationFactory(system: ActorSystem): MQCommunicationFactory = {
     val connection: ActorRef = createConnection(system)
-    val messageDeserializer = ProtocolJsonDeserializer(graphReader).orElse(GlobalMQDeserializer)
-    val messageSerializer = ProtocolJsonSerializer(graphReader).orElse(GlobalMQSerializer)
+    val messageDeserializer  = ProtocolJsonDeserializer(graphReader).orElse(GlobalMQDeserializer)
+    val messageSerializer    = ProtocolJsonSerializer(graphReader).orElse(GlobalMQSerializer)
     MQCommunicationFactory(system, connection, messageSerializer, messageDeserializer)
   }
 
@@ -296,9 +303,7 @@ case class SessionExecutor(
     factory.setPort(messageQueuePort)
     factory.setUsername(messageQueueUser)
     factory.setPassword(messageQueuePass)
-    system.actorOf(
-      ConnectionActor.props(factory),
-      MQCommunication.mqActorSystemName)
+    system.actorOf(ConnectionActor.props(factory), MQCommunication.mqActorSystemName)
   }
 
   // Clients after receiving ready or heartbeat will assume
@@ -318,7 +323,8 @@ case class SessionExecutor(
       system: ActorSystem,
       sparkContext: SparkContext,
       pythonExecutionCaretaker: PythonExecutionCaretaker,
-      kernelManagerCaretaker: KernelManagerCaretaker): Unit = {
+      kernelManagerCaretaker: KernelManagerCaretaker
+  ): Unit = {
     logger.debug("Cleaning up...")
     pythonExecutionCaretaker.stop()
     kernelManagerCaretaker.stop()
@@ -327,4 +333,5 @@ case class SessionExecutor(
     AkkaUtils.terminate(system)
     logger.debug("Akka terminated!")
   }
+
 }

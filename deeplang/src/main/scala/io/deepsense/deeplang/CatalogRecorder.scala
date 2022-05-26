@@ -18,33 +18,30 @@ import io.deepsense.deeplang.doperables.spark.wrappers.evaluators._
 import io.deepsense.deeplang.doperables.spark.wrappers.models._
 import io.deepsense.deeplang.doperables.spark.wrappers.transformers._
 import io.deepsense.deeplang.doperations._
-import io.deepsense.deeplang.doperations.custom.{Sink, Source}
+import io.deepsense.deeplang.doperations.custom.Sink
+import io.deepsense.deeplang.doperations.custom.Source
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators._
 import io.deepsense.deeplang.doperations.spark.wrappers.evaluators._
 import io.deepsense.deeplang.doperations.spark.wrappers.transformers._
 import io.deepsense.deeplang.refl.CatalogScanner
 
-/**
- * Class used to register all desired DOperables and DOperations.
- */
+/** Class used to register all desired DOperables and DOperations. */
 class CatalogRecorder private (jars: Seq[URL]) {
+
   def withDir(jarsDir: File): CatalogRecorder = {
     val additionalJars =
-      if (jarsDir.exists && jarsDir.isDirectory) {
+      if (jarsDir.exists && jarsDir.isDirectory)
         jarsDir.listFiles().toSeq.filter(f => f.isFile && f.getName.endsWith(".jar"))
-      } else {
+      else
         Seq.empty
-      }
     withJars(additionalJars)
   }
 
-  def withJars(additionalJars: Seq[File]): CatalogRecorder = {
+  def withJars(additionalJars: Seq[File]): CatalogRecorder =
     new CatalogRecorder(jars ++ additionalJars.map(_.toURI.toURL))
-  }
 
-  def withSparkContext(sparkContext: SparkContext): CatalogRecorder = {
+  def withSparkContext(sparkContext: SparkContext): CatalogRecorder =
     new CatalogRecorder(jars ++ sparkContext.jars.map(new URL(_)))
-  }
 
   private def registerDOperables(catalog: DOperableCatalog): Unit = {
     catalog.registerDOperable[DataFrame]()
@@ -228,8 +225,10 @@ class CatalogRecorder private (jars: Seq[URL]) {
     catalog.registerDOperation(DOperationCategories.ML.ModelEvaluation, () => new CreateREvaluator())
     // operations generated from Spark evaluators
     catalog.registerDOperation(DOperationCategories.ML.ModelEvaluation, () => new CreateBinaryClassificationEvaluator())
-    catalog.registerDOperation(DOperationCategories.ML.ModelEvaluation,
-      () => new CreateMulticlassClassificationEvaluator())
+    catalog.registerDOperation(
+      DOperationCategories.ML.ModelEvaluation,
+      () => new CreateMulticlassClassificationEvaluator()
+    )
     catalog.registerDOperation(DOperationCategories.ML.ModelEvaluation, () => new CreateRegressionEvaluator())
 
   }
@@ -247,7 +246,7 @@ class CatalogRecorder private (jars: Seq[URL]) {
   }
 
   lazy val catalogs: CatalogPair = {
-    val dOperableCatalog = createDOperableCatalog()
+    val dOperableCatalog   = createDOperableCatalog()
     val dOperationsCatalog = createDOperationsCatalog()
 
     new CatalogScanner(jars).scanAndRegister(dOperableCatalog, dOperationsCatalog)
@@ -258,19 +257,19 @@ class CatalogRecorder private (jars: Seq[URL]) {
 }
 
 object CatalogRecorder {
+
   val logger = LoggerForCallerClass()
 
-  def fromDir(dir: File): CatalogRecorder = {
+  def fromDir(dir: File): CatalogRecorder =
     new CatalogRecorder(Seq.empty).withDir(dir)
-  }
-  def fromJars(jars: Seq[URL]): CatalogRecorder = {
-    new CatalogRecorder(jars)
-  }
-  def fromSparkContext(sparkContext: SparkContext): CatalogRecorder = {
-    new CatalogRecorder(Seq.empty).withSparkContext(sparkContext)
-  }
 
-  lazy val resourcesCatalogRecorder: CatalogRecorder = {
+  def fromJars(jars: Seq[URL]): CatalogRecorder =
+    new CatalogRecorder(jars)
+
+  def fromSparkContext(sparkContext: SparkContext): CatalogRecorder =
+    new CatalogRecorder(Seq.empty).withSparkContext(sparkContext)
+
+  lazy val resourcesCatalogRecorder: CatalogRecorder =
     fromDir(Config.jarsDir)
-  }
+
 }

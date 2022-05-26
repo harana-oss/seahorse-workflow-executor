@@ -12,7 +12,8 @@ object ContinuousDistributionBuilderFactory {
   def prepareBuilder(
       columnIndex: Int,
       field: StructField,
-      multivarStats: MultivariateStatisticalSummary): DistributionBuilder = {
+      multivarStats: MultivariateStatisticalSummary
+  ): DistributionBuilder = {
     val columnStats = ColumnStats.fromMultiVarStats(multivarStats, columnIndex)
     // MultivarStats inits min with Double.MaxValue and max with MinValue.
     // If there is at least one not (null or NaN) its guaranteed to change min/max values.
@@ -25,15 +26,14 @@ object ContinuousDistributionBuilderFactory {
 
     if (!hasOnlyNulls) {
       val histogram = {
-        val buckets = BucketsCalculator.calculateBuckets(field.dataType,
-          columnStats)
+        val buckets = BucketsCalculator.calculateBuckets(field.dataType, columnStats)
         HistogramAggregator(buckets, true).mapInput(getColumnAsDouble(columnIndex))
       }
-      val missing = CountOccurenceAggregator[Option[Any]](None).mapInput(getOption(columnIndex))
+      val missing  = CountOccurenceAggregator[Option[Any]](None).mapInput(getOption(columnIndex))
       val colStats = columnStats
       ContinuousDistributionBuilder(histogram, missing, field, colStats)
-    } else {
+    } else
       NoDistributionBuilder(field.name, NoDistributionReasons.OnlyNulls)
-    }
   }
+
 }

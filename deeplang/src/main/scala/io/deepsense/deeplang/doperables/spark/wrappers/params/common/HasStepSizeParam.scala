@@ -16,6 +16,9 @@ trait HasStepSizeParam extends Params {
     name = "step size",
     description = Some("The step size to be used for each iteration of optimization."),
     sparkParamGetter = _.stepSize,
-    validator = RangeValidator(begin = 0.0, end = Double.MaxValue))
+    validator = RangeValidator(begin = 0.0, end = Double.MaxValue)
+  )
+
   setDefault(stepSize, stepSizeDefault)
+
 }

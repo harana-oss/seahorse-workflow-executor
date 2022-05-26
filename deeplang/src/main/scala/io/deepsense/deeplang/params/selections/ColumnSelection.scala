@@ -9,26 +9,22 @@ import io.deepsense.commons.types.ColumnType._
 import io.deepsense.deeplang.exceptions.DeepLangException
 import io.deepsense.deeplang.params.exceptions.IllegalIndexRangeColumnSelectionException
 
-/**
- * Represents selecting subset of columns of dataframe.
- */
+/** Represents selecting subset of columns of dataframe. */
 @SerialVersionUID(1)
-sealed abstract class ColumnSelection(
-    val typeName: String)
-  extends Serializable {
+sealed abstract class ColumnSelection(val typeName: String) extends Serializable {
 
-  final def toJson: JsValue = JsObject(
-    ColumnSelection.typeField -> typeName.toJson,
-    ColumnSelection.valuesField -> valuesToJson)
+  final def toJson: JsValue =
+    JsObject(ColumnSelection.typeField -> typeName.toJson, ColumnSelection.valuesField -> valuesToJson)
 
   protected def valuesToJson: JsValue
 
-  def validate: Vector[DeepLangException] = {
+  def validate: Vector[DeepLangException] =
     Vector.empty[DeepLangException]
-  }
+
 }
 
 object ColumnSelection {
+
   val typeField = "type"
 
   val valuesField = "values"
@@ -46,58 +42,64 @@ object ColumnSelection {
         case JsString(IndexRangeColumnSelection.typeName) =>
           IndexRangeColumnSelection.fromJson(value)
         case unknownType =>
-          throw new DeserializationException(s"Cannot create column selection with $jsValue:" +
-            s"unknown type $unknownType")
+          throw new DeserializationException(
+            s"Cannot create column selection with $jsValue:" +
+              s"unknown type $unknownType"
+          )
       }
-    case _ => throw new DeserializationException(
-      s"Cannot create column selection with $jsValue: object expected.")
+    case _ => throw new DeserializationException(s"Cannot create column selection with $jsValue: object expected.")
   }
+
 }
 
 trait ColumnSelectionJsonProtocol extends DefaultJsonProtocol with SprayJsonSupport {
+
   implicit object ColumnSelectionFormat extends RootJsonFormat[ColumnSelection] {
+
     def write(selection: ColumnSelection): JsValue = selection.toJson
+
     def read(value: JsValue): ColumnSelection = ColumnSelection.fromJson(value)
+
   }
+
 }
 
 object ColumnSelectionJsonProtocol extends ColumnSelectionJsonProtocol
 
-/**
- * Represents selecting subset of columns which have one of given names.
- */
-case class NameColumnSelection(names: Set[String])
-  extends ColumnSelection(NameColumnSelection.typeName) {
+/** Represents selecting subset of columns which have one of given names. */
+case class NameColumnSelection(names: Set[String]) extends ColumnSelection(NameColumnSelection.typeName) {
 
   override protected def valuesToJson: JsValue = names.toJson
+
 }
 
 object NameColumnSelection {
+
   val typeName = "columnList"
 
-  def fromJson(jsValue: JsValue): NameColumnSelection = {
+  def fromJson(jsValue: JsValue): NameColumnSelection =
     NameColumnSelection(jsValue.convertTo[Set[String]])
-  }
+
 }
-/**
- * Represents selecting subset of columns which have one of given indexes.
- */
-case class IndexColumnSelection(indexes: Set[Int])
-  extends ColumnSelection(IndexColumnSelection.typeName) {
+
+/** Represents selecting subset of columns which have one of given indexes. */
+case class IndexColumnSelection(indexes: Set[Int]) extends ColumnSelection(IndexColumnSelection.typeName) {
 
   override protected def valuesToJson: JsValue = indexes.toJson
+
 }
 
 object IndexColumnSelection {
+
   val typeName = "indexList"
 
-  def fromJson(jsValue: JsValue): IndexColumnSelection = {
+  def fromJson(jsValue: JsValue): IndexColumnSelection =
     IndexColumnSelection(jsValue.convertTo[Set[Int]])
-  }
+
 }
 
 case class IndexRangeColumnSelection(lowerBound: Option[Int], upperBound: Option[Int])
-  extends ColumnSelection(IndexRangeColumnSelection.typeName) {
+    extends ColumnSelection(IndexRangeColumnSelection.typeName) {
 
   override protected def valuesToJson: JsValue =
     List(lowerBound, upperBound).flatten.toJson
@@ -108,49 +110,47 @@ case class IndexRangeColumnSelection(lowerBound: Option[Int], upperBound: Option
       upper <- upperBound
     } yield lower <= upper
     val valid = lowerLessThanUpper.getOrElse(false)
-    if (valid) {
+    if (valid)
       Vector.empty[DeepLangException]
-    } else {
+    else
       Vector(IllegalIndexRangeColumnSelectionException(this))
-    }
   }
+
 }
 
 object IndexRangeColumnSelection {
+
   val typeName = "indexRange"
 
   def fromJson(jsValue: JsValue): IndexRangeColumnSelection = {
     val bounds = jsValue.convertTo[List[Int]]
-    if (bounds.isEmpty) {
+    if (bounds.isEmpty)
       IndexRangeColumnSelection(None, None)
-    }
-    else if (bounds.size == 1) {
+    else if (bounds.size == 1)
       IndexRangeColumnSelection(Some(bounds.head), Some(bounds.head))
-    }
-    else if (bounds.size == 2) {
+    else if (bounds.size == 2)
       IndexRangeColumnSelection(Some(bounds.head), Some(bounds(1)))
-    }
-    else {
-      throw new DeserializationException("Can not deserialize IndexRangeColumnSelection. " +
-        s"Expected list of size <= 2 but got: $jsValue")
-    }
+    else
+      throw new DeserializationException(
+        "Can not deserialize IndexRangeColumnSelection. " +
+          s"Expected list of size <= 2 but got: $jsValue"
+      )
   }
+
 }
 
-/**
- * Represents selecting subset of columns which have one of given types.
- */
-case class TypeColumnSelection(types: Set[ColumnType])
-  extends ColumnSelection(TypeColumnSelection.typeName) {
+/** Represents selecting subset of columns which have one of given types. */
+case class TypeColumnSelection(types: Set[ColumnType]) extends ColumnSelection(TypeColumnSelection.typeName) {
 
   override protected def valuesToJson: JsValue = types.map(_.toString).toJson
 
 }
 
 object TypeColumnSelection {
+
   val typeName = "typeList"
 
-  def fromJson(jsValue: JsValue): TypeColumnSelection = {
+  def fromJson(jsValue: JsValue): TypeColumnSelection =
     TypeColumnSelection(jsValue.convertTo[Set[String]].map(ColumnType.withName))
-  }
+
 }

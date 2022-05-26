@@ -1,32 +1,34 @@
 package io.deepsense.workflowexecutor.partialexecution
 
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import io.deepsense.commons.StandardSpec
 import io.deepsense.commons.exception.FailureDescription
 import io.deepsense.commons.models.Entity
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.inference.InferContext
-import io.deepsense.deeplang.{DOperable, DOperation}
+import io.deepsense.deeplang.DOperable
+import io.deepsense.deeplang.DOperation
 import io.deepsense.graph.DeeplangGraph.DeeplangNode
 import io.deepsense.graph._
-import io.deepsense.graph.nodestate.{Completed, NodeStatus, Queued}
-import io.deepsense.models.workflows.{EntitiesMap, NodeState, NodeStateWithResults}
+import io.deepsense.graph.nodestate.Completed
+import io.deepsense.graph.nodestate.NodeStatus
+import io.deepsense.graph.nodestate.Queued
+import io.deepsense.models.workflows.EntitiesMap
+import io.deepsense.models.workflows.NodeState
+import io.deepsense.models.workflows.NodeStateWithResults
 import io.deepsense.reportlib.model.ReportContent
 import io.deepsense.reportlib.model.factory.ReportContentTestFactory
 
-class ExecutionSpec
-  extends StandardSpec
-  with MockitoSugar
-  with GraphTestSupport {
+class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport {
 
   val directedGraph = DeeplangGraph(nodeSet, edgeSet)
-  val statefulGraph = StatefulGraph(
-    directedGraph,
-    directedGraph.nodes.map(_.id -> NodeStateWithResults.draft).toMap,
-    None)
+
+  val statefulGraph =
+    StatefulGraph(directedGraph, directedGraph.nodes.map(_.id -> NodeStateWithResults.draft).toMap, None)
+
   val allNodesIds = directedGraph.nodes.map(_.id)
 
   "Execution" should {
@@ -38,9 +40,7 @@ class ExecutionSpec
       "created with selection" in {
         val execution = Execution(statefulGraph, Set(idA, idB))
         execution.graph.states should have size execution.graph.size
-        execution.selectedNodes.foreach {
-          n => execution.graph.states(n) shouldBe NodeStateWithResults.draft
-        }
+        execution.selectedNodes.foreach(n => execution.graph.states(n) shouldBe NodeStateWithResults.draft)
       }
     }
     "have all previously queued nodes get aborted after aborting execution" in {
@@ -53,15 +53,10 @@ class ExecutionSpec
         None
       )
 
-      val running = RunningExecution(
-        statefulGraph,
-        statefulGraph,
-        allNodesIds.toSet)
+      val running = RunningExecution(statefulGraph, statefulGraph, allNodesIds.toSet)
 
       val aborted = running.abort
-      aborted.graph.states.values.foreach { nodeState =>
-        nodeState.isAborted shouldBe true
-      }
+      aborted.graph.states.values.foreach(nodeState => nodeState.isAborted shouldBe true)
     }
     "infer knowledge only on the selected part" in {
       val graph = mock[StatefulGraph]
@@ -72,7 +67,7 @@ class ExecutionSpec
       when(graph.subgraph(any())).thenReturn(subgraph)
       when(subgraph.enqueueDraft).thenReturn(subgraph)
 
-      val nodes = Set[Node.Id]()
+      val nodes     = Set[Node.Id]()
       val execution = IdleExecution(graph, nodes)
 
       val inferenceResult = mock[StatefulGraph]
@@ -81,7 +76,7 @@ class ExecutionSpec
       when(graph.updateStates(any())).thenReturn(inferenceResult)
 
       val inferContext = mock[InferContext]
-      val inferred = execution.inferAndApplyKnowledge(inferContext)
+      val inferred     = execution.inferAndApplyKnowledge(inferContext)
       verify(subgraph).inferAndApplyKnowledge(inferContext)
 
       inferred shouldBe IdleExecution(inferenceResult, nodes)
@@ -100,9 +95,7 @@ class ExecutionSpec
           None
         )
 
-        val execution = IdleExecution(
-          statefulGraph,
-          statefulGraph.nodes.map(_.id))
+        val execution = IdleExecution(statefulGraph, statefulGraph.nodes.map(_.id))
 
         val updated =
           execution.updateStructure(statefulGraph.directedGraph, Set(idC))
@@ -112,7 +105,7 @@ class ExecutionSpec
         updated.graph.states(idC) shouldBe execution.graph.states(idC).draft
         updated.graph.states(idD) shouldBe execution.graph.states(idD).draft
         updated.graph.states(idE) shouldBe execution.graph.states(idE).draft
-    }
+      }
     "enqueue all nodes" when {
       "all nodes where specified" in {
         val allSelected = Execution(statefulGraph, allNodesIds)
@@ -132,10 +125,7 @@ class ExecutionSpec
         val enqueued = allSelected.enqueue
 
         enqueued shouldBe
-          RunningExecution(
-            draftGraph,
-            queuedGraph,
-            allNodesIds.toSet)
+          RunningExecution(draftGraph, queuedGraph, allNodesIds.toSet)
 
         enqueued.graph.states.forall { case (_, state) => state.isQueued } shouldBe true
       }
@@ -153,9 +143,7 @@ class ExecutionSpec
         None
       )
 
-      val execution = IdleExecution(
-        statefulGraph,
-        statefulGraph.nodes.map(_.id))
+      val execution = IdleExecution(statefulGraph, statefulGraph.nodes.map(_.id))
 
       val updated =
         execution.updateStructure(statefulGraph.directedGraph, Set(idC, idE))
@@ -168,54 +156,51 @@ class ExecutionSpec
     }
     "not execute operations that are already completed (if they are not selected)" +
       "finish execution if the selected subgraph finished" in {
-      val stateWC = nodeCompletedIdState(idC)
-      val stateWD = nodeCompletedIdState(idD)
-      val stateWE = nodeCompletedIdState(idE)
-      val statefulGraph = StatefulGraph(
-        DeeplangGraph(nodeSet, edgeSet),
-        Map(
-          idA -> nodeCompletedIdState(idA),
-          idB -> nodeCompletedIdState(idB),
-          idC -> stateWC,
-          idD -> stateWD,
-          idE -> stateWE
-        ),
-        None
-      )
+        val stateWC = nodeCompletedIdState(idC)
+        val stateWD = nodeCompletedIdState(idD)
+        val stateWE = nodeCompletedIdState(idE)
+        val statefulGraph = StatefulGraph(
+          DeeplangGraph(nodeSet, edgeSet),
+          Map(
+            idA -> nodeCompletedIdState(idA),
+            idB -> nodeCompletedIdState(idB),
+            idC -> stateWC,
+            idD -> stateWD,
+            idE -> stateWE
+          ),
+          None
+        )
 
-      val execution = IdleExecution(
-        statefulGraph,
-        statefulGraph.nodes.map(_.id))
+        val execution = IdleExecution(statefulGraph, statefulGraph.nodes.map(_.id))
 
-      val enqueued = execution
+        val enqueued = execution
           .updateStructure(statefulGraph.directedGraph, Set(idC, idE))
           .enqueue
 
-      enqueued.graph.states(idA) shouldBe execution.graph.states(idA)
-      enqueued.graph.states(idB) shouldBe execution.graph.states(idB)
-      enqueued.graph.states(idC) shouldBe stateWC.draft.enqueue
-      enqueued.graph.states(idD) shouldBe stateWD.draft
-      enqueued.graph.states(idE) shouldBe stateWE.draft.enqueue
+        enqueued.graph.states(idA) shouldBe execution.graph.states(idA)
+        enqueued.graph.states(idB) shouldBe execution.graph.states(idB)
+        enqueued.graph.states(idC) shouldBe stateWC.draft.enqueue
+        enqueued.graph.states(idD) shouldBe stateWD.draft
+        enqueued.graph.states(idE) shouldBe stateWE.draft.enqueue
 
-      enqueued.graph.readyNodes.map(
-        rn => rn.node) should contain theSameElementsAs List(nodeC, nodeE)
-      val cStarted = enqueued.nodeStarted(idC)
-      cStarted.graph.readyNodes.map(rn => rn.node) should contain theSameElementsAs List(nodeE)
-      val eStarted = cStarted.nodeStarted(idE)
-      eStarted.graph.readyNodes.map(rn => rn.node) shouldBe 'empty
+        enqueued.graph.readyNodes.map(rn => rn.node) should contain theSameElementsAs List(nodeC, nodeE)
+        val cStarted = enqueued.nodeStarted(idC)
+        cStarted.graph.readyNodes.map(rn => rn.node) should contain theSameElementsAs List(nodeE)
+        val eStarted = cStarted.nodeStarted(idE)
+        eStarted.graph.readyNodes.map(rn => rn.node) shouldBe 'empty
 
-      val idCResults = results(idC)
-      val idEResults = results(idE)
-      def reports(ids: Seq[Entity.Id]): Map[Entity.Id, ReportContent] =
-        ids.map(_ -> ReportContentTestFactory.someReport).toMap
-      def dOperables(ids: Seq[Entity.Id]): Map[Entity.Id, DOperable] =
-        ids.map(_ -> mock[DOperable]).toMap
-      val finished = eStarted
-        .nodeFinished(idC, idCResults, reports(idCResults), dOperables(idCResults))
-        .nodeFinished(idE, idEResults, reports(idEResults), dOperables(idEResults))
+        val idCResults = results(idC)
+        val idEResults = results(idE)
+        def reports(ids: Seq[Entity.Id]): Map[Entity.Id, ReportContent] =
+          ids.map(_ -> ReportContentTestFactory.someReport).toMap
+        def dOperables(ids: Seq[Entity.Id]): Map[Entity.Id, DOperable] =
+          ids.map(_ -> mock[DOperable]).toMap
+        val finished = eStarted
+          .nodeFinished(idC, idCResults, reports(idCResults), dOperables(idCResults))
+          .nodeFinished(idE, idEResults, reports(idEResults), dOperables(idEResults))
 
-      finished shouldBe an[IdleExecution]
-    }
+        finished shouldBe an[IdleExecution]
+      }
     "expose inference errors" in {
       val failedGraph = mock[StatefulGraph]
       when(failedGraph.readyNodes).thenReturn(Seq.empty)
@@ -233,8 +218,7 @@ class ExecutionSpec
       when(graph.executionFailure).thenReturn(None)
 
       val execution = IdleExecution(graph, Set())
-      execution.inferAndApplyKnowledge(
-        mock[InferContext]).graph.executionFailure shouldBe failureDescription
+      execution.inferAndApplyKnowledge(mock[InferContext]).graph.executionFailure shouldBe failureDescription
     }
     "reset successors state when predecessor is replaced" in {
       val changedC = Node(Node.Id.randomId, op1To1) // Notice: different Id
@@ -246,7 +230,8 @@ class ExecutionSpec
           stateWD: NodeStateWithResults,
           stateWE: NodeStateWithResults,
           stateC: NodeStateWithResults,
-          execution: IdleExecution): Unit = {
+          execution: IdleExecution
+      ): Unit = {
         val updatedExecution = execution.updateStructure(updatedGraph, Set(idE))
         updatedExecution.graph.states(idA) shouldBe statefulGraph.states(idA)
         updatedExecution.graph.states(idB) shouldBe statefulGraph.states(idB)
@@ -262,14 +247,12 @@ class ExecutionSpec
         queuedExecution.graph.states(idE) shouldBe stateWE.draft.enqueue
       }
 
-
       checkSuccessorsStatesAfterANodeChange(changedC, validate)
     }
     "reset successors state when predecessor's parameters are modified" in {
       val changedCOp = createOp1To1
       when(changedCOp.sameAs(any())).thenReturn(false) // Notice: the same id; different parameters!
       val changedC = Node(idC, changedCOp)
-
 
       def validate(
           changedC: DeeplangNode,
@@ -278,7 +261,8 @@ class ExecutionSpec
           stateWD: NodeStateWithResults,
           stateWE: NodeStateWithResults,
           stateC: NodeStateWithResults,
-          execution: IdleExecution): Unit = {
+          execution: IdleExecution
+      ): Unit = {
         val updatedExecution = execution.updateStructure(updatedGraph, Set(idE))
         updatedExecution.graph.states(idA) shouldBe statefulGraph.states(idA)
         updatedExecution.graph.states(idB) shouldBe statefulGraph.states(idB)
@@ -293,7 +277,6 @@ class ExecutionSpec
         queuedExecution.graph.states(idD) shouldBe stateWD.draft.clearKnowledge
         queuedExecution.graph.states(idE) shouldBe stateWE.draft.enqueue
       }
-
 
       checkSuccessorsStatesAfterANodeChange(changedC, validate)
     }
@@ -311,13 +294,10 @@ class ExecutionSpec
           None
         )
 
-        val execution = IdleExecution(
-          statefulGraph,
-          statefulGraph.nodes.map(_.id))
+        val execution = IdleExecution(statefulGraph, statefulGraph.nodes.map(_.id))
 
         val emptyStructure = execution.updateStructure(DeeplangGraph(), Set())
-        val enqueued = emptyStructure.inferAndApplyKnowledge(mock[InferContext])
-          .enqueue
+        val enqueued       = emptyStructure.inferAndApplyKnowledge(mock[InferContext]).enqueue
 
         enqueued shouldBe an[IdleExecution]
       }
@@ -336,13 +316,11 @@ class ExecutionSpec
         val node1 = Node(Node.Id.randomId, op1)
         val node2 = Node(Node.Id.randomId, op2)
         val node3 = Node(Node.Id.randomId, op1)
-        val edge = Edge(node1, 0, node2, 0)
+        val edge  = Edge(node1, 0, node2, 0)
         val graph = DeeplangGraph(Set(node1, node2), Set(edge))
-        val statefulGraph = StatefulGraph(
-          graph,
-          Map(node1.id -> nodeCompletedState, node2.id -> nodeCompletedState),
-          None)
-        val execution = IdleExecution(statefulGraph)
+        val statefulGraph =
+          StatefulGraph(graph, Map(node1.id -> nodeCompletedState, node2.id -> nodeCompletedState), None)
+        val execution    = IdleExecution(statefulGraph)
         val newStructure = DeeplangGraph(Set(node1, node2, node3), Set())
 
         val updatedExecution = execution.updateStructure(newStructure)
@@ -357,13 +335,15 @@ class ExecutionSpec
   def checkSuccessorsStatesAfterANodeChange(
       changedC: DeeplangNode,
       validate: (
-        DeeplangNode,
+          DeeplangNode,
           DeeplangGraph,
           StatefulGraph,
           NodeStateWithResults,
           NodeStateWithResults,
           NodeStateWithResults,
-          IdleExecution) => Unit): Unit = {
+          IdleExecution
+      ) => Unit
+  ): Unit = {
     val graph = DeeplangGraph(nodeSet, edgeSet)
 
     val edgeBtoC = Edge(nodeB, 0, changedC, 0)
@@ -375,7 +355,7 @@ class ExecutionSpec
 
     val stateWD = nodeCompletedIdState(idD).withKnowledge(mock[NodeInferenceResult])
     val stateWE = nodeCompletedIdState(idE).withKnowledge(mock[NodeInferenceResult])
-    val stateC = nodeCompletedIdState(idC).withKnowledge(mock[NodeInferenceResult])
+    val stateC  = nodeCompletedIdState(idC).withKnowledge(mock[NodeInferenceResult])
     val statefulGraph = StatefulGraph(
       graph,
       Map(
@@ -385,32 +365,28 @@ class ExecutionSpec
         idD -> stateWD,
         idE -> stateWE
       ),
-      None)
+      None
+    )
 
-    val execution = IdleExecution(
-      statefulGraph,
-      statefulGraph.nodes.map(_.id))
+    val execution = IdleExecution(statefulGraph, statefulGraph.nodes.map(_.id))
 
     validate(changedC, updatedGraph, statefulGraph, stateWD, stateWE, stateC, execution)
   }
 
-  private def nodeCompletedState: NodeStateWithResults = {
+  private def nodeCompletedState: NodeStateWithResults =
     nodeState(nodeCompleted)
-  }
 
   private def nodeCompletedIdState(entityId: Entity.Id): NodeStateWithResults = {
-    val dOperables: Map[Entity.Id, DataFrame] = Map(entityId -> mock[DataFrame])
-    val reports: Map[Entity.Id, ReportContent] = Map(
-      entityId -> ReportContentTestFactory.someReport)
+    val dOperables: Map[Entity.Id, DataFrame]  = Map(entityId -> mock[DataFrame])
+    val reports: Map[Entity.Id, ReportContent] = Map(entityId -> ReportContentTestFactory.someReport)
     NodeStateWithResults(
-      NodeState(
-        nodeCompleted.copy(results = Seq(entityId)),
-        Some(EntitiesMap(dOperables, reports))),
+      NodeState(nodeCompleted.copy(results = Seq(entityId)), Some(EntitiesMap(dOperables, reports))),
       dOperables,
-      None)
+      None
+    )
   }
 
-  private def nodeState(status: NodeStatus): NodeStateWithResults = {
+  private def nodeState(status: NodeStatus): NodeStateWithResults =
     NodeStateWithResults(NodeState(status, Some(EntitiesMap())), Map(), None)
-  }
+
 }

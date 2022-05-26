@@ -7,7 +7,8 @@ import io.deepsense.deeplang.doperations.ReadDataFrame.ReadDataFrameParameters
 import io.deepsense.deeplang.doperations.WriteDataFrame
 import io.deepsense.deeplang.doperations.inout.CsvParameters.ColumnSeparatorChoice
 import io.deepsense.deeplang.doperations.inout._
-import io.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
+import io.deepsense.deeplang.doperations.readwritedataframe.FilePath
+import io.deepsense.deeplang.doperations.readwritedataframe.FileScheme
 
 trait ToDatasourceConverters {
 
@@ -17,51 +18,49 @@ trait ToDatasourceConverters {
     hdfsParams.setFileFormat(fileType.getFileFormat())
     hdfsParams.setHdfsPath(fileType.getOutputFile())
 
-    if (hdfsParams.getFileFormat == FileFormat.CSV) {
+    if (hdfsParams.getFileFormat == FileFormat.CSV)
       hdfsParams.setCsvFileFormatParams(
         fileType.getFileFormat().asInstanceOf[OutputFileFormatChoice.Csv]
       )
-    }
 
     hdfsParams
   }
 
   implicit def inputStorageTypeChoiceFileToLibraryFileParams(
-      fileType: InputStorageTypeChoice.File): LibraryFileParams = {
+      fileType: InputStorageTypeChoice.File
+  ): LibraryFileParams = {
     val libraryFileParams = new LibraryFileParams
 
     libraryFileParams.setFileFormat(fileType.getFileFormat())
     libraryFileParams.setLibraryPath(fileType.getSourceFile())
 
-    if (libraryFileParams.getFileFormat == FileFormat.CSV) {
+    if (libraryFileParams.getFileFormat == FileFormat.CSV)
       libraryFileParams.setCsvFileFormatParams(
         fileType.getFileFormat().asInstanceOf[InputFileFormatChoice.Csv]
       )
-    }
 
     libraryFileParams
   }
 
   implicit def outputStorageTypeChoiceFileToLibraryFileParams(
-      fileType: OutputStorageTypeChoice.File): LibraryFileParams = {
+      fileType: OutputStorageTypeChoice.File
+  ): LibraryFileParams = {
     val libraryFileParams = new LibraryFileParams
 
     libraryFileParams.setFileFormat(fileType.getFileFormat())
     libraryFileParams.setLibraryPath(fileType.getOutputFile())
 
-    if (libraryFileParams.getFileFormat == FileFormat.CSV) {
+    if (libraryFileParams.getFileFormat == FileFormat.CSV)
       libraryFileParams.setCsvFileFormatParams(
         fileType.getFileFormat().asInstanceOf[OutputFileFormatChoice.Csv]
       )
-    }
 
     libraryFileParams
   }
 
   implicit def convertGoogleSheet(
-      googleSheet: GoogleSheetParams
-        with HasShouldConvertToBooleanParam
-        with NamesIncludedParam): GoogleSpreadsheetParams = {
+      googleSheet: GoogleSheetParams with HasShouldConvertToBooleanParam with NamesIncludedParam
+  ): GoogleSpreadsheetParams = {
     val params = new GoogleSpreadsheetParams
 
     params.setConvert01ToBoolean(googleSheet.getShouldConvertToBoolean)
@@ -83,7 +82,7 @@ trait ToDatasourceConverters {
   }
 
   implicit def rdfParamsToDatasourceParams(readDataFrameParameters: ReadDataFrameParameters): DatasourceParams = {
-    val params = new DatasourceParams
+    val params      = new DatasourceParams
     val storageType = readDataFrameParameters.getStorageType()
 
     storageType match {
@@ -91,10 +90,7 @@ trait ToDatasourceConverters {
         val FilePath(scheme, path) = fileType.getSourceFile()
         params.setName(FilenameUtils.getName(path))
         scheme match {
-          case FileScheme.File |
-               FileScheme.FTP |
-               FileScheme.HTTP |
-               FileScheme.HTTPS =>
+          case FileScheme.File | FileScheme.FTP | FileScheme.HTTP | FileScheme.HTTPS =>
             params.setExternalFileParams(fileType)
             params.setDatasourceType(DatasourceType.EXTERNALFILE)
           case FileScheme.HDFS =>
@@ -120,7 +116,7 @@ trait ToDatasourceConverters {
   }
 
   implicit def wdfToDatasourceParams(writeDataFrame: WriteDataFrame): DatasourceParams = {
-    val params = new DatasourceParams
+    val params      = new DatasourceParams
     val storageType = writeDataFrame.getStorageType()
 
     storageType match {
@@ -128,10 +124,7 @@ trait ToDatasourceConverters {
         val FilePath(scheme, path) = fileType.getOutputFile()
         params.setName(FilenameUtils.getName(path))
         scheme match {
-          case FileScheme.File |
-               FileScheme.FTP |
-               FileScheme.HTTP |
-               FileScheme.HTTPS =>
+          case FileScheme.File | FileScheme.FTP | FileScheme.HTTP | FileScheme.HTTPS =>
             params.setExternalFileParams(fileType)
             params.setDatasourceType(DatasourceType.EXTERNALFILE)
           case FileScheme.HDFS =>
@@ -156,85 +149,79 @@ trait ToDatasourceConverters {
     params
   }
 
-
   implicit def convertInputFileFormatChoice(inputFileFormatChoice: InputFileFormatChoice): FileFormat =
     inputFileFormatChoice match {
-      case _: InputFileFormatChoice.Csv => FileFormat.CSV
-      case _: InputFileFormatChoice.Json => FileFormat.JSON
+      case _: InputFileFormatChoice.Csv     => FileFormat.CSV
+      case _: InputFileFormatChoice.Json    => FileFormat.JSON
       case _: InputFileFormatChoice.Parquet => FileFormat.PARQUET
     }
 
   implicit def convertOutputFileFormatChoice(outputFileFormatChoice: OutputFileFormatChoice): FileFormat =
     outputFileFormatChoice match {
-      case _: OutputFileFormatChoice.Csv => FileFormat.CSV
-      case _: OutputFileFormatChoice.Json => FileFormat.JSON
+      case _: OutputFileFormatChoice.Csv     => FileFormat.CSV
+      case _: OutputFileFormatChoice.Json    => FileFormat.JSON
       case _: OutputFileFormatChoice.Parquet => FileFormat.PARQUET
     }
 
   implicit def convertColumnSeparatorChoice(columnSeparatorChoice: ColumnSeparatorChoice): CsvSeparatorType =
     columnSeparatorChoice match {
-      case _: ColumnSeparatorChoice.Colon => CsvSeparatorType.COLON
-      case _: ColumnSeparatorChoice.Comma => CsvSeparatorType.COMMA
+      case _: ColumnSeparatorChoice.Colon     => CsvSeparatorType.COLON
+      case _: ColumnSeparatorChoice.Comma     => CsvSeparatorType.COMMA
       case _: ColumnSeparatorChoice.Semicolon => CsvSeparatorType.SEMICOLON
-      case _: ColumnSeparatorChoice.Space => CsvSeparatorType.SPACE
-      case _: ColumnSeparatorChoice.Tab => CsvSeparatorType.TAB
-      case _: ColumnSeparatorChoice.Custom => CsvSeparatorType.CUSTOM
+      case _: ColumnSeparatorChoice.Space     => CsvSeparatorType.SPACE
+      case _: ColumnSeparatorChoice.Tab       => CsvSeparatorType.TAB
+      case _: ColumnSeparatorChoice.Custom    => CsvSeparatorType.CUSTOM
     }
 
-  implicit def convertCsvParams(
-      csv: CsvParameters): CsvFileFormatParams = {
+  implicit def convertCsvParams(csv: CsvParameters): CsvFileFormatParams = {
     val params = new CsvFileFormatParams
 
     val separatorType = csv.getCsvColumnSeparator()
 
     params.setSeparatorType(separatorType)
 
-    if (params.getSeparatorType == CsvSeparatorType.CUSTOM) {
-      params.setCustomSeparator(
-        separatorType.asInstanceOf[ColumnSeparatorChoice.Custom].getCustomColumnSeparator)
-    }
+    if (params.getSeparatorType == CsvSeparatorType.CUSTOM)
+      params.setCustomSeparator(separatorType.asInstanceOf[ColumnSeparatorChoice.Custom].getCustomColumnSeparator)
 
     params.setIncludeHeader(csv.getNamesIncluded)
 
-    params.setConvert01ToBoolean(
-      csv match {
-        case hasShouldConvertParam: HasShouldConvertToBooleanParam =>
-          hasShouldConvertParam.getShouldConvertToBoolean
-        case _ => false
+    params.setConvert01ToBoolean(csv match {
+      case hasShouldConvertParam: HasShouldConvertToBooleanParam =>
+        hasShouldConvertParam.getShouldConvertToBoolean
+      case _ => false
     })
 
     params
   }
 
   implicit def inputStorageTypeChoiceFileToExternalFileParams(
-      fileType: InputStorageTypeChoice.File): ExternalFileParams = {
+      fileType: InputStorageTypeChoice.File
+  ): ExternalFileParams = {
     val externalFileParams = new ExternalFileParams
 
     externalFileParams.setFileFormat(fileType.getFileFormat())
     externalFileParams.setUrl(fileType.getSourceFile())
 
-    if (externalFileParams.getFileFormat == FileFormat.CSV) {
+    if (externalFileParams.getFileFormat == FileFormat.CSV)
       externalFileParams.setCsvFileFormatParams(
         fileType.getFileFormat().asInstanceOf[InputFileFormatChoice.Csv]
       )
-    }
 
     externalFileParams
   }
 
   implicit def outputStorageTypeChoiceFileToExternalFileParams(
-      fileType: OutputStorageTypeChoice.File): ExternalFileParams = {
+      fileType: OutputStorageTypeChoice.File
+  ): ExternalFileParams = {
     val externalFileParams = new ExternalFileParams
 
     externalFileParams.setFileFormat(fileType.getFileFormat())
     externalFileParams.setUrl(fileType.getOutputFile())
 
-    if (externalFileParams.getFileFormat == FileFormat.CSV) {
+    if (externalFileParams.getFileFormat == FileFormat.CSV)
       externalFileParams.setCsvFileFormatParams(
-        convertCsvParams(
-        fileType.getFileFormat().asInstanceOf[OutputFileFormatChoice.Csv])
+        convertCsvParams(fileType.getFileFormat().asInstanceOf[OutputFileFormatChoice.Csv])
       )
-    }
 
     externalFileParams
   }
@@ -245,11 +232,10 @@ trait ToDatasourceConverters {
     hdfsParams.setFileFormat(fileType.getFileFormat())
     hdfsParams.setHdfsPath(fileType.getSourceFile())
 
-    if (hdfsParams.getFileFormat == FileFormat.CSV) {
+    if (hdfsParams.getFileFormat == FileFormat.CSV)
       hdfsParams.setCsvFileFormatParams(
         fileType.getFileFormat().asInstanceOf[InputFileFormatChoice.Csv]
       )
-    }
 
     hdfsParams
   }

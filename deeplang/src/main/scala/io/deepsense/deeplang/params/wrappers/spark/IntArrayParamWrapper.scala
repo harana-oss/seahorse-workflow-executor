@@ -4,21 +4,24 @@ import org.apache.spark.ml
 import org.apache.spark.sql.types.StructType
 
 import io.deepsense.deeplang.params.MultipleNumericParam
-import io.deepsense.deeplang.params.validators.{ComplexArrayValidator, RangeValidator, Validator}
+import io.deepsense.deeplang.params.validators.ComplexArrayValidator
+import io.deepsense.deeplang.params.validators.RangeValidator
+import io.deepsense.deeplang.params.validators.Validator
 
 class IntArrayParamWrapper[P <: ml.param.Params](
     override val name: String,
     override val description: Option[String],
     val sparkParamGetter: P => ml.param.IntArrayParam,
-    override val validator: Validator[Array[Double]] =
-      ComplexArrayValidator(
-        RangeValidator(Int.MinValue, Int.MaxValue, step = Some(1.0))))
-  extends MultipleNumericParam(name, description, validator)
-  with SparkParamWrapper[P, Array[Int], Array[Double]] {
+    override val validator: Validator[Array[Double]] = ComplexArrayValidator(
+      RangeValidator(Int.MinValue, Int.MaxValue, step = Some(1.0))
+    )
+) extends MultipleNumericParam(name, description, validator)
+    with SparkParamWrapper[P, Array[Int], Array[Double]] {
 
   import IntArrayParamWrapper._
 
   require(arrayValidatorHasMinMaxInIntegerRange(validator))
+
   require(arrayValidatorHasIntegerStep(validator))
 
   override def convert(values: Array[Double])(schema: StructType): Array[Int] =
@@ -26,6 +29,7 @@ class IntArrayParamWrapper[P <: ml.param.Params](
 
   override def replicate(name: String): IntArrayParamWrapper[P] =
     new IntArrayParamWrapper[P](name, description, sparkParamGetter, validator)
+
 }
 
 object IntArrayParamWrapper {
@@ -43,8 +47,9 @@ object IntArrayParamWrapper {
     import IntParamWrapper.validatorHasIntegerStep
 
     validator match {
-    case ComplexArrayValidator(rangeValidator, arrayLengthValidator) =>
-      validatorHasIntegerStep(rangeValidator)
+      case ComplexArrayValidator(rangeValidator, arrayLengthValidator) =>
+        validatorHasIntegerStep(rangeValidator)
     }
   }
+
 }

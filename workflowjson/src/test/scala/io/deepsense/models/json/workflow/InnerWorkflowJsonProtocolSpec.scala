@@ -2,9 +2,11 @@ package io.deepsense.models.json.workflow
 
 import spray.json._
 
-import io.deepsense.deeplang.params.custom.{PublicParam, InnerWorkflow}
+import io.deepsense.deeplang.params.custom.PublicParam
+import io.deepsense.deeplang.params.custom.InnerWorkflow
 import io.deepsense.graph.Node
-import io.deepsense.models.json.graph.GraphJsonProtocol.{GraphReader, GraphWriter}
+import io.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
+import io.deepsense.models.json.graph.GraphJsonProtocol.GraphWriter
 
 class InnerWorkflowJsonProtocolSpec extends WorkflowTestSupport with InnerWorkflowJsonProtocol {
 
@@ -30,7 +32,8 @@ class InnerWorkflowJsonProtocolSpec extends WorkflowTestSupport with InnerWorkfl
       JsObject(
         "example" -> JsArray(JsNumber(1), JsNumber(2), JsNumber(3))
       ),
-      List(PublicParam(nodeId, "name", "public")))
+      List(PublicParam(nodeId, "name", "public"))
+    )
     val innerWorkflowJson = JsObject(
       "workflow" -> innerWorkflowGraph.toJson(GraphWriter),
       "thirdPartyData" -> JsObject(
@@ -38,12 +41,13 @@ class InnerWorkflowJsonProtocolSpec extends WorkflowTestSupport with InnerWorkfl
       ),
       "publicParams" -> JsArray(
         JsObject(
-          "nodeId" -> JsString(nodeId.toString),
-          "paramName" -> JsString("name"),
+          "nodeId"     -> JsString(nodeId.toString),
+          "paramName"  -> JsString("name"),
           "publicName" -> JsString("public")
         )
       )
     )
     (innerWorkflow, innerWorkflowJson)
   }
+
 }

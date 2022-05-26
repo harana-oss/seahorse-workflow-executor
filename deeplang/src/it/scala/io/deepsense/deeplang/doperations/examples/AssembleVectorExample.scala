@@ -3,6 +3,7 @@ package io.deepsense.deeplang.doperations.examples
 import io.deepsense.deeplang.doperations.spark.wrappers.transformers.AssembleVector
 
 class AssembleVectorExample extends AbstractOperationExample[AssembleVector] {
+
   override def dOperation: AssembleVector = {
     val op = new AssembleVector()
     op.transformer
@@ -12,4 +13,5 @@ class AssembleVectorExample extends AbstractOperationExample[AssembleVector] {
   }
 
   override def fileNames: Seq[String] = Seq("example_datetime_windspeed_hum_temp")
+
 }

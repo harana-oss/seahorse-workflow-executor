@@ -1,29 +1,30 @@
 package io.deepsense.graph
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
 
 import io.deepsense.commons.serialization.Serialization
 import io.deepsense.commons.utils.Logging
 import io.deepsense.graph.DeeplangGraph.DeeplangNode
 import io.deepsense.graph.RandomNodeFactory._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 class DeeplangGraphSpec
-  extends FunSuite
-  with Matchers
-  with Serialization
-  with Logging
-  with MockitoSugar
-  with GraphTestSupport {
+    extends AnyFunSuite
+    with Matchers
+    with Serialization
+    with Logging
+    with MockitoSugar
+    with GraphTestSupport {
 
   test("An empty Graph should have size 0") {
     DeeplangGraph().size shouldBe 0
   }
 
   test("An edge added to an empty graph should be filtered out as invalid") {
-      val edge = Edge(Endpoint(Node.Id.randomId, 0), Endpoint(Node.Id.randomId, 0))
-      val graph = DeeplangGraph(Set(), Set(edge))
-      graph.getValidEdges shouldBe Set()
+    val edge  = Edge(Endpoint(Node.Id.randomId, 0), Endpoint(Node.Id.randomId, 0))
+    val graph = DeeplangGraph(Set(), Set(edge))
+    graph.getValidEdges shouldBe Set()
   }
 
   test("Graph with two nodes should have size 2") {
@@ -64,12 +65,9 @@ class DeeplangGraphSpec
     val node2 = randomNode(DOperationA1ToA())
     val node3 = randomNode(DOperationA1ToA())
     val node4 = randomNode(DOperationA1ToA())
-    val edges = Set(
-      Edge(node1, 0, node2, 0),
-      Edge(node2, 0, node3, 0),
-      Edge(node3, 0, node4, 0))
+    val edges = Set(Edge(node1, 0, node2, 0), Edge(node2, 0, node3, 0), Edge(node3, 0, node4, 0))
 
-    val graph = DeeplangGraph(Set(node1, node2, node3, node4), edges)
+    val graph  = DeeplangGraph(Set(node1, node2, node3, node4), edges)
     val sorted = graph.topologicallySorted
     assert(sorted == Some(List(node1, node2, node3, node4)))
   }
@@ -81,10 +79,7 @@ class DeeplangGraphSpec
     val node2 = randomNode(DOperationA1ToA())
     val node3 = randomNode(DOperationA1ToA())
     val node4 = randomNode(DOperationA1ToA())
-    val edges = Set(
-      Edge(node1, 0, node2, 0),
-      Edge(node2, 0, node3, 0),
-      Edge(node3, 0, node4, 0))
+    val edges = Set(Edge(node1, 0, node2, 0), Edge(node2, 0, node3, 0), Edge(node3, 0, node4, 0))
 
     val graph = DeeplangGraph(Set(node1, node2, node3, node4), edges)
 
@@ -95,10 +90,8 @@ class DeeplangGraphSpec
   test("Complicated Graph can be sorted topologically") {
     import io.deepsense.graph.DOperationTestClasses._
 
-    def checkIfInOrder(
-        node1: DeeplangNode, node2: DeeplangNode, order: List[DeeplangNode]): Unit = {
+    def checkIfInOrder(node1: DeeplangNode, node2: DeeplangNode, order: List[DeeplangNode]): Unit =
       assert(order.indexOf(node1) < order.indexOf(node2))
-    }
 
     val node1 = randomNode(DOperationA1ToA())
     val node2 = randomNode(DOperationA1ToA())
@@ -116,9 +109,10 @@ class DeeplangGraphSpec
       (node4, node5, 0, 0),
       (node4, node6, 0, 0),
       (node5, node7, 0, 0),
-      (node6, node7, 0, 1))
+      (node6, node7, 0, 1)
+    )
     val edgesSet = edges.map(n => Edge(Endpoint(n._1.id, n._3), Endpoint(n._2.id, n._4))).toSet
-    val graph = DeeplangGraph(nodes, edgesSet)
+    val graph    = DeeplangGraph(nodes, edgesSet)
 
     val sortedOption = graph.topologicallySorted
     assert(sortedOption.isDefined)
@@ -183,11 +177,10 @@ class DeeplangGraphSpec
     val node2 = Node(Node.Id.randomId, op1To1)
     val cyclicGraph = DeeplangGraph(
       Set(node1, node2),
-      Set(
-        Edge(node1, 0, node2, 0),
-        Edge(node2, 0, node1, 0))
+      Set(Edge(node1, 0, node2, 0), Edge(node2, 0, node1, 0))
     )
 
     cyclicGraph.subgraph(Set(node1.id)) shouldBe cyclicGraph
   }
+
 }

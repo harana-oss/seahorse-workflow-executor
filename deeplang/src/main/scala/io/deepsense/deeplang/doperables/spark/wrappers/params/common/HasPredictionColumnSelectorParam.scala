@@ -11,11 +11,13 @@ import io.deepsense.deeplang.params.wrappers.spark.SingleColumnSelectorParamWrap
 trait HasPredictionColumnSelectorParam extends Params {
 
   val predictionColumn =
-    new SingleColumnSelectorParamWrapper[
-        ml.param.Params { val predictionCol: ml.param.Param[String] }](
+    new SingleColumnSelectorParamWrapper[ml.param.Params { val predictionCol: ml.param.Param[String] }](
       name = "prediction column",
       description = Some("The prediction column."),
       sparkParamGetter = _.predictionCol,
-      portIndex = 0)
+      portIndex = 0
+    )
+
   setDefault(predictionColumn, NameSingleColumnSelection("prediction"))
+
 }

@@ -3,6 +3,7 @@ package io.deepsense.deeplang.doperations.examples
 import io.deepsense.deeplang.doperations.spark.wrappers.transformers.Binarize
 
 class BinarizeExample extends AbstractOperationExample[Binarize] {
+
   override def dOperation: Binarize = {
     val op = new Binarize()
     op.transformer
@@ -12,4 +13,5 @@ class BinarizeExample extends AbstractOperationExample[Binarize] {
   }
 
   override def fileNames: Seq[String] = Seq("example_datetime_windspeed_hum_temp")
+
 }

@@ -8,17 +8,21 @@ import io.deepsense.deeplang.doperables.spark.wrappers.evaluators.BinaryClassifi
 import io.deepsense.deeplang.doperables.spark.wrappers.evaluators.BinaryClassificationEvaluator._
 import io.deepsense.deeplang.doperations.exceptions._
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
-import io.deepsense.deeplang.{DKnowledge, DeeplangIntegTestSupport}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DeeplangIntegTestSupport
 
 class BinaryClassificationEvaluatorIntegSpec extends DeeplangIntegTestSupport {
 
   "BinaryClassificationEvaluator" should {
     val eval = new BinaryClassificationEvaluator()
 
-    def simpleSchema: StructType = StructType(Seq(
-      StructField("label", DoubleType),
-      StructField("prediction", DoubleType),
-      StructField("rawPrediction", new io.deepsense.sparkutils.Linalg.VectorUDT())))
+    def simpleSchema: StructType = StructType(
+      Seq(
+        StructField("label", DoubleType),
+        StructField("prediction", DoubleType),
+        StructField("rawPrediction", new io.deepsense.sparkutils.Linalg.VectorUDT())
+      )
+    )
     val simpleData = Seq(
       Seq(0.0, 1.0, Vectors.dense(-0.001, 0.001)),
       Seq(1.0, 1.0, Vectors.dense(-0.001, 0.001)),
@@ -43,12 +47,9 @@ class BinaryClassificationEvaluatorIntegSpec extends DeeplangIntegTestSupport {
       f1Score.value shouldBe 0.8
     }
 
-
     // Based on "recognizing dogs in scenes from a video" example in:
     // https://en.wikipedia.org/wiki/Precision_and_recall
-    def dogSchema: StructType = StructType(Seq(
-      StructField("label", DoubleType),
-      StructField("prediction", DoubleType)))
+    def dogSchema: StructType = StructType(Seq(StructField("label", DoubleType), StructField("prediction", DoubleType)))
     val dogData = Seq(
       Seq(1.0, 1.0),
       Seq(1.0, 1.0),
@@ -76,21 +77,23 @@ class BinaryClassificationEvaluatorIntegSpec extends DeeplangIntegTestSupport {
     }
 
     "calculate correct precision, recall and f1-score values with non-default column names" in {
-      def dogSchemaRenamed: StructType = StructType(Seq(
-        StructField("labe", DoubleType),
-        StructField("pred", DoubleType)))
+      def dogSchemaRenamed: StructType =
+        StructType(Seq(StructField("labe", DoubleType), StructField("pred", DoubleType)))
       val dogDFRenamed = createDataFrame(dogData.map(Row.fromSeq), dogSchemaRenamed)
 
       val evalRenamed = new BinaryClassificationEvaluator()
       evalRenamed.setLabelColumn(new NameSingleColumnSelection("labe"))
       val predSel = new NameSingleColumnSelection("pred")
-      val precision = evalRenamed.setMetricName(new Precision().setPredictionColumnParam(predSel))
+      val precision = evalRenamed
+        .setMetricName(new Precision().setPredictionColumnParam(predSel))
         .evaluate(executionContext)()(dogDFRenamed)
       precision.value shouldBe 4.0 / 7.0
-      val recall = evalRenamed.setMetricName(new Recall().setPredictionColumnParam(predSel))
+      val recall = evalRenamed
+        .setMetricName(new Recall().setPredictionColumnParam(predSel))
         .evaluate(executionContext)()(dogDFRenamed)
       recall.value shouldBe 4.0 / 9.0
-      val f1Score = evalRenamed.setMetricName(new F1Score().setPredictionColumnParam(predSel))
+      val f1Score = evalRenamed
+        .setMetricName(new F1Score().setPredictionColumnParam(predSel))
         .evaluate(executionContext)()(dogDFRenamed)
       // F1-score calculation formula from: https://en.wikipedia.org/wiki/F1_score
       f1Score.value shouldBe 2.0 * precision.value * recall.value / (precision.value + recall.value)
@@ -100,9 +103,8 @@ class BinaryClassificationEvaluatorIntegSpec extends DeeplangIntegTestSupport {
       // TODO: Schema cannot be checked in method _infer until DS-3258 is fixed
       // currently schema is checked only in method evaluate
       "label column has invalid type" in {
-        def invalidSchema: StructType = StructType(Seq(
-          StructField("label", StringType),
-          StructField("prediction", DoubleType)))
+        def invalidSchema: StructType =
+          StructType(Seq(StructField("label", StringType), StructField("prediction", DoubleType)))
         // TODO: DS-3258: Creating DF with dummy data should not be necessary for _infer
         // DataFrame.forInference(invalidSchema) should be sufficient
         val invalidDataFrame = createDataFrame(Seq(Row("label1", 1.0)), invalidSchema)
@@ -114,9 +116,8 @@ class BinaryClassificationEvaluatorIntegSpec extends DeeplangIntegTestSupport {
       }
 
       "prediction column has invalid type and there is no rawPrediction column" in {
-        def invalidSchema: StructType = StructType(Seq(
-          StructField("label", DoubleType),
-          StructField("prediction", StringType)))
+        def invalidSchema: StructType =
+          StructType(Seq(StructField("label", DoubleType), StructField("prediction", StringType)))
         // TODO: DS-3258: Creating DF with dummy data should not be necessary for _infer
         // DataFrame.forInference(invalidSchema) should be sufficient
         val invalidDataFrame = createDataFrame(Seq(Row(0.0, "pred1")), invalidSchema)
@@ -140,9 +141,8 @@ class BinaryClassificationEvaluatorIntegSpec extends DeeplangIntegTestSupport {
       }
 
       "rawPrediction column has invalid type and there is no prediction column" in {
-        def invalidSchema: StructType = StructType(Seq(
-          StructField("label", DoubleType),
-          StructField("rawPrediction", DoubleType)))  // rawPrediction should be vector column
+        def invalidSchema: StructType =
+          StructType(Seq(StructField("label", DoubleType), StructField("rawPrediction", DoubleType))) // rawPrediction should be vector column
         // TODO: DS-3258: Creating DF with dummy data should not be necessary for _infer
         // DataFrame.forInference(invalidSchema) should be sufficient
         val invalidDataFrame = createDataFrame(Seq(Row(0.0, 1.0)), invalidSchema)
@@ -166,4 +166,5 @@ class BinaryClassificationEvaluatorIntegSpec extends DeeplangIntegTestSupport {
       }
     }
   }
+
 }

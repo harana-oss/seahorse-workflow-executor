@@ -6,15 +6,12 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.exceptions.ColumnsDoNotExistException._
 import io.deepsense.deeplang.params.selections._
 
-case class ColumnsDoNotExistException(
-    invalidSelection: ColumnSelection,
-    schema: StructType)
-  extends DOperationExecutionException(exceptionMessage(invalidSelection, schema), None)
+case class ColumnsDoNotExistException(invalidSelection: ColumnSelection, schema: StructType)
+    extends DOperationExecutionException(exceptionMessage(invalidSelection, schema), None)
 
 object ColumnsDoNotExistException {
-  def apply(
-      invalidSelection: ColumnSelection,
-      dataFrame: DataFrame): ColumnsDoNotExistException =
+
+  def apply(invalidSelection: ColumnSelection, dataFrame: DataFrame): ColumnsDoNotExistException =
     ColumnsDoNotExistException(invalidSelection, dataFrame.sparkDataFrame.schema)
 
   private def exceptionMessage(selection: ColumnSelection, schema: StructType): String =
@@ -29,17 +26,17 @@ object ColumnsDoNotExistException {
         s"One or more columns from index range ${begin.get}..${end.get}" +
           " does not exist in the input DataFrame"
       case NameColumnSelection(names) =>
-        val dfColumnNames = schema.map(field => field.name)
+        val dfColumnNames  = schema.map(field => field.name)
         val missingColumns = (names -- dfColumnNames.toSet).map(name => s"`$name`")
         val (pluralityDependentPrefix, pluralityDependentVerb) =
           if (missingColumns.size > 1) ("Columns:", "do") else ("Column", "does")
         s"$pluralityDependentPrefix ${missingColumns.mkString(", ")}" +
-          s" ${pluralityDependentVerb} not exist in the input DataFrame"
+          s" $pluralityDependentVerb not exist in the input DataFrame"
       case TypeColumnSelection(_) =>
         throw new IllegalStateException("This shouldn't be called on TypeColumnSelection!")
     }
 
-  private def schemaDescription(selection: ColumnSelection, schema: StructType): String = {
+  private def schemaDescription(selection: ColumnSelection, schema: StructType): String =
     selection match {
       case IndexColumnSelection(_) | IndexRangeColumnSelection(_, _) =>
         s"index range: 0..${schema.length - 1}"
@@ -48,5 +45,5 @@ object ColumnsDoNotExistException {
       case TypeColumnSelection(_) =>
         throw new IllegalStateException("This shouldn't be called on TypeColumnSelection!")
     }
-  }
+
 }

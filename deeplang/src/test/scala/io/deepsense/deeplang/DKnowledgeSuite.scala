@@ -2,22 +2,27 @@ package io.deepsense.deeplang
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.{FunSuite, Matchers}
-
 import io.deepsense.deeplang.doperables.DOperableMock
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 object ClassesForDKnowledge {
+
   trait A extends DOperableMock
 
   trait B extends DOperableMock
 
   case class A1(i: Int) extends A
+
   case class A2(i: Int) extends A
+
   case class B1(i: Int) extends B
+
   case class B2(i: Int) extends B
+
 }
 
-class DKnowledgeSuite extends FunSuite with Matchers {
+class DKnowledgeSuite extends AnyFunSuite with Matchers {
 
   test("DKnowledge[DOperable] with same content are equal") {
     case class A(i: Int) extends DOperableMock
@@ -34,11 +39,11 @@ class DKnowledgeSuite extends FunSuite with Matchers {
 
     class A extends DOperableMock {
       override def equals(any: Any): Boolean = isAOrB(any)
-      override def hashCode: Int = 1234567
+      override def hashCode: Int             = 1234567
     }
     class B extends DOperableMock {
       override def equals(any: Any): Boolean = isAOrB(any)
-      override def hashCode: Int = 1234567
+      override def hashCode: Int             = 1234567
     }
 
     val knowledge1: DKnowledge[A] = DKnowledge(new A)
@@ -52,7 +57,7 @@ class DKnowledgeSuite extends FunSuite with Matchers {
 
     val knowledge1 = DKnowledge(A(1))
     val knowledge2 = DKnowledge(A(2))
-    knowledge1 shouldNot be (knowledge2)
+    knowledge1 shouldNot be(knowledge2)
   }
 
   test("DKnowledge can intersect internal knowledge with external types") {
@@ -63,19 +68,20 @@ class DKnowledgeSuite extends FunSuite with Matchers {
 
   test("Sum of two DKnowledges is sum of their types") {
     import ClassesForDKnowledge._
-    val knowledge1 = DKnowledge[A](A1(1), A2(2))
-    val knowledge2 = DKnowledge[B](B1(1), B2(2))
+    val knowledge1           = DKnowledge[A](A1(1), A2(2))
+    val knowledge2           = DKnowledge[B](B1(1), B2(2))
     val expectedKnowledgeSum = DKnowledge[DOperable](A1(1), A2(2), B1(1), B2(2))
-    val actualKnowledgeSum = knowledge1 ++ knowledge2
+    val actualKnowledgeSum   = knowledge1 ++ knowledge2
 
     actualKnowledgeSum shouldBe expectedKnowledgeSum
   }
 
   test("DKnowledge can be constructed of traversable of DKnowledges") {
     import ClassesForDKnowledge._
-    val knowledge1 = DKnowledge[A](A1(1))
-    val knowledge2 = DKnowledge[A](A2(2))
+    val knowledge1   = DKnowledge[A](A1(1))
+    val knowledge2   = DKnowledge[A](A2(2))
     val knowledgeSum = DKnowledge(A1(1), A2(2))
     DKnowledge(Traversable(knowledge1, knowledge2)) shouldBe knowledgeSum
   }
+
 }

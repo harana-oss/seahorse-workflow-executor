@@ -8,8 +8,8 @@ import io.deepsense.commons.rest.client.req.NotebookClientRequest
 
 trait NotebookRestClientProtocol {
 
-  implicit val reqFormat: RootJsonFormat[NotebookClientRequest] = jsonFormat(NotebookClientRequest,
-    "workflow_id", "node_id", "language")
+  implicit val reqFormat: RootJsonFormat[NotebookClientRequest] =
+    jsonFormat(NotebookClientRequest, "workflow_id", "node_id", "language")
 
 }
 

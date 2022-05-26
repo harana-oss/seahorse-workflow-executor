@@ -1,7 +1,8 @@
 package io.deepsense.commons.rest.client
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
@@ -18,10 +19,9 @@ class NotebookPoller private (
     retryCountLimit: Int,
     workflowId: Id,
     nodeId: Id,
-    endpointPath: String)(
-    implicit override val actorSystem: ActorSystem,
-    override val timeout: Timeout)
-  extends Retry[Array[Byte]] {
+    endpointPath: String
+)(implicit override val actorSystem: ActorSystem, override val timeout: Timeout)
+    extends Retry[Array[Byte]] {
 
   override val retryInterval: FiniteDuration = pollInterval
 
@@ -35,19 +35,31 @@ class NotebookPoller private (
     notebookRestClient.fetchHttpResponse(Get(endpointPath)).flatMap { resp =>
       resp.status match {
         case StatusCodes.NotFound =>
-          Future.failed(RetriableException(s"File containing output data for workflow " +
-            s"s$workflowId and node s$nodeId not found", None))
+          Future.failed(
+            RetriableException(
+              s"File containing output data for workflow " +
+                s"s$workflowId and node s$nodeId not found",
+              None
+            )
+          )
         case StatusCodes.OK =>
           Future.successful(resp.entity.data.toByteArray)
         case statusCode =>
-          Future.failed(NotebookHttpException(resp, s"Notebook server responded with $statusCode " +
-            s"when asked for file for workflow $workflowId and node $nodeId"))
+          Future.failed(
+            NotebookHttpException(
+              resp,
+              s"Notebook server responded with $statusCode " +
+                s"when asked for file for workflow $workflowId and node $nodeId"
+            )
+          )
       }
     }
   }
+
 }
 
 object NotebookPoller {
+
   def apply(
       notebookRestClient: NotebookRestClient,
       pollInterval: FiniteDuration,
@@ -56,11 +68,7 @@ object NotebookPoller {
       nodeId: Id,
       endpointPath: String
   )(implicit as: ActorSystem, tout: Timeout): Retry[Array[Byte]] = new NotebookPoller(
-    notebookRestClient,
-    pollInterval,
-    retryCountLimit,
-    workflowId,
-    nodeId,
-    endpointPath
+    notebookRestClient, pollInterval, retryCountLimit, workflowId, nodeId, endpointPath
   )
+
 }

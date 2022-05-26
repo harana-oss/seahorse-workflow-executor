@@ -15,18 +15,19 @@ class GBTRegressionSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
   import estimator._
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    featuresColumn -> NameSingleColumnSelection("myFeatures"),
-    impurity -> Variance(),
-    labelColumn -> NameSingleColumnSelection(labelColumnName),
-    lossType -> GBTRegression.Squared(),
-    maxBins -> 2.0,
-    maxDepth -> 6.0,
-    maxIterations -> 10.0,
-    minInfoGain -> 0.0,
+    featuresColumn      -> NameSingleColumnSelection("myFeatures"),
+    impurity            -> Variance(),
+    labelColumn         -> NameSingleColumnSelection(labelColumnName),
+    lossType            -> GBTRegression.Squared(),
+    maxBins             -> 2.0,
+    maxDepth            -> 6.0,
+    maxIterations       -> 10.0,
+    minInfoGain         -> 0.0,
     minInstancesPerNode -> 1,
-    predictionColumn -> "prediction",
-    seed -> 100.0,
-    stepSize -> 0.11,
-    subsamplingRate -> 0.999
+    predictionColumn    -> "prediction",
+    seed                -> 100.0,
+    stepSize            -> 0.11,
+    subsamplingRate     -> 0.999
   )
+
 }

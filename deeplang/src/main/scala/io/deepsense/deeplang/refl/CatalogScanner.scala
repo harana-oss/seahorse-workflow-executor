@@ -1,7 +1,8 @@
 package io.deepsense.deeplang.refl
 
 import java.io.File
-import java.net.{URL, URLClassLoader}
+import java.net.URL
+import java.net.URLClassLoader
 
 import scala.collection.JavaConversions._
 
@@ -11,34 +12,33 @@ import org.reflections.util.ConfigurationBuilder
 import io.deepsense.commons.utils.Logging
 import io.deepsense.deeplang.catalogs.doperable.DOperableCatalog
 import io.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
-import io.deepsense.deeplang.{DOperation, DOperationCategories, TypeUtils}
+import io.deepsense.deeplang.DOperation
+import io.deepsense.deeplang.DOperationCategories
+import io.deepsense.deeplang.TypeUtils
 
-/**
-  * Scanner for operations and operables. It scans given jars and additionally a jar containing this
-  * class.
-  * @param jarsUrls Jars to scan
+/** Scanner for operations and operables. It scans given jars and additionally a jar containing this class.
+  * @param jarsUrls
+  *   Jars to scan
   */
 class CatalogScanner(jarsUrls: Seq[URL]) extends Logging {
 
-  /**
-    * Scans jars on classpath for classes annotated with [[io.deepsense.deeplang.refl.Register
-    * Register]]
-    * annotation and at the same time implementing [[io.deepsense.deeplang.DOperation DOperation]]
-    * interface. Found classes are then registered in appropriate catalogs.
+  /** Scans jars on classpath for classes annotated with [[io.deepsense.deeplang.refl.Register Register]] annotation and
+    * at the same time implementing [[io.deepsense.deeplang.DOperation DOperation]] interface. Found classes are then
+    * registered in appropriate catalogs.
     *
-    * @see [[io.deepsense.deeplang.refl.Register Register]]
+    * @see
+    *   [[io.deepsense.deeplang.refl.Register Register]]
     */
   def scanAndRegister(
       dOperableCatalog: DOperableCatalog,
       dOperationsCatalog: DOperationsCatalog
   ): Unit = {
-    logger.info(
-      s"Scanning registrables. Following jars will be scanned: ${jarsUrls.mkString(";")}.")
+    logger.info(s"Scanning registrables. Following jars will be scanned: ${jarsUrls.mkString(";")}.")
     for (registrable <- scanForRegistrables()) {
       logger.debug(s"Trying to register class $registrable")
       registrable match {
         case DOperationMatcher(doperation) => registerDOperation(dOperationsCatalog, doperation)
-        case other => logger.warn(s"Only DOperation can be `@Register`ed")
+        case other                         => logger.warn(s"Only DOperation can be `@Register`ed")
       }
     }
   }
@@ -51,29 +51,26 @@ class CatalogScanner(jarsUrls: Seq[URL]) extends Logging {
 
       val configBuilder = ConfigurationBuilder.build(urls.toSeq: _*)
 
-      if (jarsUrls.nonEmpty) {
+      if (jarsUrls.nonEmpty)
         configBuilder.addClassLoader(URLClassLoader.newInstance(jarsUrls.toArray))
-      }
 
       new Reflections(configBuilder).getTypesAnnotatedWith(classOf[Register]).toSet
-    } else {
+    } else
       Set()
-    }
 
   }
 
   private lazy val thisJarURLOpt: Option[URL] = {
     val jarRegex = """jar:(file:.*\.jar)!.*""".r
 
-    val url = getClass.getClassLoader.getResource(
-      getClass.getCanonicalName.replaceAll("\\.", File.separator) + ".class")
+    val url =
+      getClass.getClassLoader.getResource(getClass.getCanonicalName.replaceAll("\\.", File.separator) + ".class")
 
     url.toString match {
       case jarRegex(jar) => Some(new URL(jar))
-      case _ => None
+      case _             => None
     }
   }
-
 
   private def registerDOperation(
       catalog: DOperationsCatalog,
@@ -84,20 +81,21 @@ class CatalogScanner(jarsUrls: Seq[URL]) extends Logging {
         DOperationCategories.UserDefined,
         () => TypeUtils.createInstance[DOperation](constructor)
       )
-    case None => logger.error(
-      s"Class $operation could not be registered." +
-        "It needs to have parameterless constructor"
-    )
+    case None =>
+      logger.error(
+        s"Class $operation could not be registered." +
+          "It needs to have parameterless constructor"
+      )
   }
 
   class AssignableFromExtractor[T](targetClass: Class[T]) {
-    def unapply(clazz: Class[_]): Option[Class[T]] = {
-      if (targetClass.isAssignableFrom(clazz)) {
+
+    def unapply(clazz: Class[_]): Option[Class[T]] =
+      if (targetClass.isAssignableFrom(clazz))
         Some(clazz.asInstanceOf[Class[T]])
-      } else {
+      else
         None
-      }
-    }
+
   }
 
   object DOperationMatcher extends AssignableFromExtractor(classOf[DOperation])

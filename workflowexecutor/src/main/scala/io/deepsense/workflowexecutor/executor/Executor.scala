@@ -2,14 +2,16 @@ package io.deepsense.workflowexecutor.executor
 
 import java.io.File
 
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 
 import io.deepsense.commons.BuildInfo
 import io.deepsense.commons.mail.EmailSender
 import io.deepsense.commons.rest.client.NotebooksClientFactory
 import io.deepsense.commons.rest.client.datasources.DatasourceClientFactory
 import io.deepsense.commons.spark.sql.UserDefinedFunctions
-import io.deepsense.commons.utils.{Logging, Version}
+import io.deepsense.commons.utils.Logging
+import io.deepsense.commons.utils.Version
 import io.deepsense.deeplang._
 import io.deepsense.deeplang.catalogs.CatalogPair
 import io.deepsense.deeplang.catalogs.doperable.DOperableCatalog
@@ -34,13 +36,13 @@ trait Executor extends Logging {
       sparkSQLSession: SparkSQLSession,
       tempPath: String,
       libraryPath: String,
-      dOperableCatalog: Option[DOperableCatalog] = None): CommonExecutionContext = {
+      dOperableCatalog: Option[DOperableCatalog] = None
+  ): CommonExecutionContext = {
 
     val CatalogPair(operableCatalog, operationsCatalog) =
       CatalogRecorder.fromSparkContext(sparkContext).catalogs
 
-    val innerWorkflowExecutor = new InnerWorkflowExecutorImpl(
-      new GraphReader(operationsCatalog))
+    val innerWorkflowExecutor = new InnerWorkflowExecutorImpl(new GraphReader(operationsCatalog))
 
     val inferContext = InferContext(
       DataFrameBuilder(sparkSQLSession),
@@ -61,12 +63,14 @@ trait Executor extends Logging {
       dataFrameStorage,
       notebooksClientFactory,
       emailSender,
-      customCodeExecutionProvider)
+      customCodeExecutionProvider
+    )
   }
 
   def createSparkContext(): SparkContext = {
     val sparkConf = new SparkConf()
-    sparkConf.setAppName("Seahorse Workflow Executor")
+    sparkConf
+      .setAppName("Seahorse Workflow Executor")
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .registerKryoClasses(Array())
 

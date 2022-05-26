@@ -2,7 +2,7 @@ package io.deepsense.deeplang.doperables
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.types._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -14,7 +14,8 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.ConvertType
 import io.deepsense.deeplang.inference.InferContext
 import io.deepsense.deeplang.params.Param
-import io.deepsense.deeplang.params.custom.{InnerWorkflow, PublicParam}
+import io.deepsense.deeplang.params.custom.InnerWorkflow
+import io.deepsense.deeplang.params.custom.PublicParam
 import io.deepsense.sparkutils.SparkSQLSession
 
 class CustomTransformerSpec extends UnitSpec {
@@ -22,7 +23,7 @@ class CustomTransformerSpec extends UnitSpec {
   "CustomTransfromer" should {
 
     "execute inner workflow" in {
-      val workflow = InnerWorkflow(simpleGraph(), JsObject())
+      val workflow        = InnerWorkflow(simpleGraph(), JsObject())
       val outputDataFrame = mock[DataFrame]
 
       val innerWorkflowExecutor = mock[InnerWorkflowExecutor]
@@ -40,26 +41,30 @@ class CustomTransformerSpec extends UnitSpec {
 
       val transformer = new CustomTransformer(InnerWorkflow(simpleGraph(), JsObject()), Seq.empty)
 
-      val schema = StructType(Seq(
-        StructField("column1", DoubleType),
-        StructField("column2", DoubleType)
-      ))
+      val schema = StructType(
+        Seq(
+          StructField("column1", DoubleType),
+          StructField("column2", DoubleType)
+        )
+      )
 
-      val expectedSchema = StructType(Seq(
-        StructField("column1", StringType),
-        StructField("column2", DoubleType)
-      ))
+      val expectedSchema = StructType(
+        Seq(
+          StructField("column1", StringType),
+          StructField("column2", DoubleType)
+        )
+      )
 
       transformer._transformSchema(schema, inferContext) shouldBe Some(expectedSchema)
     }
 
     "replicate" in {
-      val publicParam = TypeConverter().targetType.replicate("public name")
-      val publicParamsWithValues = Seq(ParamWithValues(publicParam))
+      val publicParam             = TypeConverter().targetType.replicate("public name")
+      val publicParamsWithValues  = Seq(ParamWithValues(publicParam))
       val params: Array[Param[_]] = publicParamsWithValues.map(_.param).toArray
 
-      val workflow = InnerWorkflow(simpleGraph(), JsObject(),
-        List(PublicParam(innerNodeId, "target type", "public name")))
+      val workflow =
+        InnerWorkflow(simpleGraph(), JsObject(), List(PublicParam(innerNodeId, "target type", "public name")))
       val transformer = new CustomTransformer(workflow, publicParamsWithValues)
 
       val replicated = transformer.replicate()
@@ -68,15 +73,15 @@ class CustomTransformerSpec extends UnitSpec {
     }
 
     "replicate with set values" in {
-      val publicParam = TypeConverter().targetType.replicate("public name")
+      val publicParam  = TypeConverter().targetType.replicate("public name")
       val defaultValue = TargetTypeChoices.IntegerTargetTypeChoice()
-      val setValue = TargetTypeChoices.StringTargetTypeChoice()
+      val setValue     = TargetTypeChoices.StringTargetTypeChoice()
       val publicParamsWithValues =
         Seq(ParamWithValues(publicParam, Some(defaultValue), Some(setValue)))
       val params: Array[Param[_]] = publicParamsWithValues.map(_.param).toArray
 
-      val workflow = InnerWorkflow(simpleGraph(), JsObject(),
-        List(PublicParam(innerNodeId, "target type", "public name")))
+      val workflow =
+        InnerWorkflow(simpleGraph(), JsObject(), List(PublicParam(innerNodeId, "target type", "public name")))
       val transformer = new CustomTransformer(workflow, publicParamsWithValues)
 
       val replicated = transformer.replicate()
@@ -88,14 +93,14 @@ class CustomTransformerSpec extends UnitSpec {
 
     "set public params" when {
       "executing inner workflow" in {
-        val innerParam = TypeConverter().targetType
-        val publicParam = TypeConverter().targetType.replicate("public name")
+        val innerParam             = TypeConverter().targetType
+        val publicParam            = TypeConverter().targetType.replicate("public name")
         val publicParamsWithValues = Seq(ParamWithValues(publicParam))
 
         val customTargetType = TargetTypeChoices.LongTargetTypeChoice()
 
-        val workflow = InnerWorkflow(simpleGraph(), JsObject(),
-          List(PublicParam(innerNodeId, "target type", "public name")))
+        val workflow =
+          InnerWorkflow(simpleGraph(), JsObject(), List(PublicParam(innerNodeId, "target type", "public name")))
 
         val outputDataFrame = mock[DataFrame]
 
@@ -104,7 +109,10 @@ class CustomTransformerSpec extends UnitSpec {
           .thenAnswer(new Answer[DataFrame] {
             override def answer(invocation: InvocationOnMock): DataFrame = {
               val workflow = invocation.getArguments.apply(1).asInstanceOf[InnerWorkflow]
-              val innerOp = workflow.graph.nodes.find(_.id.toString == innerNodeId).get.value
+              val innerOp = workflow.graph.nodes
+                .find(_.id.toString == innerNodeId)
+                .get
+                .value
                 .asInstanceOf[ConvertType]
 
               innerOp.get(innerParam) shouldBe Some(customTargetType)
@@ -124,31 +132,37 @@ class CustomTransformerSpec extends UnitSpec {
       "inferring schema" in {
         val inferContext = MockedInferContext()
 
-        val publicParam = TypeConverter().targetType.replicate("public name")
+        val publicParam            = TypeConverter().targetType.replicate("public name")
         val publicParamsWithValues = Seq(ParamWithValues(publicParam))
 
-        val transformer = new CustomTransformer(InnerWorkflow(simpleGraph(), JsObject(),
-          List(PublicParam(innerNodeId, "target type", "public name"))), publicParamsWithValues)
+        val transformer =
+          new CustomTransformer(
+            InnerWorkflow(simpleGraph(), JsObject(), List(PublicParam(innerNodeId, "target type", "public name"))),
+            publicParamsWithValues
+          )
 
         transformer.set(publicParam -> TargetTypeChoices.LongTargetTypeChoice())
 
-        val schema = StructType(Seq(
-          StructField("column1", DoubleType),
-          StructField("column2", DoubleType)
-        ))
+        val schema = StructType(
+          Seq(
+            StructField("column1", DoubleType),
+            StructField("column2", DoubleType)
+          )
+        )
 
-        val expectedSchema = StructType(Seq(
-          StructField("column1", LongType),
-          StructField("column2", DoubleType)
-        ))
+        val expectedSchema = StructType(
+          Seq(
+            StructField("column1", LongType),
+            StructField("column2", DoubleType)
+          )
+        )
 
         transformer._transformSchema(schema, inferContext) shouldBe Some(expectedSchema)
       }
     }
   }
 
-  private def mockExecutionContext(
-      innerWorkflowExecutor: InnerWorkflowExecutor): ExecutionContext =
+  private def mockExecutionContext(innerWorkflowExecutor: InnerWorkflowExecutor): ExecutionContext =
     ExecutionContext(
       mock[SparkContext],
       mock[SparkSQLSession],
@@ -163,4 +177,5 @@ class CustomTransformerSpec extends UnitSpec {
       None,
       mock[ContextualCustomCodeExecutor]
     )
+
 }

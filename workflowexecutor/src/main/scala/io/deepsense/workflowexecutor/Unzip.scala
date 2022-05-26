@@ -11,33 +11,36 @@ import io.deepsense.commons.utils.Logging
 
 object Unzip extends Logging {
 
-  /**
-   * Unzips a ZIP file to a temporary directory. Allows to filter extracted files by name.
-   * @param inputFile A path to the input file.
-   * @param filter A predicate that operates on file names. If true then the file will be
-   *               extracted.
-   * @return A path where the input archive was extracted.
-   */
+  /** Unzips a ZIP file to a temporary directory. Allows to filter extracted files by name.
+    * @param inputFile
+    *   A path to the input file.
+    * @param filter
+    *   A predicate that operates on file names. If true then the file will be extracted.
+    * @return
+    *   A path where the input archive was extracted.
+    */
   def unzipToTmp(inputFile: String, filter: (String) => Boolean): String = {
     val zis: ZipInputStream = new ZipInputStream(new FileInputStream(inputFile))
-    val tempDir = Files.createTempDir()
+    val tempDir             = Files.createTempDir()
     logger.info(s"Created temporary directory for $inputFile: ${tempDir.getAbsolutePath}")
 
     var entry = zis.getNextEntry
     while (entry != null) {
       if (filter(entry.getName)) {
-        val path = Path(entry.getName)
+        val path          = Path(entry.getName)
         val entryFilename = path.name
-        val entryDirName = path.parent
+        val entryDirName  = path.parent
 
-        logger.debug("Entry found in jar file: " +
-          s"directory: $entryDirName filename: $entryFilename isDirectory: ${entry.isDirectory}")
+        logger.debug(
+          "Entry found in jar file: " +
+            s"directory: $entryDirName filename: $entryFilename isDirectory: ${entry.isDirectory}"
+        )
 
         val destinationPath = Path(tempDir) / entryDirName
         new File(destinationPath.toURI).mkdirs()
         if (!entry.isDirectory) {
-          val target = new File((destinationPath/entryFilename).toURI)
-          val fos = new BufferedOutputStream(new FileOutputStream(target, true))
+          val target = new File((destinationPath / entryFilename).toURI)
+          val fos    = new BufferedOutputStream(new FileOutputStream(target, true))
           transferImpl(zis, fos, close = false)
         }
       }
@@ -47,15 +50,16 @@ object Unzip extends Logging {
     tempDir.toString
   }
 
-  /**
-   * Unzips the entire archive to a temporary directory.
-   * @param inputFile A path to the input file.
-   * @return A path where the input archive was extracted.
-   */
+  /** Unzips the entire archive to a temporary directory.
+    * @param inputFile
+    *   A path to the input file.
+    * @return
+    *   A path where the input archive was extracted.
+    */
   def unzipAll(inputFile: String): String =
     unzipToTmp(inputFile, _ => true)
 
-  private def transferImpl(in: InputStream, out: OutputStream, close: Boolean): Unit = {
+  private def transferImpl(in: InputStream, out: OutputStream, close: Boolean): Unit =
     try {
       val buffer = new Array[Byte](4096)
       def read(): Unit = {
@@ -67,11 +71,8 @@ object Unzip extends Logging {
       }
       read()
       out.close()
-    }
-    finally {
-      if (close) {
+    } finally
+      if (close)
         in.close()
-      }
-    }
-  }
+
 }

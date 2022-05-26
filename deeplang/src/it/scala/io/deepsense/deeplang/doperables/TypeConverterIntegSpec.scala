@@ -6,20 +6,25 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.util.DateTimeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
 import io.deepsense.commons.types.ColumnType
 import io.deepsense.commons.types.ColumnType._
 import io.deepsense.deeplang.DeeplangIntegTestSupport
-import io.deepsense.deeplang.doperables.TargetTypeChoices.{DoubleTargetTypeChoice, StringTargetTypeChoice}
+import io.deepsense.deeplang.doperables.TargetTypeChoices.DoubleTargetTypeChoice
+import io.deepsense.deeplang.doperables.TargetTypeChoices.StringTargetTypeChoice
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
-import io.deepsense.deeplang.params.selections.{IndexColumnSelection, MultipleColumnSelection, NameColumnSelection, TypeColumnSelection}
+import io.deepsense.deeplang.params.selections.IndexColumnSelection
+import io.deepsense.deeplang.params.selections.MultipleColumnSelection
+import io.deepsense.deeplang.params.selections.NameColumnSelection
+import io.deepsense.deeplang.params.selections.TypeColumnSelection
 
 class TypeConverterIntegSpec
-  extends DeeplangIntegTestSupport
-  with MultiColumnTransformerTestSupport
-  with TransformerSerialization {
+    extends DeeplangIntegTestSupport
+    with MultiColumnTransformerTestSupport
+    with TransformerSerialization {
 
   import DeeplangIntegTestSupport._
   import TransformerSerialization._
@@ -27,12 +32,12 @@ class TypeConverterIntegSpec
   var inputDataFrame: DataFrame = _
 
   "TypeConverter" when {
-    "converting columns to String" which {
+    "converting columns to String".which {
       val targetType = StringTargetTypeChoice()
       "are Doubles" should {
         "cast them to String" in {
           val converted = useTypeConverter(Set(doubleId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(doubleId))
+          val expected  = toString(Set(doubleId))
           assertDataFramesEqual(converted, expected)
         }
       }
@@ -45,74 +50,74 @@ class TypeConverterIntegSpec
       "are Booleans" should {
         "return 'true', 'false' strings" in {
           val converted = useTypeConverter(Set(booleanId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(booleanId))
+          val expected  = toString(Set(booleanId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Timestamps" should {
         "use ISO 8601 format" in {
           val converted = useTypeConverter(Set(timestampId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(timestampId))
+          val expected  = toString(Set(timestampId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Longs" should {
         "cast them to String" in {
           val converted = useTypeConverter(Set(longId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(longId))
+          val expected  = toString(Set(longId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Integers" should {
         "cast them to String" in {
           val converted = useTypeConverter(Set(integerId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(integerId))
+          val expected  = toString(Set(integerId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Floats" should {
         "cast them to String" in {
           val converted = useTypeConverter(Set(floatId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(floatId))
+          val expected  = toString(Set(floatId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Bytes" should {
         "cast them to String" in {
           val converted = useTypeConverter(Set(byteId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(byteId))
+          val expected  = toString(Set(byteId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Shorts" should {
         "cast them to String" in {
           val converted = useTypeConverter(Set(shortId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(shortId))
+          val expected  = toString(Set(shortId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Decimals" should {
         "cast them to String" in {
           val converted = useTypeConverter(Set(decimalId), Set.empty, Set.empty, targetType)
-          val expected = toString(Set(decimalId))
+          val expected  = toString(Set(decimalId))
           assertDataFramesEqual(converted, expected)
         }
       }
     }
-    "converting columns to Double" which {
+    "converting columns to Double".which {
       val targetType = DoubleTargetTypeChoice()
       "are strings" should {
         "return values as Double" when {
           "strings represent numbers" in {
             val converted = useTypeConverter(Set(numStrId), Set.empty, Set.empty, targetType)
-            val expected = toDouble(Set(numStrId))
+            val expected  = toDouble(Set(numStrId))
             assertDataFramesEqual(converted, expected)
           }
         }
         "produce nulls" when {
           "strings DO NOT represent numbers" in {
             val converted = useTypeConverter(Set(nonNumStrId), Set.empty, Set.empty, targetType)
-            val expected = toDouble(Set(nonNumStrId))
+            val expected  = toDouble(Set(nonNumStrId))
             assertDataFramesEqual(converted, expected)
           }
         }
@@ -120,56 +125,56 @@ class TypeConverterIntegSpec
       "are Boolean" should {
         "return 1.0s and 0.0s" in {
           val converted = useTypeConverter(Set(booleanId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(booleanId))
+          val expected  = toDouble(Set(booleanId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Timestamp" should {
         "convert the value to millis and then to double" in {
           val converted = useTypeConverter(Set(timestampId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(timestampId))
+          val expected  = toDouble(Set(timestampId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Longs" should {
         "cast them to Double" in {
           val converted = useTypeConverter(Set(longId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(longId))
+          val expected  = toDouble(Set(longId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Integers" should {
         "cast them to Double" in {
           val converted = useTypeConverter(Set(integerId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(integerId))
+          val expected  = toDouble(Set(integerId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Floats" should {
         "cast them to Double" in {
           val converted = useTypeConverter(Set(floatId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(floatId))
+          val expected  = toDouble(Set(floatId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Bytes" should {
         "cast them to Double" in {
           val converted = useTypeConverter(Set(byteId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(byteId))
+          val expected  = toDouble(Set(byteId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Shorts" should {
         "cast them to Double" in {
           val converted = useTypeConverter(Set(shortId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(shortId))
+          val expected  = toDouble(Set(shortId))
           assertDataFramesEqual(converted, expected)
         }
       }
       "are Decimals" should {
         "cast them to Double" in {
           val converted = useTypeConverter(Set(decimalId), Set.empty, Set.empty, targetType)
-          val expected = toDouble(Set(decimalId))
+          val expected  = toDouble(Set(decimalId))
           assertDataFramesEqual(converted, expected)
         }
       }
@@ -178,30 +183,39 @@ class TypeConverterIntegSpec
 
   it should {
     "transform schema" in {
-      val originalSchema = StructType(Seq(
-        StructField("col1", DoubleType),
-        StructField("col2", StringType),
-        StructField("col3", BooleanType),
-        StructField("col4", DoubleType),
-        StructField("col5", TimestampType)
-      ))
+      val originalSchema = StructType(
+        Seq(
+          StructField("col1", DoubleType),
+          StructField("col2", StringType),
+          StructField("col3", BooleanType),
+          StructField("col4", DoubleType),
+          StructField("col5", TimestampType)
+        )
+      )
 
       val transformedSchema = new TypeConverter()
         .setSelectedColumns(
-          MultipleColumnSelection(Vector(
-            TypeColumnSelection(Set(ColumnType.numeric)),
-            NameColumnSelection(Set("col5"))
-          )))
+          MultipleColumnSelection(
+            Vector(
+              TypeColumnSelection(Set(ColumnType.numeric)),
+              NameColumnSelection(Set("col5"))
+            )
+          )
+        )
         .setTargetType(StringTargetTypeChoice())
         ._transformSchema(originalSchema)
 
-      transformedSchema shouldBe Some(StructType(Seq(
-        StructField("col1", StringType),
-        StructField("col2", StringType),
-        StructField("col3", BooleanType),
-        StructField("col4", StringType),
-        StructField("col5", StringType)
-      )))
+      transformedSchema shouldBe Some(
+        StructType(
+          Seq(
+            StructField("col1", StringType),
+            StructField("col2", StringType),
+            StructField("col3", BooleanType),
+            StructField("col4", StringType),
+            StructField("col5", StringType)
+          )
+        )
+      )
     }
   }
 
@@ -241,22 +255,20 @@ class TypeConverterIntegSpec
   }
 
   val timestampColumn = {
-    val dateTime1 = new DateTime(1989, 4, 23, 3, 14, 15, 926, DateTimeZone.getDefault)
-    val dateTime2 = dateTime1.plusDays(1).plusMinutes(1)
-    val timestamp1 = new Timestamp(dateTime1.getMillis)
-    val timestamp2 = new Timestamp(dateTime2.getMillis)
+    val dateTime1       = new DateTime(1989, 4, 23, 3, 14, 15, 926, DateTimeZone.getDefault)
+    val dateTime2       = dateTime1.plusDays(1).plusMinutes(1)
+    val timestamp1      = new Timestamp(dateTime1.getMillis)
+    val timestamp2      = new Timestamp(dateTime2.getMillis)
     val dateTime1String = "1989-04-23 03:14:15.926"
     val dateTime2String = "1989-04-24 03:15:15.926"
-    val original = Seq(timestamp1, null, timestamp2)
-    val asString = Seq(dateTime1String, null, dateTime2String)
+    val original        = Seq(timestamp1, null, timestamp2)
+    val asString        = Seq(dateTime1String, null, dateTime2String)
 
     def timestampStringToSparkDouble(ts: String): Double = // Welcome to Spark.
       DateTimeUtils.stringToTimestamp(UTF8String.fromString(ts)).get.toDouble / 1000000.0d
 
-    val asDouble = Seq(
-      timestampStringToSparkDouble(dateTime1String),
-      null,
-      timestampStringToSparkDouble(dateTime2String))
+    val asDouble =
+      Seq(timestampStringToSparkDouble(dateTime1String), null, timestampStringToSparkDouble(dateTime2String))
     ColumnContainer(original, asDouble, asString, emptyMetadata)
   }
 
@@ -302,107 +314,109 @@ class TypeConverterIntegSpec
     ColumnContainer(original, asDouble, asString, emptyMetadata)
   }
 
-  case class ColumnContainer(
-    original: Seq[Any],
-    asDouble: Seq[Any],
-    asString: Seq[Any],
-    originalMetadata: Metadata)
+  case class ColumnContainer(original: Seq[Any], asDouble: Seq[Any], asString: Seq[Any], originalMetadata: Metadata)
 
-  val columns = Seq(
-    doubleColumn,
-    numStrColumn,
-    strColumn,
-    boolColumn,
-    timestampColumn,
-    longColumn,
-    integerColumn,
-    floatColumn,
-    byteColumn,
-    shortColumn,
-    decimalColumn)
+  val columns = Seq(doubleColumn, numStrColumn, strColumn, boolColumn, timestampColumn, longColumn, integerColumn,
+    floatColumn, byteColumn, shortColumn, decimalColumn)
 
-  val schema = StructType(Seq(
-    StructField("doubles", DoubleType), // 0
-    StructField("num strings", StringType), // 1
-    StructField("non num strings", StringType), // 2
-    StructField("booleans", BooleanType), // 3
-    StructField("timestamps", TimestampType), // 4
-    StructField("longs", LongType), // 5
-    StructField("integers", IntegerType), // 6
-    StructField("floats", FloatType), // 7
-    StructField("bytes", ByteType), // 8
-    StructField("shorts", ShortType), // 9
-    StructField("decimals", DecimalType(10, 5)) // 10
-  ))
+  val schema = StructType(
+    Seq(
+      StructField("doubles", DoubleType),         // 0
+      StructField("num strings", StringType),     // 1
+      StructField("non num strings", StringType), // 2
+      StructField("booleans", BooleanType),       // 3
+      StructField("timestamps", TimestampType),   // 4
+      StructField("longs", LongType),             // 5
+      StructField("integers", IntegerType),       // 6
+      StructField("floats", FloatType),           // 7
+      StructField("bytes", ByteType),             // 8
+      StructField("shorts", ShortType),           // 9
+      StructField("decimals", DecimalType(10, 5)) // 10
+    )
+  )
 
   val rowsNumber = 3
 
   val doubleId = 0
+
   val numStrId = 1
+
   val nonNumStrId = 2
+
   val booleanId = 3
+
   val timestampId = 4
+
   val longId = 5
+
   val integerId = 6
+
   val floatId = 7
+
   val byteId = 8
+
   val shortId = 9
+
   val decimalId = 10
 
   val originalColumns = columns.map(_.original)
+
   val inputRows = (0 until rowsNumber).map(i => Row.fromSeq(originalColumns.map(_.apply(i))))
 
-  def to(dataType: DataType, ids: Set[Int], newSchema: Option[StructType])
-      (f: ColumnContainer => Seq[Any]): DataFrame = {
+  def to(dataType: DataType, ids: Set[Int], newSchema: Option[StructType])(
+      f: ColumnContainer => Seq[Any]
+  ): DataFrame = {
     val values = columns.zipWithIndex.map { case (cc, idx) =>
-      if (ids.contains(idx)) {
+      if (ids.contains(idx))
         f(cc)
-      } else {
+      else
         cc.original
-      }
     }
     val rows = (0 until rowsNumber).map(i => Row.fromSeq(values.map(_.apply(i))))
     val updatedSchema = newSchema.getOrElse(ids.foldLeft(schema) { case (oldSchema, index) =>
-      StructType(oldSchema.updated(index, oldSchema(index).copy(
-        dataType = dataType, metadata = new MetadataBuilder().build())))
+      StructType(
+        oldSchema.updated(index, oldSchema(index).copy(dataType = dataType, metadata = new MetadataBuilder().build()))
+      )
     })
     createDataFrame(rows, updatedSchema)
   }
 
-  def toDouble(ids: Set[Int]): DataFrame = to(DoubleType, ids, None){ _.asDouble }
+  def toDouble(ids: Set[Int]): DataFrame = to(DoubleType, ids, None)(_.asDouble)
 
-  def toString(ids: Set[Int]): DataFrame = to(StringType, ids, None){ _.asString }
+  def toString(ids: Set[Int]): DataFrame = to(StringType, ids, None)(_.asString)
 
   private def useTypeConverter(
-    ids: Set[Int],
-    names: Set[String],
-    types: Set[ColumnType],
-    targetTypeChoice: TargetTypeChoice,
-    dataFrame: DataFrame = inputDataFrame): DataFrame = {
+      ids: Set[Int],
+      names: Set[String],
+      types: Set[ColumnType],
+      targetTypeChoice: TargetTypeChoice,
+      dataFrame: DataFrame = inputDataFrame
+  ): DataFrame = {
 
     val operation = new TypeConverter()
       .setSelectedColumns(
         MultipleColumnSelection(
-          Vector(
-            NameColumnSelection(names),
-            IndexColumnSelection(ids),
-            TypeColumnSelection(types))))
+          Vector(NameColumnSelection(names), IndexColumnSelection(ids), TypeColumnSelection(types))
+        )
+      )
       .setTargetType(targetTypeChoice)
 
     operation.applyTransformationAndSerialization(tempDir, dataFrame)
   }
 
   override def transformerName: String = "TypeConverter"
+
   override def inputType: DataType = DoubleType
+
   override def outputType: DataType = StringType
 
-  override def transformer: MultiColumnTransformer = {
+  override def transformer: MultiColumnTransformer =
     new TypeConverter().setTargetType(StringTargetTypeChoice())
-  }
 
   override val testValues: Seq[(Double, String)] = {
     val doubles = Seq.fill(5)(Math.random())
     val strings = doubles.map(_.toString)
     doubles.zip(strings)
   }
+
 }

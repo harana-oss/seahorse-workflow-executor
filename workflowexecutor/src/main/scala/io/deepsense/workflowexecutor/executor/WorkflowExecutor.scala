@@ -11,41 +11,50 @@ import spray.json._
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future, Promise}
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.Promise
 import scala.io.Source
-import scala.util.{Failure, Success, Try}
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 import io.deepsense.commons.json.datasources.DatasourceListJsonProtocol
 import io.deepsense.commons.models.Entity
 import io.deepsense.commons.rest.client.datasources.DatasourceInMemoryClientFactory
 import io.deepsense.commons.rest.client.datasources.DatasourceTypes.DatasourceList
-import io.deepsense.commons.utils.{Logging, Version}
-import io.deepsense.deeplang.{OperationExecutionDispatcher, _}
+import io.deepsense.commons.utils.Logging
+import io.deepsense.commons.utils.Version
+import io.deepsense.deeplang.OperationExecutionDispatcher
+import io.deepsense.deeplang._
 import io.deepsense.graph.CyclicGraphException
 import io.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import io.deepsense.models.json.workflow.WorkflowVersionUtil
 import io.deepsense.models.json.workflow.exceptions._
-import io.deepsense.models.workflows.{ExecutionReport, WorkflowInfo, WorkflowWithResults, WorkflowWithVariables}
+import io.deepsense.models.workflows.ExecutionReport
+import io.deepsense.models.workflows.WorkflowInfo
+import io.deepsense.models.workflows.WorkflowWithResults
+import io.deepsense.models.workflows.WorkflowWithVariables
 import io.deepsense.sparkutils.AkkaUtils
 import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.Launch
 import io.deepsense.workflowexecutor._
 import io.deepsense.workflowexecutor.buildinfo.BuildInfo
 import io.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
-import io.deepsense.workflowexecutor.exception.{UnexpectedHttpResponseException, WorkflowExecutionException}
+import io.deepsense.workflowexecutor.exception.UnexpectedHttpResponseException
+import io.deepsense.workflowexecutor.exception.WorkflowExecutionException
 import io.deepsense.workflowexecutor.pyspark.PythonPathGenerator
 import io.deepsense.workflowexecutor.session.storage.DataFrameStorageImpl
 
-/**
- * WorkflowExecutor creates an execution context and then executes a workflow on Spark.
- */
+/** WorkflowExecutor creates an execution context and then executes a workflow on Spark. */
 case class WorkflowExecutor(
     workflow: WorkflowWithVariables,
     customCodeExecutorsPath: String,
     pythonPathGenerator: PythonPathGenerator,
-    tempPath: String)
-  extends Executor {
+    tempPath: String
+) extends Executor {
 
   val dOperableCache = mutable.Map[Entity.Id, DOperable]()
+
   private val actorSystemName = "WorkflowExecutor"
 
   def execute(sparkContext: SparkContext): Try[ExecutionReport] = Try {
@@ -64,34 +73,28 @@ case class WorkflowExecutor(
     logger.info("HOST ADDRESS: {}", hostAddress.getHostAddress)
 
     val pythonBinary = ConfigFactory.load
-        .getString("pythoncaretaker.python-binary-default")
+      .getString("pythoncaretaker.python-binary-default")
 
     val operationExecutionDispatcher = new OperationExecutionDispatcher
 
-    val customCodeEntryPoint = new CustomCodeEntryPoint(
-      sparkContext,
-      sparkSQLSession,
-      dataFrameStorage,
-      operationExecutionDispatcher)
+    val customCodeEntryPoint =
+      new CustomCodeEntryPoint(sparkContext, sparkSQLSession, dataFrameStorage, operationExecutionDispatcher)
 
     val pythonExecutionCaretaker = new PythonExecutionCaretaker(
-      customCodeExecutorsPath,
-      pythonPathGenerator,
-      pythonBinary,
-      sparkContext,
-      sparkSQLSession,
-      dataFrameStorage,
-      customCodeEntryPoint,
-      hostAddress)
+      customCodeExecutorsPath, pythonPathGenerator, pythonBinary, sparkContext, sparkSQLSession, dataFrameStorage,
+      customCodeEntryPoint, hostAddress
+    )
     pythonExecutionCaretaker.start()
 
     val rExecutionCaretaker = new RExecutionCaretaker(customCodeExecutorsPath, customCodeEntryPoint)
     rExecutionCaretaker.start()
 
-    val customCodeExecutionProvider = CustomCodeExecutionProvider(
-      pythonExecutionCaretaker.pythonCodeExecutor,
-      rExecutionCaretaker.rCodeExecutor,
-      operationExecutionDispatcher)
+    val customCodeExecutionProvider =
+      CustomCodeExecutionProvider(
+        pythonExecutionCaretaker.pythonCodeExecutor,
+        rExecutionCaretaker.rCodeExecutor,
+        operationExecutionDispatcher
+      )
 
     val libraryPath = "/library"
 
@@ -110,21 +113,24 @@ case class WorkflowExecutor(
       libraryPath = libraryPath
     )
 
-    val actorSystem = ActorSystem(actorSystemName)
+    val actorSystem                                       = ActorSystem(actorSystemName)
     val finishedExecutionStatus: Promise[ExecutionReport] = Promise()
     val statusReceiverActor =
       actorSystem.actorOf(TerminationListenerActor.props(finishedExecutionStatus))
 
-    val workflowWithResults = WorkflowWithResults(
-      workflow.id,
-      workflow.metadata,
-      workflow.graph,
-      workflow.thirdPartyData,
-      ExecutionReport(Map(), None),
-      WorkflowInfo.forId(workflow.id))
+    val workflowWithResults =
+      WorkflowWithResults(
+        workflow.id,
+        workflow.metadata,
+        workflow.graph,
+        workflow.thirdPartyData,
+        ExecutionReport(Map(), None),
+        WorkflowInfo.forId(workflow.id)
+      )
     val workflowExecutorActor = actorSystem.actorOf(
       BatchWorkflowExecutorActor.props(executionContext, statusReceiverActor, workflowWithResults),
-      workflow.id.toString)
+      workflow.id.toString
+    )
 
     workflowExecutorActor ! Launch(workflow.graph.nodes.map(_.id))
 
@@ -147,7 +153,8 @@ case class WorkflowExecutor(
   private def cleanup(
       actorSystem: ActorSystem,
       executionContext: CommonExecutionContext,
-      pythonExecutionCaretaker: PythonExecutionCaretaker): Unit = {
+      pythonExecutionCaretaker: PythonExecutionCaretaker
+  ): Unit = {
     logger.debug("Cleaning up...")
     pythonExecutionCaretaker.stop()
     logger.debug("PythonExecutionCaretaker terminated!")
@@ -156,6 +163,7 @@ case class WorkflowExecutor(
     executionContext.sparkContext.stop()
     logger.debug("Spark terminated!")
   }
+
 }
 
 object WorkflowExecutor extends Logging with Executor {
@@ -163,15 +171,13 @@ object WorkflowExecutor extends Logging with Executor {
   private val outputFile = "result.json"
 
   def datasourcesFrom(workflow: WorkflowWithVariables): DatasourceList = {
-    val datasourcesJson = workflow.thirdPartyData.fields("datasources")
+    val datasourcesJson       = workflow.thirdPartyData.fields("datasources")
     val datasourcesJsonString = datasourcesJson.compactPrint
     DatasourceListJsonProtocol.fromString(datasourcesJsonString)
   }
 
-  def runInNoninteractiveMode(
-      params: ExecutionParams,
-      pythonPathGenerator: PythonPathGenerator): Unit = {
-    val sparkContext = createSparkContext()
+  def runInNoninteractiveMode(params: ExecutionParams, pythonPathGenerator: PythonPathGenerator): Unit = {
+    val sparkContext       = createSparkContext()
     val dOperationsCatalog = CatalogRecorder.fromSparkContext(sparkContext).catalogs.dOperationsCatalog
 
     val workflowVersionUtil: WorkflowVersionUtil = new WorkflowVersionUtil with Logging {
@@ -182,19 +188,18 @@ object WorkflowExecutor extends Logging with Executor {
     }
     val workflow = loadWorkflow(params, workflowVersionUtil)
 
-    val executionReport = workflow.map(w => {executeWorkflow(w, params.customCodeExecutorsPath.get,
-      pythonPathGenerator, params.tempPath.get, sparkContext)
-    })
+    val executionReport = workflow.map(w =>
+      executeWorkflow(w, params.customCodeExecutorsPath.get, pythonPathGenerator, params.tempPath.get, sparkContext)
+    )
     val workflowWithResultsFuture = workflow.flatMap(w =>
-      executionReport
-        .map {
-          case Success(r) =>
-            val emptyWorkflowInfo = WorkflowInfo.forId(w.id)
-            WorkflowWithResults(w.id, w.metadata, w.graph, w.thirdPartyData, r, emptyWorkflowInfo)
-          case Failure(ex) =>
-            logger.error(s"Error while processing workflow: $workflow")
-            throw ex
-        }
+      executionReport.map {
+        case Success(r) =>
+          val emptyWorkflowInfo = WorkflowInfo.forId(w.id)
+          WorkflowWithResults(w.id, w.metadata, w.graph, w.thirdPartyData, r, emptyWorkflowInfo)
+        case Failure(ex) =>
+          logger.error(s"Error while processing workflow: $workflow")
+          throw ex
+      }
     )
 
     // Await for workflow execution
@@ -202,56 +207,58 @@ object WorkflowExecutor extends Logging with Executor {
 
     workflowWithResultsTry match {
       // Workflow execution failed
-      case Failure(exception) => exception match {
-        case e: WorkflowVersionException => handleVersionException(e)
-        case e: DeserializationException => handleDeserializationException(e)
-        case e: WorkflowExecutionException => logger.error(e.getMessage, e)
-        case e: Exception => logger.error("Unexpected workflow execution exception", e)
-      }
+      case Failure(exception) =>
+        exception match {
+          case e: WorkflowVersionException   => handleVersionException(e)
+          case e: DeserializationException   => handleDeserializationException(e)
+          case e: WorkflowExecutionException => logger.error(e.getMessage, e)
+          case e: Exception                  => logger.error("Unexpected workflow execution exception", e)
+        }
       // Workflow execution succeeded
       case Success(workflowWithResults) =>
         logger.info("Handling execution report")
         // Saving execution report to file
         val reportPathFuture: Future[Option[String]] = params.outputDirectoryPath match {
-          case None => Future.successful(None)
+          case None       => Future.successful(None)
           case Some(path) => saveWorkflowToFile(path, workflowWithResults, workflowVersionUtil)
         }
 
         val reportPathTry: Try[Option[String]] =
-          try {
+          try
             Await.ready(reportPathFuture, 1.minute).value.get
-          } catch {
+          catch {
             case e: Exception =>
               executionReportDump(workflowWithResults, workflowVersionUtil)
               throw e
           }
 
-        if (reportPathTry.isFailure) {
+        if (reportPathTry.isFailure)
           executionReportDump(workflowWithResults, workflowVersionUtil)
-        }
 
         reportPathTry match {
           case Success(None) => // Saving execution report to file was not requested
           case Success(Some(path)) =>
             logger.info(s"Execution report successfully saved to file under path: $path")
-          case Failure(exception) => exception match {
-            case e: WorkflowVersionException => handleVersionException(e)
-            case e: DeserializationException => handleDeserializationException(e)
-            case e: UnexpectedHttpResponseException => logger.error(e.getMessage)
-            case e: Exception => logger.error("Saving execution report to file failed", e)
-          }
+          case Failure(exception) =>
+            exception match {
+              case e: WorkflowVersionException        => handleVersionException(e)
+              case e: DeserializationException        => handleDeserializationException(e)
+              case e: UnexpectedHttpResponseException => logger.error(e.getMessage)
+              case e: Exception                       => logger.error("Saving execution report to file failed", e)
+            }
         }
     }
   }
 
   private def executionReportDump(
       workflowWithResults: WorkflowWithResults,
-      workflowVersionUtil: WorkflowVersionUtil): Unit = {
+      workflowVersionUtil: WorkflowVersionUtil
+  ): Unit = {
     import workflowVersionUtil._
     logger.error("Execution report dump: \n" + workflowWithResults.toJson.prettyPrint)
   }
 
-  private def handleVersionException(versionException: WorkflowVersionException): Unit = {
+  private def handleVersionException(versionException: WorkflowVersionException): Unit =
     versionException match {
       case e @ WorkflowVersionFormatException(stringVersion) =>
         logger.error(e.getMessage)
@@ -261,50 +268,54 @@ object WorkflowExecutor extends Logging with Executor {
         logger.error(
           "The input workflow is incompatible with this WorkflowExecutor. " +
             s"Workflow's version is '${workflowApiVersion.humanReadable}' but " +
-            s"WorkflowExecutor's version is '${supportedApiVersion.humanReadable}'.")
+            s"WorkflowExecutor's version is '${supportedApiVersion.humanReadable}'."
+        )
     }
-  }
 
-  private def handleDeserializationException(exception: DeserializationException): Unit = {
+  private def handleDeserializationException(exception: DeserializationException): Unit =
     logger.error(s"WorkflowExecutor is unable to parse the input file: ${exception.getMessage}")
-  }
 
   private def executeWorkflow(
       workflow: WorkflowWithVariables,
       customCodeExecutorsPath: String,
       pythonPathGenerator: PythonPathGenerator,
       tempPath: String,
-      sparkContext: SparkContext): Try[ExecutionReport] = {
+      sparkContext: SparkContext
+  ): Try[ExecutionReport] = {
 
     // Run executor
     logger.info("Executing the workflow.")
-    logger.debug("Executing the workflow: " +  workflow)
+    logger.debug("Executing the workflow: " + workflow)
     WorkflowExecutor(workflow, customCodeExecutorsPath, pythonPathGenerator, tempPath).execute(sparkContext)
   }
 
-  private def loadWorkflow(params: ExecutionParams,
-      workflowVersionUtil: WorkflowVersionUtil): Future[WorkflowWithVariables] = {
+  private def loadWorkflow(
+      params: ExecutionParams,
+      workflowVersionUtil: WorkflowVersionUtil
+  ): Future[WorkflowWithVariables] = {
     val content = Future(Source.fromFile(params.workflowFilename.get).mkString)
-    content.map(_.parseJson)
+    content
+      .map(_.parseJson)
       .map(w => WorkflowJsonParamsOverrider.overrideParams(w, params.extraVars))
-      .map(_.convertTo[WorkflowWithVariables](
-        workflowVersionUtil.versionedWorkflowWithVariablesReader))
+      .map(_.convertTo[WorkflowWithVariables](workflowVersionUtil.versionedWorkflowWithVariablesReader))
   }
 
   private def saveWorkflowToFile(
       outputDir: String,
       result: WorkflowWithResults,
-      workflowVersionUtil: WorkflowVersionUtil): Future[Option[String]] = {
+      workflowVersionUtil: WorkflowVersionUtil
+  ): Future[Option[String]] = {
     import workflowVersionUtil._
-    logger.info(s"Execution report file ($outputFile) will be written on host: " +
-      s"${InetAddress.getLocalHost.getHostName} (${InetAddress.getLocalHost.getHostAddress})")
+    logger.info(
+      s"Execution report file ($outputFile) will be written on host: " +
+        s"${InetAddress.getLocalHost.getHostName} (${InetAddress.getLocalHost.getHostAddress})"
+    )
     var writerOption: Option[PrintWriter] = None
     try {
       val resultsFile = new File(outputDir, outputFile)
-      val parentFile = resultsFile.getParentFile
-      if (parentFile != null) {
+      val parentFile  = resultsFile.getParentFile
+      if (parentFile != null)
         parentFile.mkdirs()
-      }
       logger.info(s"Writing execution report file to: ${resultsFile.getPath}")
       writerOption = Some(new PrintWriter(new FileWriter(resultsFile, false)))
       writerOption.get.write(result.toJson.prettyPrint)
@@ -313,23 +324,23 @@ object WorkflowExecutor extends Logging with Executor {
       Future.successful(Some(resultsFile.getPath))
     } catch {
       case e: Exception =>
-        writerOption.foreach {
-          writer =>
-            try {
-              writer.close()
-            } catch {
-              case e: Exception =>
-                logger.warn("Exception during emergency closing of PrintWriter", e)
-            }
+        writerOption.foreach { writer =>
+          try
+            writer.close()
+          catch {
+            case e: Exception =>
+              logger.warn("Exception during emergency closing of PrintWriter", e)
+          }
         }
         Future.failed(e)
     }
   }
+
 }
 
 private case class FileSystemClientStub() extends FileSystemClient {
-  override def copyLocalFile[T <: Serializable]
-  (localFilePath: String, remoteFilePath: String): Unit = ()
+
+  override def copyLocalFile[T <: Serializable](localFilePath: String, remoteFilePath: String): Unit = ()
 
   override def delete(path: String): Unit = ()
 
@@ -337,11 +348,11 @@ private case class FileSystemClientStub() extends FileSystemClient {
 
   override def fileExists(path: String): Boolean = throw new UnsupportedOperationException
 
-  override def saveInputStreamToFile(
-    inputStream: InputStream, destinationPath: String): Unit = ()
+  override def saveInputStreamToFile(inputStream: InputStream, destinationPath: String): Unit = ()
 
   override def getFileInfo(path: String): Option[FileInfo] = throw new UnsupportedOperationException
 
   override def readFileAsObject[T <: Serializable](path: String): T =
     throw new UnsupportedOperationException
+
 }

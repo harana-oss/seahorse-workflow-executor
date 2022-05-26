@@ -1,28 +1,37 @@
 package io.deepsense.models.json.workflow
 
-import scala.reflect.runtime.universe.{TypeTag, typeOf}
+import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.runtime.universe.typeOf
 
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatestplus.mockito.MockitoSugar
 import spray.json._
 
-import io.deepsense.deeplang.{DPortPosition, DOperation}
-import io.deepsense.deeplang.catalogs.doperations.{DOperationCategory, DOperationDescriptor}
+import io.deepsense.deeplang.DPortPosition
+import io.deepsense.deeplang.DOperation
+import io.deepsense.deeplang.catalogs.doperations.DOperationCategory
+import io.deepsense.deeplang.catalogs.doperations.DOperationDescriptor
 import io.deepsense.deeplang.params.Params
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 object HelperTypes {
+
   class A
+
   class B
+
   trait T1
+
   trait T2
+
 }
 
 class DOperationDescriptorJsonProtocolSpec
-  extends FlatSpec
-  with MockitoSugar
-  with Matchers
-  with DOperationDescriptorJsonProtocol {
+    extends AnyFlatSpec
+    with MockitoSugar
+    with Matchers
+    with DOperationDescriptorJsonProtocol {
 
   "DOperationDescriptor" should "be correctly serialized to json" in {
     val (operationDescriptor, expectedJson) = operationDescriptorWithExpectedJsRepresentation
@@ -31,21 +40,20 @@ class DOperationDescriptorJsonProtocolSpec
 
   it should "be correctly serialized to json omitting its parameters" in {
     val (operationDescriptor, expectedJson) = operationDescriptorWithExpectedJsRepresentation
-    val jsonWithoutParameters = JsObject(expectedJson.asJsObject.fields - "parameters")
+    val jsonWithoutParameters               = JsObject(expectedJson.asJsObject.fields - "parameters")
     operationDescriptor.toJson(DOperationDescriptorBaseFormat) shouldBe jsonWithoutParameters
   }
 
-  private[this] def operationDescriptorWithExpectedJsRepresentation:
-  (DOperationDescriptor, JsValue) = {
+  private[this] def operationDescriptorWithExpectedJsRepresentation: (DOperationDescriptor, JsValue) = {
 
     import io.deepsense.models.json.workflow.HelperTypes._
 
     val category = mock[DOperationCategory]
-    when(category.id) thenReturn DOperationCategory.Id.randomId
+    when(category.id).thenReturn(DOperationCategory.Id.randomId)
 
-    val parameters = mock[Params]
+    val parameters                 = mock[Params]
     val parametersJsRepresentation = JsString("Mock parameters representation")
-    when(parameters.paramsToJson) thenReturn parametersJsRepresentation
+    when(parameters.paramsToJson).thenReturn(parametersJsRepresentation)
 
     val operationDescriptor = DOperationDescriptor(
       DOperation.Id.randomId,
@@ -57,43 +65,44 @@ class DOperationDescriptorJsonProtocolSpec
       Seq(typeOf[A], typeOf[A with T1]),
       Vector(DPortPosition.Left, DPortPosition.Center),
       Seq(typeOf[B], typeOf[B with T2]),
-      Vector(DPortPosition.Right, DPortPosition.Center))
+      Vector(DPortPosition.Right, DPortPosition.Center)
+    )
 
     def name[T: TypeTag]: String = typeOf[T].typeSymbol.fullName
 
     val expectedJson = JsObject(
-      "id" -> JsString(operationDescriptor.id.toString),
-      "name" -> JsString(operationDescriptor.name),
-      "category" -> JsString(category.id.toString),
-      "description" -> JsString(operationDescriptor.description),
-      "deterministic" -> JsBoolean(false),
+      "id"               -> JsString(operationDescriptor.id.toString),
+      "name"             -> JsString(operationDescriptor.name),
+      "category"         -> JsString(category.id.toString),
+      "description"      -> JsString(operationDescriptor.description),
+      "deterministic"    -> JsBoolean(false),
       "hasDocumentation" -> JsBoolean(false),
-      "parameters" -> parametersJsRepresentation,
+      "parameters"       -> parametersJsRepresentation,
       "ports" -> JsObject(
         "input" -> JsArray(
           JsObject(
-            "portIndex" -> JsNumber(0),
-            "required" -> JsBoolean(true),
+            "portIndex"     -> JsNumber(0),
+            "required"      -> JsBoolean(true),
             "typeQualifier" -> JsArray(JsString(name[A])),
-            "portPosition" -> JsString("left")
+            "portPosition"  -> JsString("left")
           ),
           JsObject(
-            "portIndex" -> JsNumber(1),
-            "required" -> JsBoolean(true),
+            "portIndex"     -> JsNumber(1),
+            "required"      -> JsBoolean(true),
             "typeQualifier" -> JsArray(JsString(name[A]), JsString(name[T1])),
-            "portPosition" -> JsString("center")
+            "portPosition"  -> JsString("center")
           )
         ),
         "output" -> JsArray(
           JsObject(
-            "portIndex" -> JsNumber(0),
+            "portIndex"     -> JsNumber(0),
             "typeQualifier" -> JsArray(JsString(name[B])),
-            "portPosition" -> JsString("right")
+            "portPosition"  -> JsString("right")
           ),
           JsObject(
-            "portIndex" -> JsNumber(1),
+            "portIndex"     -> JsNumber(1),
             "typeQualifier" -> JsArray(JsString(name[B]), JsString(name[T2])),
-            "portPosition" -> JsString("center")
+            "portPosition"  -> JsString("center")
           )
         )
       )
@@ -101,4 +110,5 @@ class DOperationDescriptorJsonProtocolSpec
 
     (operationDescriptor, expectedJson)
   }
+
 }

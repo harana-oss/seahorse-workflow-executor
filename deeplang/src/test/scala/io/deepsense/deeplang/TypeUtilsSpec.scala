@@ -1,6 +1,5 @@
 package io.deepsense.deeplang
 
-
 import scala.reflect.runtime.universe.typeTag
 
 class TypeUtilsSpec extends UnitSpec {
@@ -24,15 +23,21 @@ class TypeUtilsSpec extends UnitSpec {
       TypeUtils.describeType(typeTag[C[A] with B].tpe) shouldBe Seq(describedC, describedB)
     }
   }
+
 }
 
 object TypeUtilsSpec {
+
   class A
+
   trait B
+
   class C[T]
 
   val describedA = "io.deepsense.deeplang.TypeUtilsSpec.A"
+
   val describedB = "io.deepsense.deeplang.TypeUtilsSpec.B"
+
   val describedC = "io.deepsense.deeplang.TypeUtilsSpec.C"
 
 }

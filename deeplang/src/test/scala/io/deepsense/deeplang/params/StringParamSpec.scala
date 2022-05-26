@@ -13,12 +13,13 @@ class StringParamSpec extends AbstractParamSpec[String, StringParam] {
     val param = StringParam(
       name = "String parameter name",
       description = Some(description),
-      validator = new AcceptAllRegexValidator)
+      validator = new AcceptAllRegexValidator
+    )
     val expectedJson = JsObject(
-      "type" -> JsString("string"),
-      "name" -> JsString(param.name),
+      "type"        -> JsString("string"),
+      "name"        -> JsString(param.name),
       "description" -> JsString(description),
-      "default" -> JsNull,
+      "default"     -> JsNull,
       "isGriddable" -> JsFalse,
       "validator" -> JsObject(
         "type" -> JsString("regex"),
@@ -34,4 +35,5 @@ class StringParamSpec extends AbstractParamSpec[String, StringParam] {
     val value = "abcdefghij"
     (value, JsString(value))
   }
+
 }

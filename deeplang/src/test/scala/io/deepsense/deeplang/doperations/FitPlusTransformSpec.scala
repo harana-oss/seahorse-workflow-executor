@@ -1,6 +1,7 @@
 package io.deepsense.deeplang.doperations
 
-import spray.json.{JsNumber, JsObject}
+import spray.json.JsNumber
+import spray.json.JsObject
 
 import io.deepsense.deeplang.doperables.Transformer
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
@@ -8,23 +9,23 @@ import io.deepsense.deeplang.doperations.MockDOperablesFactory._
 import io.deepsense.deeplang.doperations.exceptions.TooManyPossibleTypesException
 import io.deepsense.deeplang.exceptions.DeepLangMultiException
 import io.deepsense.deeplang.inference.InferContext
-import io.deepsense.deeplang.{DKnowledge, DOperable, ExecutionContext, UnitSpec}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DOperable
+import io.deepsense.deeplang.ExecutionContext
+import io.deepsense.deeplang.UnitSpec
 
 class FitPlusTransformSpec extends UnitSpec {
 
   "FitPlusTransform" when {
     "executed" should {
       "pass parameters to the input Estimator produce a Transformer and transformed DataFrame" in {
-        val estimator = new MockEstimator
+        val estimator               = new MockEstimator
         val initialParametersValues = estimator.extractParamMap()
-        val fpt = new FitPlusTransform
+        val fpt                     = new FitPlusTransform
 
-        def testExecute(
-          op: FitPlusTransform,
-          expectedDataFrame: DataFrame,
-          expectedTransformer: Transformer): Unit = {
-          val results = op.executeUntyped(Vector(estimator, mock[DataFrame]))(mock[ExecutionContext])
-          val outputDataFrame = results(0).asInstanceOf[DataFrame]
+        def testExecute(op: FitPlusTransform, expectedDataFrame: DataFrame, expectedTransformer: Transformer): Unit = {
+          val results           = op.executeUntyped(Vector(estimator, mock[DataFrame]))(mock[ExecutionContext])
+          val outputDataFrame   = results(0).asInstanceOf[DataFrame]
           val outputTransformer = results(1).asInstanceOf[Transformer]
 
           outputDataFrame shouldBe expectedDataFrame
@@ -40,14 +41,15 @@ class FitPlusTransformSpec extends UnitSpec {
     }
     "inferring knowledge" should {
       "take parameters from the input Estimator, infer Transformer and then a DataFrame" in {
-        val estimator = new MockEstimator
+        val estimator               = new MockEstimator
         val initialParametersValues = estimator.extractParamMap()
-        val fpt = new FitPlusTransform
+        val fpt                     = new FitPlusTransform
 
         def testInference(
-          op: FitPlusTransform,
-          expectedDataFrameKnowledge: DKnowledge[DataFrame],
-          expectedTransformerKnowledge: DKnowledge[Transformer]): Unit = {
+            op: FitPlusTransform,
+            expectedDataFrameKnowledge: DKnowledge[DataFrame],
+            expectedTransformerKnowledge: DKnowledge[Transformer]
+        ): Unit = {
           val (Vector(outputDataFrameKnowledge, outputTransformerKnowledge), _) =
             op.inferKnowledgeUntyped(Vector(DKnowledge(estimator), mock[DKnowledge[DataFrame]]))(mock[InferContext])
 
@@ -83,4 +85,5 @@ class FitPlusTransformSpec extends UnitSpec {
       }
     }
   }
+
 }

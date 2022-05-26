@@ -2,17 +2,25 @@ package io.deepsense.deeplang.doperations
 
 import io.deepsense.commons.utils.Version
 import io.deepsense.deeplang.DOperation.Id
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
 import io.deepsense.deeplang.params.ParamMap
-import io.deepsense.deeplang.{DKnowledge, ExecutionContext, UnitSpec}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.ExecutionContext
+import io.deepsense.deeplang.UnitSpec
 
 class TransformerAsFactorySpec extends UnitSpec {
+
   import MockTransformers._
 
   class MockTransformerAsFactory extends TransformerAsFactory[MockTransformer] {
+
     override val name: String = ""
+
     override val id: Id = "6d924962-9456-11e5-8994-feff819cdc9f"
+
     override val description: String = ""
+
   }
 
   "TransformerAsFactory" should {
@@ -31,7 +39,7 @@ class TransformerAsFactorySpec extends UnitSpec {
       op.set(op.transformer.paramA -> 2)
       val result = op.executeUntyped(Vector())(mock[ExecutionContext])
 
-      result should have length 1
+      (result should have).length(1)
       result(0).asInstanceOf[MockTransformer].extractParamMap() shouldBe
         ParamMap(op.transformer.paramA -> 2)
     }
@@ -44,9 +52,10 @@ class TransformerAsFactorySpec extends UnitSpec {
 
       warnings shouldBe InferenceWarnings.empty
 
-      result should have length 1
+      (result should have).length(1)
       result(0).single.asInstanceOf[MockTransformer].extractParamMap() shouldBe
         ParamMap(op.transformer.paramA -> 2)
     }
   }
+
 }

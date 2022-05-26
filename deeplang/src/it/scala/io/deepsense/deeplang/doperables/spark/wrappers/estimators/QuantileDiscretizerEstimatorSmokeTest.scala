@@ -4,8 +4,7 @@ import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTra
 import io.deepsense.deeplang.params.ParamPair
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
-class QuantileDiscretizerEstimatorSmokeTest
-  extends AbstractEstimatorModelWrapperSmokeTest {
+class QuantileDiscretizerEstimatorSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
 
   override def className: String = "QuantileDiscretizer"
 
@@ -14,8 +13,9 @@ class QuantileDiscretizerEstimatorSmokeTest
   import estimator._
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    numBuckets -> 2,
-    inputColumn -> NameSingleColumnSelection("myRating"),
+    numBuckets          -> 2,
+    inputColumn         -> NameSingleColumnSelection("myRating"),
     singleInPlaceChoice -> NoInPlaceChoice().setOutputColumn("testOutputColumn")
   )
+
 }

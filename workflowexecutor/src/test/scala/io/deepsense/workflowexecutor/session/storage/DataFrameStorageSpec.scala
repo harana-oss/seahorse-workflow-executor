@@ -2,34 +2,39 @@ package io.deepsense.workflowexecutor.session.storage
 
 import org.apache.spark.sql.{DataFrame => SparkDataFrame}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import io.deepsense.commons.StandardSpec
 import io.deepsense.commons.models.Id
 import io.deepsense.deeplang.DataFrameStorage
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 
-class DataFrameStorageSpec
-    extends StandardSpec
-    with BeforeAndAfter
-    with MockitoSugar {
+class DataFrameStorageSpec extends StandardSpec with BeforeAndAfter with MockitoSugar {
 
   val workflow1Id = Id.randomId
+
   val workflow2Id = Id.randomId
 
   val node1Id = Id.randomId
+
   val node2Id = Id.randomId
 
   val dataframe1Id = "dataframe1"
+
   val dataframe2Id = "dataframe2"
+
   val dataframe3Id = "dataframe3"
 
   val dataframe1 = mock[DataFrame]
+
   val dataframe2 = mock[DataFrame]
+
   val dataframe3 = mock[DataFrame]
 
   val sparkDataFrame1 = mock[SparkDataFrame]
+
   val sparkDataFrame2 = mock[SparkDataFrame]
+
   val sparkDataFrame3 = mock[SparkDataFrame]
 
   var storage: DataFrameStorage = _
@@ -93,4 +98,5 @@ class DataFrameStorageSpec
       storage.getOutputDataFrame(workflow2Id, node2Id, 1) shouldBe Some(sparkDataFrame3)
     }
   }
+
 }

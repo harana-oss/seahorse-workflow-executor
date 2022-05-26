@@ -6,18 +6,18 @@ import io.deepsense.commons.utils.Logging
 import io.deepsense.models.workflows.Workflow
 import io.deepsense.sparkutils.AkkaUtils
 import io.deepsense.workflowexecutor.communication.message.global.Launch
-import io.deepsense.workflowexecutor.communication.message.{global, workflow}
+import io.deepsense.workflowexecutor.communication.message.global
+import io.deepsense.workflowexecutor.communication.message.workflow
 import io.deepsense.workflowexecutor.executor.Executor
-import io.deepsense.workflowexecutor.{SessionWorkflowExecutorActorProvider, WorkflowExecutorActor}
+import io.deepsense.workflowexecutor.SessionWorkflowExecutorActorProvider
+import io.deepsense.workflowexecutor.WorkflowExecutorActor
 
-/**
-  * Handles messages with topic workflow.&#36;{id}. All messages directed to workflows.
-  */
+/** Handles messages with topic workflow.&#36;{id}. All messages directed to workflows. */
 case class WorkflowTopicSubscriber(
-      actorProvider: SessionWorkflowExecutorActorProvider,
-      sessionId: String,
-      workflowId: Workflow.Id)
-    extends Actor
+    actorProvider: SessionWorkflowExecutorActorProvider,
+    sessionId: String,
+    workflowId: Workflow.Id
+) extends Actor
     with Logging
     with Executor {
 
@@ -45,16 +45,12 @@ case class WorkflowTopicSubscriber(
     case x =>
       logger.error(s"Unexpected '$x' from '${sender()}'!")
   }
+
 }
 
 object WorkflowTopicSubscriber {
-  def props(
-      actorProvider: SessionWorkflowExecutorActorProvider,
-      sessionId: String,
-      workflowId: Workflow.Id): Props = {
-    Props(WorkflowTopicSubscriber(
-      actorProvider,
-      sessionId,
-      workflowId))
-  }
+
+  def props(actorProvider: SessionWorkflowExecutorActorProvider, sessionId: String, workflowId: Workflow.Id): Props =
+    Props(WorkflowTopicSubscriber(actorProvider, sessionId, workflowId))
+
 }

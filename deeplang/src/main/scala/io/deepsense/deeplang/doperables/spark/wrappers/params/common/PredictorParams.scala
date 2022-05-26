@@ -4,7 +4,4 @@ import scala.language.reflectiveCalls
 
 import io.deepsense.deeplang.params.Params
 
-trait PredictorParams
-  extends Params
-  with HasFeaturesColumnParam
-  with HasPredictionColumnCreatorParam
+trait PredictorParams extends Params with HasFeaturesColumnParam with HasPredictionColumnCreatorParam

@@ -2,7 +2,8 @@ package io.deepsense.deeplang.doperables
 
 import io.deepsense.deeplang.ExecutionContext
 import io.deepsense.deeplang.OperationExecutionDispatcher.Result
-import io.deepsense.deeplang.params.{CodeSnippetLanguage, CodeSnippetParam}
+import io.deepsense.deeplang.params.CodeSnippetLanguage
+import io.deepsense.deeplang.params.CodeSnippetParam
 
 class RTransformer extends CustomCodeTransformer {
 
@@ -11,10 +12,12 @@ class RTransformer extends CustomCodeTransformer {
     description = None,
     language = CodeSnippetLanguage(CodeSnippetLanguage.r)
   )
-  setDefault(codeParameter ->
-    """transform <- function(dataframe) {
-      |  return(dataframe)
-      |}
+
+  setDefault(
+    codeParameter ->
+      """transform <- function(dataframe) {
+        |  return(dataframe)
+        |}
     """.stripMargin
   )
 
@@ -23,4 +26,5 @@ class RTransformer extends CustomCodeTransformer {
 
   override def runCode(context: ExecutionContext, code: String): Result =
     context.customCodeExecutor.runR(code)
+
 }

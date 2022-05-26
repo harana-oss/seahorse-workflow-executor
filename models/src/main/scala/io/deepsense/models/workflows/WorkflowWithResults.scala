@@ -5,9 +5,10 @@ import spray.json.JsObject
 import io.deepsense.graph.DeeplangGraph
 
 case class WorkflowWithResults(
-  id: Workflow.Id,
-  metadata: WorkflowMetadata,
-  graph: DeeplangGraph,
-  thirdPartyData: JsObject,
-  executionReport: ExecutionReport,
-  workflowInfo: WorkflowInfo)
+    id: Workflow.Id,
+    metadata: WorkflowMetadata,
+    graph: DeeplangGraph,
+    thirdPartyData: JsObject,
+    executionReport: ExecutionReport,
+    workflowInfo: WorkflowInfo
+)

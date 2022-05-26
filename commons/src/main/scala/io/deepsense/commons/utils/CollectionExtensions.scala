@@ -10,14 +10,10 @@ object CollectionExtensions {
 
     def hasDuplicates: Boolean = !hasUniqueValues
 
-    /**
-     * Works like groupBy, but assumes function f is injective, so there is
-     * only one element for each key.
-     */
+    /** Works like groupBy, but assumes function f is injective, so there is only one element for each key. */
     def lookupBy[R](f: T => R): Map[R, T] = {
       val mapEntries = seq.map(e => f(e) -> e)
-      assert(mapEntries.size == seq.size,
-        "Function f must be injective, otherwise we would override some key")
+      assert(mapEntries.size == seq.size, "Function f must be injective, otherwise we would override some key")
       mapEntries.toMap
     }
 
@@ -27,10 +23,8 @@ object CollectionExtensions {
 
   implicit class RichSet[T](set: Set[T]) {
 
-    /**
-      * Returns set with elements which are in both sets but not in their intersection
-      */
-    def xor(another: Set[T]): Set[T] = (set diff another) union (another diff set)
+    /** Returns set with elements which are in both sets but not in their intersection */
+    def xor(another: Set[T]): Set[T] = set.diff(another).union(another.diff(set))
 
   }
 

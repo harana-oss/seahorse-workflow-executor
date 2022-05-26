@@ -1,7 +1,7 @@
 package io.deepsense.workflowexecutor
 
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import spray.json._
 
 import io.deepsense.commons.StandardSpec
@@ -15,7 +15,7 @@ class WorkflowJsonParamsOverriderSpec
   "WorkflowJsonParamsOverrider" should {
     "override parameters based on passed extra params" in {
       val overrides = Map(
-        "node1.param with spaces" -> "new value",
+        "node1.param with spaces"     -> "new value",
         "node2.nested.parameter.test" -> "changed"
       )
 
@@ -25,7 +25,7 @@ class WorkflowJsonParamsOverriderSpec
     "throw when invalid parameters are passed" in {
       val overrides = Map(
         "node1.no such param" -> "no such param",
-        "no such node.param" -> "no such node"
+        "no such node.param"  -> "no such node"
       )
 
       a[RuntimeException] should be thrownBy {
@@ -79,4 +79,5 @@ class WorkflowJsonParamsOverriderSpec
       |  }
       |}
     """.stripMargin.parseJson
+
 }

@@ -13,19 +13,21 @@ import io.deepsense.deeplang.doperations.exceptions.DeepSenseIOException
 import io.deepsense.deeplang.doperations.inout._
 import io.deepsense.deeplang.doperations.readwritedataframe.filestorage.DataFrameToFileWriter
 import io.deepsense.deeplang.doperations.readwritedataframe.googlestorage.DataFrameToGoogleSheetWriter
-import io.deepsense.deeplang.doperations.readwritedataframe.validators.{FilePathHasValidFileScheme, ParquetSupportedOnClusterOnly}
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
+import io.deepsense.deeplang.doperations.readwritedataframe.validators.FilePathHasValidFileScheme
+import io.deepsense.deeplang.doperations.readwritedataframe.validators.ParquetSupportedOnClusterOnly
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
 import io.deepsense.deeplang.params.choice.ChoiceParam
-import io.deepsense.deeplang.params.{Param, Params}
+import io.deepsense.deeplang.params.Param
+import io.deepsense.deeplang.params.Params
 import org.apache.spark.sql.SaveMode
 
-class WriteDataFrame()
-  extends DOperation1To0[DataFrame]
-  with Params
-  with OperationDocumentation {
+class WriteDataFrame() extends DOperation1To0[DataFrame] with Params with OperationDocumentation {
 
   override val id: Id = "9e460036-95cc-42c5-ba64-5bc767a40e4e"
+
   override val name: String = "Write DataFrame"
+
   override val description: String = "Writes a DataFrame to a file or database"
 
   override val since: Version = Version(0, 4, 0)
@@ -33,27 +35,31 @@ class WriteDataFrame()
   @transient
   override lazy val tTagTI_0: ru.TypeTag[DataFrame] = ru.typeTag[DataFrame]
 
-  val storageType = ChoiceParam[OutputStorageTypeChoice](
-    name = "data storage type",
-    description = Some("Storage type."))
+  val storageType =
+    ChoiceParam[OutputStorageTypeChoice](name = "data storage type", description = Some("Storage type."))
 
   def getStorageType(): OutputStorageTypeChoice = $(storageType)
+
   def setStorageType(value: OutputStorageTypeChoice): this.type = set(storageType, value)
 
   val params: Array[Param[_]] = Array(storageType)
+
   setDefault(storageType, new OutputStorageTypeChoice.File())
 
   override def execute(dataFrame: DataFrame)(context: ExecutionContext): Unit = {
     import OutputStorageTypeChoice._
-    try {
+    try
       getStorageType() match {
         case jdbcChoice: Jdbc => writeToJdbc(jdbcChoice, context, dataFrame)
-        case googleSheetChoice: GoogleSheet => DataFrameToGoogleSheetWriter.writeToGoogleSheet(
-          googleSheetChoice, context, dataFrame
-        )
+        case googleSheetChoice: GoogleSheet =>
+          DataFrameToGoogleSheetWriter.writeToGoogleSheet(
+            googleSheetChoice,
+            context,
+            dataFrame
+          )
         case fileChoice: File => DataFrameToFileWriter.writeToFile(fileChoice, context, dataFrame)
       }
-    } catch {
+    catch {
       case e: IOException =>
         logger.error(s"WriteDataFrame error. Could not write file to designated storage", e)
         throw DeepSenseIOException(e)
@@ -63,13 +69,14 @@ class WriteDataFrame()
   private def writeToJdbc(
       jdbcChoice: OutputStorageTypeChoice.Jdbc,
       context: ExecutionContext,
-      dataFrame: DataFrame): Unit = {
+      dataFrame: DataFrame
+  ): Unit = {
     val properties = new Properties()
     properties.setProperty("driver", jdbcChoice.getJdbcDriverClassName)
 
-    val jdbcUrl = jdbcChoice.getJdbcUrl
+    val jdbcUrl       = jdbcChoice.getJdbcUrl
     val jdbcTableName = jdbcChoice.getJdbcTableName
-    val saveMode = if (jdbcChoice.getShouldOverwrite) SaveMode.Overwrite else SaveMode.ErrorIfExists
+    val saveMode      = if (jdbcChoice.getShouldOverwrite) SaveMode.Overwrite else SaveMode.ErrorIfExists
 
     dataFrame.sparkDataFrame.write.mode(saveMode).jdbc(jdbcUrl, jdbcTableName, properties)
   }
@@ -79,4 +86,5 @@ class WriteDataFrame()
     ParquetSupportedOnClusterOnly.validate(this)
     super.inferKnowledge(k0)(context)
   }
+
 }

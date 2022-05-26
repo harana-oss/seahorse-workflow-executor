@@ -6,14 +6,17 @@ import io.deepsense.commons.json.EnumerationSerializer
 import io.deepsense.commons.types.ColumnType
 
 trait ReportJsonProtocol
-  extends DefaultJsonProtocol
-  with StructTypeJsonProtocol
-  with ProductFormatsInstances
-  with NullOptions {
+    extends DefaultJsonProtocol
+    with StructTypeJsonProtocol
+    with ProductFormatsInstances
+    with NullOptions {
 
   type maybeStats = Option[String]
+
   val statisticsConstructor: ((maybeStats, maybeStats, maybeStats) => Statistics) = Statistics.apply
+
   implicit val statisticsFormat = jsonFormat3(statisticsConstructor)
+
   implicit val reportTypeFormat = EnumerationSerializer.jsonEnumFormat(ReportType)
 
   implicit object DistributionJsonFormat extends JsonFormat[Distribution] {
@@ -24,7 +27,8 @@ trait ReportJsonProtocol
       DistributionJsonProtocol.descriptionKey,
       DistributionJsonProtocol.missingValuesKey,
       DistributionJsonProtocol.bucketsKey,
-      DistributionJsonProtocol.countsKey)
+      DistributionJsonProtocol.countsKey
+    )
 
     val continuousDistributionFormat = jsonFormat(
       ContinuousDistribution.apply,
@@ -33,69 +37,89 @@ trait ReportJsonProtocol
       DistributionJsonProtocol.missingValuesKey,
       DistributionJsonProtocol.bucketsKey,
       DistributionJsonProtocol.countsKey,
-      DistributionJsonProtocol.statisticsKey)
+      DistributionJsonProtocol.statisticsKey
+    )
 
-    val noDistributionFormat = jsonFormat(
-      NoDistribution.apply,
-      DistributionJsonProtocol.nameKey,
-      DistributionJsonProtocol.descriptionKey)
+    val noDistributionFormat =
+      jsonFormat(NoDistribution.apply, DistributionJsonProtocol.nameKey, DistributionJsonProtocol.descriptionKey)
 
     override def read(json: JsValue): Distribution = {
       val fields: Map[String, JsValue] = json.asJsObject.fields
-      val subtype: String = fields.get(DistributionJsonProtocol.subtypeKey).get.convertTo[String]
+      val subtype: String              = fields(DistributionJsonProtocol.subtypeKey).convertTo[String]
       subtype match {
-        case DiscreteDistribution.subtype => json.convertTo(categoricalDistributionFormat)
+        case DiscreteDistribution.subtype   => json.convertTo(categoricalDistributionFormat)
         case ContinuousDistribution.subtype => json.convertTo(continuousDistributionFormat)
-        case NoDistribution.subtype => json.convertTo(noDistributionFormat)
+        case NoDistribution.subtype         => json.convertTo(noDistributionFormat)
       }
     }
+
     override def write(distribution: Distribution): JsValue = {
       val basicFields = Map(
-        DistributionJsonProtocol.nameKey -> JsString(distribution.name),
-        DistributionJsonProtocol.subtypeKey -> JsString(distribution.subtype),
-        DistributionJsonProtocol.descriptionKey -> JsString(distribution.description),
+        DistributionJsonProtocol.nameKey          -> JsString(distribution.name),
+        DistributionJsonProtocol.subtypeKey       -> JsString(distribution.subtype),
+        DistributionJsonProtocol.descriptionKey   -> JsString(distribution.description),
         DistributionJsonProtocol.missingValuesKey -> JsNumber(distribution.missingValues)
       )
       distribution match {
-        case d: ContinuousDistribution => JsObject(basicFields ++ Map(
-          DistributionJsonProtocol.bucketsKey -> d.buckets.toJson,
-          DistributionJsonProtocol.countsKey -> d.counts.toJson,
-          DistributionJsonProtocol.statisticsKey -> d.statistics.toJson
-        ))
-        case d: DiscreteDistribution => JsObject(basicFields ++ Map(
-          DistributionJsonProtocol.countsKey -> d.counts.toJson,
-          DistributionJsonProtocol.bucketsKey -> d.categories.toJson
-        ))
+        case d: ContinuousDistribution =>
+          JsObject(
+            basicFields ++ Map(
+              DistributionJsonProtocol.bucketsKey    -> d.buckets.toJson,
+              DistributionJsonProtocol.countsKey     -> d.counts.toJson,
+              DistributionJsonProtocol.statisticsKey -> d.statistics.toJson
+            )
+          )
+        case d: DiscreteDistribution =>
+          JsObject(
+            basicFields ++ Map(
+              DistributionJsonProtocol.countsKey  -> d.counts.toJson,
+              DistributionJsonProtocol.bucketsKey -> d.categories.toJson
+            )
+          )
         case d: NoDistribution => JsObject(basicFields)
       }
     }
+
   }
 
   implicit val columnTypeFormat = new RootJsonFormat[ColumnType.ColumnType] {
-    override def write(obj: ColumnType.ColumnType): JsValue = {
+
+    override def write(obj: ColumnType.ColumnType): JsValue =
       JsString(obj.toString)
-    }
 
     override def read(json: JsValue): ColumnType.ColumnType = json match {
       case JsString(str) => ColumnType.withName(str)
-      case _ => throw new DeserializationException("Enum string expected")
+      case _             => throw new DeserializationException("Enum string expected")
     }
+
   }
 
   implicit val tableFormat = jsonFormat6(Table.apply)
+
   implicit val reportFormat = jsonFormat4(ReportContent.apply)
+
 }
 
 object ReportJsonProtocol extends ReportJsonProtocol
 
 object DistributionJsonProtocol {
+
   val typeName = "distribution"
+
   val nameKey = "name"
+
   val reportTypeKey = "reportType"
+
   val subtypeKey = "subtype"
+
   val missingValuesKey = "missingValues"
+
   val descriptionKey = "description"
+
   val bucketsKey = "buckets"
+
   val countsKey = "counts"
+
   val statisticsKey = "statistics"
+
 }

@@ -13,12 +13,13 @@ class NaiveBayesSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
   import estimator._
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    smoothing -> 1.0,
-    modelType -> Multinomial(),
-    featuresColumn -> NameSingleColumnSelection("myFeatures"),
-    labelColumn -> NameSingleColumnSelection("myLabel"),
-    probabilityColumn -> "prob",
+    smoothing           -> 1.0,
+    modelType           -> Multinomial(),
+    featuresColumn      -> NameSingleColumnSelection("myFeatures"),
+    labelColumn         -> NameSingleColumnSelection("myLabel"),
+    probabilityColumn   -> "prob",
     rawPredictionColumn -> "rawPred",
-    predictionColumn -> "pred"
+    predictionColumn    -> "pred"
   )
+
 }

@@ -8,17 +8,15 @@ class DynamicParamSpec extends AbstractParamSpec[JsValue, DynamicParam] {
 
   override def paramFixture: (DynamicParam, JsValue) = {
     val description = "Dynamic param description"
-    val param = new DynamicParam(
-      "Dynamic param name",
-      Some(description),
-      inputPort = 4)
+    val param       = new DynamicParam("Dynamic param name", Some(description), inputPort = 4)
     val json = JsObject(
-      "type" -> JsString("dynamic"),
-      "name" -> JsString(param.name),
+      "type"        -> JsString("dynamic"),
+      "name"        -> JsString(param.name),
       "description" -> JsString(description),
-      "inputPort" -> JsNumber(param.inputPort),
+      "inputPort"   -> JsNumber(param.inputPort),
       "isGriddable" -> JsFalse,
-      "default" -> JsNull)
+      "default"     -> JsNull
+    )
     (param, json)
   }
 
@@ -30,9 +28,10 @@ class DynamicParamSpec extends AbstractParamSpec[JsValue, DynamicParam] {
   it should {
     "skip JsNull values" in {
       val (param, _) = paramFixture
-      val input = JsObject("a" -> JsNumber(3), "b" -> JsNull)
-      val expected = JsObject("a" -> JsNumber(3))
+      val input      = JsObject("a" -> JsNumber(3), "b" -> JsNull)
+      val expected   = JsObject("a" -> JsNumber(3))
       param.valueFromJson(input) shouldBe expected
     }
   }
+
 }

@@ -16,4 +16,5 @@ trait MultiColumnEstimatorParamsForwarder[E <: MultiColumnEstimator[_, _, _]] {
     set(estimator.extractParamMap())
     this
   }
+
 }

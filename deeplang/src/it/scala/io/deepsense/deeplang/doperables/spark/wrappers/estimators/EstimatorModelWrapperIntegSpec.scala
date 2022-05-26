@@ -3,7 +3,9 @@ package io.deepsense.deeplang.doperables.spark.wrappers.estimators
 import io.deepsense.deeplang.DeeplangIntegTestSupport
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{IntegerType, StructType, StructField}
+import org.apache.spark.sql.types.IntegerType
+import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.types.StructField
 
 class EstimatorModelWrapperIntegSpec extends DeeplangIntegTestSupport {
 
@@ -17,17 +19,21 @@ class EstimatorModelWrapperIntegSpec extends DeeplangIntegTestSupport {
 
   val estimatorPredictionParamValue = "estimatorPrediction"
 
-  val expectedSchema = StructType(Seq(
-    StructField("x", IntegerType, nullable = false),
-    StructField(estimatorPredictionParamValue, IntegerType, nullable = false)
-  ))
+  val expectedSchema = StructType(
+    Seq(
+      StructField("x", IntegerType, nullable = false),
+      StructField(estimatorPredictionParamValue, IntegerType, nullable = false)
+    )
+  )
 
   val transformerPredictionParamValue = "modelPrediction"
 
-  val expectedSchemaForTransformerParams = StructType(Seq(
-    StructField("x", IntegerType, nullable = false),
-    StructField(transformerPredictionParamValue, IntegerType, nullable = false)
-  ))
+  val expectedSchemaForTransformerParams = StructType(
+    Seq(
+      StructField("x", IntegerType, nullable = false),
+      StructField(transformerPredictionParamValue, IntegerType, nullable = false)
+    )
+  )
 
   "EstimatorWrapper" should {
     "_fit() and transform() + transformSchema() with parameters inherited" in {
@@ -59,7 +65,8 @@ class EstimatorModelWrapperIntegSpec extends DeeplangIntegTestSupport {
       val estimatorWrapper = new SimpleSparkEstimatorWrapper()
         .setPredictionColumn(estimatorPredictionParamValue)
 
-      estimatorWrapper._fit_infer(inputDF.schema)
+      estimatorWrapper
+        ._fit_infer(inputDF.schema)
         ._transformSchema(inputDF.sparkDataFrame.schema) shouldBe Some(expectedSchema)
     }
 
@@ -87,4 +94,5 @@ class EstimatorModelWrapperIntegSpec extends DeeplangIntegTestSupport {
 
     transformer
   }
+
 }

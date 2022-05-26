@@ -5,8 +5,9 @@ import io.deepsense.workflowexecutor.communication.message.notebook.KernelManage
 import io.deepsense.workflowexecutor.communication.mq.json.DefaultJsonMessageDeserializer
 
 object NotebookProtocol {
+
   val kernelManagerReady = "kernelManagerReady"
 
-  object KernelManagerReadyDeserializer
-    extends DefaultJsonMessageDeserializer[KernelManagerReady](kernelManagerReady)
+  object KernelManagerReadyDeserializer extends DefaultJsonMessageDeserializer[KernelManagerReady](kernelManagerReady)
+
 }

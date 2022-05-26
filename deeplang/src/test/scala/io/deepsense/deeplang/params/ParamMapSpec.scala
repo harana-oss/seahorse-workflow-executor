@@ -8,28 +8,37 @@ import ParameterType.ParameterType
 class ParamMapSpec extends UnitSpec {
 
   class MockParam[T] extends Param[T] {
+
     // cannot use mockito, because asInstanceOf[Any] won't work
     override val name: String = "name"
+
     override val description: Option[String] = Some("description")
+
     override val parameterType: ParameterType = mock[ParameterType]
 
     override def valueToJson(value: T): JsValue = ???
+
     override def valueFromJson(jsValue: JsValue): T = ???
 
     override def replicate(name: String): MockParam[T] = new MockParam[T]
+
   }
 
   val intParam = new MockParam[Int]
+
   val intValue = 5
+
   val intParamPair = ParamPair(intParam, intValue)
 
   val stringParam = new MockParam[String]
+
   val stringValue = "abc"
+
   val stringParamPair = ParamPair(stringParam, stringValue)
 
   val paramPairs = Seq(intParamPair, stringParamPair)
 
-  "ParamMap" can {
+  "ParamMap".can {
     "be built from ParamPairs" in {
       val paramMap = ParamMap(paramPairs: _*)
       ParamMap().put(stringParamPair, intParamPair) shouldBe paramMap
@@ -56,12 +65,13 @@ class ParamMapSpec extends UnitSpec {
 
   "ParamMap.put" should {
     "update value of param if it is already defined" in {
-      val map = mapWithIntParam
+      val map      = mapWithIntParam
       val newValue = 7
       map.put(intParam, newValue)
       map shouldBe ParamMap().put(intParam, newValue)
     }
   }
+
   "ParamMap.get" should {
     "return Some value" when {
       "param has value assigned" in {
@@ -97,7 +107,7 @@ class ParamMapSpec extends UnitSpec {
     }
     "throw an Exception" when {
       "param has no value assigned" in {
-        a [NoSuchElementException] shouldBe thrownBy {
+        a[NoSuchElementException] shouldBe thrownBy {
           mapWithIntParam(stringParam)
         }
       }
@@ -131,4 +141,5 @@ class ParamMapSpec extends UnitSpec {
       }
     }
   }
+
 }

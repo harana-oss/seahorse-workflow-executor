@@ -12,12 +12,13 @@ class MultilayerPerceptronClassifierSmokeTest extends AbstractEstimatorModelWrap
   import estimator._
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    featuresColumn -> NameSingleColumnSelection("myFeatures"),
-    labelColumn -> NameSingleColumnSelection("myRating"),
-    layersParam -> Array(3.0, 2.0, 1.0),
-    maxIterations -> 120.0,
+    featuresColumn   -> NameSingleColumnSelection("myFeatures"),
+    labelColumn      -> NameSingleColumnSelection("myRating"),
+    layersParam      -> Array(3.0, 2.0, 1.0),
+    maxIterations    -> 120.0,
     predictionColumn -> "prediction",
-    seed -> 100.0,
-    tolerance -> 2E-5
+    seed             -> 100.0,
+    tolerance        -> 2e-5
   )
+
 }

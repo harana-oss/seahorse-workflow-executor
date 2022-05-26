@@ -1,6 +1,9 @@
 package io.deepsense.deeplang.doperations
 
-import java.io.{ByteArrayInputStream, InputStream, PrintWriter, StringWriter}
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.io.PrintWriter
+import java.io.StringWriter
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -8,13 +11,14 @@ import scala.reflect.runtime.{universe => ru}
 
 import io.deepsense.deeplang.documentation.OperationDocumentation
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
-import io.deepsense.deeplang.params.choice.{Choice, MultipleChoiceParam}
-import io.deepsense.deeplang.params.{Params, StringParam}
-import io.deepsense.deeplang.{DOperation1To0, ExecutionContext}
+import io.deepsense.deeplang.params.choice.Choice
+import io.deepsense.deeplang.params.choice.MultipleChoiceParam
+import io.deepsense.deeplang.params.Params
+import io.deepsense.deeplang.params.StringParam
+import io.deepsense.deeplang.DOperation1To0
+import io.deepsense.deeplang.ExecutionContext
 
-
-abstract class Notebook()
-  extends DOperation1To0[DataFrame] with Params with OperationDocumentation {
+abstract class Notebook() extends DOperation1To0[DataFrame] with Params with OperationDocumentation {
 
   import Notebook._
 
@@ -23,6 +27,7 @@ abstract class Notebook()
     name = "execute notebook",
     description = Some("Should the Notebook cells be run when this operation is executed?")
   )
+
   setDefault(shouldExecuteParam, Set.empty: Set[SendEmailChoice])
 
   def getShouldExecute: Set[SendEmailChoice] = $(shouldExecuteParam)
@@ -35,74 +40,80 @@ abstract class Notebook()
 
   val notebookType: String
 
-  def headlessExecution(context: ExecutionContext) : Unit = {
-
+  def headlessExecution(context: ExecutionContext): Unit =
     context.notebooksClient.map(_.as.dispatcher).foreach { implicit ec =>
       for {
-        _ <- getShouldExecute
+        _                      <- getShouldExecute
         generatedNotebookFutOpt = context.notebooksClient.map(_.generateAndPollNbData(notebookType))
-        streamFut <- generatedNotebookFutOpt.map(_.map(new ByteArrayInputStream(_)))
+        streamFut              <- generatedNotebookFutOpt.map(_.map(new ByteArrayInputStream(_)))
       } {
         logger.info(s"Generating notebook data")
 
-        streamFut.onFailure {
-          case t =>
-            val stackWriter = new StringWriter()
-            t.printStackTrace(new PrintWriter(stackWriter))
-            sendMail("Notebook execution failed", "Sorry! The execution of your notebook has failed.\n" +
-              stackWriter.toString, context, None)
+        streamFut.onFailure { case t =>
+          val stackWriter = new StringWriter()
+          t.printStackTrace(new PrintWriter(stackWriter))
+          sendMail(
+            "Notebook execution failed",
+            "Sorry! The execution of your notebook has failed.\n" +
+              stackWriter.toString,
+            context,
+            None
+          )
         }
 
-        Await.result(for {
-          stream <- streamFut
-        } yield {
-          sendMail("Notebook execution result",
+        Await.result(
+          for {
+            stream <- streamFut
+          } yield sendMail(
+            "Notebook execution result",
             "Hi, please find the attached file with notebook execution result.",
             context,
             Some((stream, Some(Notebook.notebookDataMimeType)))
-          )
-
-        }, Duration.Inf)
+          ),
+          Duration.Inf
+        )
       }
     }
-  }
 
-  private def sendMail(subject: String,
+  private def sendMail(
+      subject: String,
       body: String,
       context: ExecutionContext,
       attachment: Option[(InputStream, Option[String])]
-  ): Unit = {
+  ): Unit =
     for {
       shouldExecute <- getShouldExecute
-      mailAddress <- shouldExecute.getSendEmail
-      sender <- context.emailSender
-      email = mailAddress.getEmailAddress
-      msg = sender.createPlainMessage(subject, body, Seq(email))
-      msgWithAttachment = attachment.map {
-        case (stream, contentTypeOpt) =>
-          sender.attachAttachment(msg, stream, Notebook.notebookDataFilename, contentTypeOpt)
-      }.getOrElse(msg)
-    } {
-      sender.sendEmail(msgWithAttachment).foreach(throw _)
+      mailAddress   <- shouldExecute.getSendEmail
+      sender        <- context.emailSender
+      email          = mailAddress.getEmailAddress
+      msg            = sender.createPlainMessage(subject, body, Seq(email))
+      msgWithAttachment = attachment.map { case (stream, contentTypeOpt) =>
+                            sender.attachAttachment(msg, stream, Notebook.notebookDataFilename, contentTypeOpt)
+                          }
+                            .getOrElse(msg)
     }
-  }
+      sender.sendEmail(msgWithAttachment).foreach(throw _)
 
   @transient
   override lazy val tTagTI_0: ru.TypeTag[DataFrame] = ru.typeTag[DataFrame]
+
 }
 
-
 object Notebook {
+
   val notebookDataMimeType = "text/html"
+
   val notebookDataFilename = "notebook.html"
 
   sealed trait SendEmailChoice extends Choice {
+
     override val name = ""
 
     val sendEmailParam = MultipleChoiceParam[EmailAddressChoice](
       name = "send e-mail report",
       description = Some("Should the e-mail report be sent after Notebook execution?")
     )
+
     setDefault(sendEmailParam, Set.empty: Set[EmailAddressChoice])
 
     def getSendEmail: Set[EmailAddressChoice] = $(sendEmailParam)
@@ -114,12 +125,13 @@ object Notebook {
       Array(sendEmailParam)
 
     override val choiceOrder: List[Class[_ <: Choice]] = List(SendEmailChoice.getClass)
+
   }
 
   object SendEmailChoice extends SendEmailChoice
 
-
   sealed trait EmailAddressChoice extends Choice {
+
     override val name = ""
 
     val emailAddressParam = StringParam(
@@ -136,9 +148,9 @@ object Notebook {
       Array(emailAddressParam)
 
     override val choiceOrder: List[Class[_ <: Choice]] = List(EmailAddressChoice.getClass)
+
   }
 
   object EmailAddressChoice extends EmailAddressChoice
+
 }
-
-

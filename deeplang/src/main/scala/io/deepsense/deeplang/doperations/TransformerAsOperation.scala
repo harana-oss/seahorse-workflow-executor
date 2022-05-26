@@ -5,12 +5,15 @@ import scala.reflect.runtime.universe.TypeTag
 import io.deepsense.deeplang.documentation.OperationDocumentation
 import io.deepsense.deeplang.doperables.Transformer
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
-import io.deepsense.deeplang.{DKnowledge, DOperation1To2, ExecutionContext, TypeUtils}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DOperation1To2
+import io.deepsense.deeplang.ExecutionContext
+import io.deepsense.deeplang.TypeUtils
 
-abstract class TransformerAsOperation[T <: Transformer]
-    ()(implicit tag: TypeTag[T])
-  extends DOperation1To2[DataFrame, DataFrame, T] {
+abstract class TransformerAsOperation[T <: Transformer]()(implicit tag: TypeTag[T])
+    extends DOperation1To2[DataFrame, DataFrame, T] {
 
   val transformer: T = TypeUtils.instanceOfType(tag)
 
@@ -23,8 +26,9 @@ abstract class TransformerAsOperation[T <: Transformer]
     (transformer.transform(context)(())(t0), transformer)
   }
 
-  override protected def inferKnowledge(dfKnowledge: DKnowledge[DataFrame])(ctx: InferContext)
-    : ((DKnowledge[DataFrame], DKnowledge[T]), InferenceWarnings) = {
+  override protected def inferKnowledge(
+      dfKnowledge: DKnowledge[DataFrame]
+  )(ctx: InferContext): ((DKnowledge[DataFrame], DKnowledge[T]), InferenceWarnings) = {
 
     transformer.set(extractParamMap())
     val (outputDfKnowledge, warnings) = transformer.transform.infer(ctx)(())(dfKnowledge)
@@ -32,5 +36,7 @@ abstract class TransformerAsOperation[T <: Transformer]
   }
 
   override lazy val tTagTI_0: TypeTag[DataFrame] = typeTag
+
   override lazy val tTagTO_0: TypeTag[DataFrame] = typeTag
+
 }

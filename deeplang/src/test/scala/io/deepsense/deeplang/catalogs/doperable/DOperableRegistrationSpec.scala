@@ -1,6 +1,8 @@
 package io.deepsense.deeplang.catalogs.doperable
 
-import io.deepsense.deeplang.{CatalogRecorder, DOperable, UnitSpec}
+import io.deepsense.deeplang.CatalogRecorder
+import io.deepsense.deeplang.DOperable
+import io.deepsense.deeplang.UnitSpec
 
 class DOperableRegistrationSpec extends UnitSpec {
 
@@ -10,4 +12,5 @@ class DOperableRegistrationSpec extends UnitSpec {
       catalog.concreteSubclassesInstances[DOperable]
     }
   }
+
 }

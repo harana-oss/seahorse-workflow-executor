@@ -6,7 +6,9 @@ import spray.json.DefaultJsonProtocol
 case class PoisonPill()
 
 trait PoisonPillJsonProtocol extends DefaultJsonProtocol with SprayJsonSupport {
+
   implicit val poisonPillFormat = jsonFormat0(PoisonPill)
+
 }
 
 object PoisonPillJsonProtocol extends PoisonPillJsonProtocol

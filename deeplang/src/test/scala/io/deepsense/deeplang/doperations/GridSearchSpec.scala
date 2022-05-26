@@ -1,24 +1,31 @@
 package io.deepsense.deeplang.doperations
 
-import spray.json.{JsNumber, JsObject}
+import spray.json.JsNumber
+import spray.json.JsObject
 
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.report.Report
-import io.deepsense.deeplang.doperations.MockDOperablesFactory.{MockEstimator, MockEvaluator}
+import io.deepsense.deeplang.doperations.MockDOperablesFactory.MockEstimator
+import io.deepsense.deeplang.doperations.MockDOperablesFactory.MockEvaluator
 import io.deepsense.deeplang.exceptions.DeepLangMultiException
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
-import io.deepsense.deeplang.{DKnowledge, DeeplangTestSupport, UnitSpec}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DeeplangTestSupport
+import io.deepsense.deeplang.UnitSpec
 
 class GridSearchSpec extends UnitSpec with DeeplangTestSupport {
+
   "GridSearch" should {
     "infer knowledge when dynamic parameters are valid" in {
-      val inputDF = DataFrame.forInference(createSchema())
+      val inputDF   = DataFrame.forInference(createSchema())
       val estimator = new MockEstimator
       val evaluator = new MockEvaluator
 
       val gridSearch = GridSearch()
-      gridSearch.inferKnowledgeUntyped(
-          Vector(DKnowledge(estimator), DKnowledge(inputDF), DKnowledge(evaluator)))(mock[InferContext]) shouldBe
+      gridSearch.inferKnowledgeUntyped(Vector(DKnowledge(estimator), DKnowledge(inputDF), DKnowledge(evaluator)))(
+        mock[InferContext]
+      ) shouldBe
         (Vector(DKnowledge(Report())), InferenceWarnings.empty)
     }
     "throw Exception" when {
@@ -34,11 +41,9 @@ class GridSearchSpec extends UnitSpec with DeeplangTestSupport {
     }
   }
 
-  private def checkMultiException(
-      estimatorParamValue: Option[Double],
-      evaluatorParamValue: Option[Double]): Unit = {
+  private def checkMultiException(estimatorParamValue: Option[Double], evaluatorParamValue: Option[Double]): Unit = {
 
-    val inputDF = DataFrame.forInference(createSchema())
+    val inputDF   = DataFrame.forInference(createSchema())
     val estimator = new MockEstimator
     val evaluator = new MockEvaluator
 
@@ -46,25 +51,24 @@ class GridSearchSpec extends UnitSpec with DeeplangTestSupport {
       .setEstimatorParams(prepareParamDictionary(estimator.paramA.name, estimatorParamValue))
       .setEvaluatorParams(prepareParamDictionary(evaluator.paramA.name, evaluatorParamValue))
 
-    val multiException = the [DeepLangMultiException] thrownBy {
-      gridSearch.inferKnowledgeUntyped(
-        Vector(
-          DKnowledge(estimator),
-          DKnowledge(inputDF),
-          DKnowledge(evaluator)))(mock[InferContext])
+    val multiException = the[DeepLangMultiException] thrownBy {
+      gridSearch.inferKnowledgeUntyped(Vector(DKnowledge(estimator), DKnowledge(inputDF), DKnowledge(evaluator)))(
+        mock[InferContext]
+      )
     }
 
     val invalidParamCount =
       estimatorParamValue.map(_ => 1).getOrElse(0) +
-      evaluatorParamValue.map(_ => 1).getOrElse(0)
+        evaluatorParamValue.map(_ => 1).getOrElse(0)
 
     multiException.exceptions should have size invalidParamCount
   }
 
   private def prepareParamDictionary(paramName: String, maybeValue: Option[Double]): JsObject = {
-    val jsonEntries = maybeValue.map(
-        value => Seq(paramName -> JsNumber(value)))
+    val jsonEntries = maybeValue
+      .map(value => Seq(paramName -> JsNumber(value)))
       .getOrElse(Seq())
     JsObject(jsonEntries: _*)
   }
+
 }

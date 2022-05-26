@@ -2,26 +2,38 @@ package io.deepsense.deeplang.catalogs.doperable
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.{FunSuite, Matchers}
-
 import io.deepsense.deeplang.DOperable
 import io.deepsense.deeplang.catalogs.doperable.exceptions._
 import io.deepsense.deeplang.doperables.DOperableMock
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 object SampleInheritance {
+
   trait T1 extends DOperable
+
   trait T2 extends T1
+
   trait T3 extends T1
+
   trait T extends DOperable
+
   abstract class A extends T3
+
   case class B() extends A with T
+
   case class C() extends A with T2
+
 }
 
 object Parametrized {
+
   trait T[T] extends DOperableMock
+
   abstract class A[T] extends DOperableMock
+
   class B extends A[Int]
+
 }
 
 object Constructors {
@@ -29,42 +41,55 @@ object Constructors {
   class NotParameterLess(val i: Int) extends DOperableMock
 
   class AuxiliaryParameterless(val i: Int) extends DOperableMock {
+
     def this() = this(1)
+
   }
 
   class WithDefault(val i: Int = 1) extends DOperableMock
+
 }
 
 object TraitInheritance {
+
   class C1 extends DOperableMock
+
   trait T1 extends C1
+
   trait T2 extends T1
+
   class C2 extends T2
 
   trait S1 extends DOperable
+
   trait S2 extends DOperable
 
   class A1 extends DOperableMock
+
   trait S3 extends A1 with S1 with S2
+
 }
 
 object MixinInheritance {
+
   trait P extends DOperable
 
   trait TrA extends DOperable
+
   trait TrB extends DOperable
+
   class OpC extends DOperable
 
   class OpA extends TrA with P
+
   class OpB extends TrB with P
+
 }
 
-class DOperableCatalogSuite extends FunSuite with Matchers {
+class DOperableCatalogSuite extends AnyFunSuite with Matchers {
 
-  def testGettingSubclasses[T <: DOperable : ru.TypeTag](
-      h: DOperableCatalog, expected: DOperable*): Unit = {
+  def testGettingSubclasses[T <: DOperable: ru.TypeTag](h: DOperableCatalog, expected: DOperable*): Unit =
     h.concreteSubclassesInstances[T] should contain theSameElementsAs expected
-  }
 
   test("Getting concrete subclasses instances") {
     import SampleInheritance._
@@ -76,9 +101,8 @@ class DOperableCatalogSuite extends FunSuite with Matchers {
     val b = new B
     val c = new C
 
-    def check[T <: DOperable : ru.TypeTag](expected: DOperable*): Unit = {
+    def check[T <: DOperable: ru.TypeTag](expected: DOperable*): Unit =
       testGettingSubclasses[T](h, expected: _*)
-    }
 
     check[T with T1](b)
     check[T2 with T3](c)
@@ -107,16 +131,16 @@ class DOperableCatalogSuite extends FunSuite with Matchers {
 
     def name[T: ru.TypeTag]: String = ru.typeOf[T].typeSymbol.fullName
 
-    val traits = (TraitDescriptor(name[DOperable], Nil)::
-      TraitDescriptor(name[T2], List(name[T1]))::
-      TraitDescriptor(name[T], List(name[DOperable]))::
-      TraitDescriptor(name[T1], List(name[DOperable]))::
-      TraitDescriptor(name[T3], List(name[T1]))::
+    val traits = (TraitDescriptor(name[DOperable], Nil) ::
+      TraitDescriptor(name[T2], List(name[T1])) ::
+      TraitDescriptor(name[T], List(name[DOperable])) ::
+      TraitDescriptor(name[T1], List(name[DOperable])) ::
+      TraitDescriptor(name[T3], List(name[T1])) ::
       Nil).map(t => t.name -> t).toMap
 
-    val classes = (ClassDescriptor(name[A], None, List(name[T3]))::
-      ClassDescriptor(name[B], Some(name[A]), List(name[T]))::
-      ClassDescriptor(name[C], Some(name[A]), List(name[T2]))::
+    val classes = (ClassDescriptor(name[A], None, List(name[T3])) ::
+      ClassDescriptor(name[B], Some(name[A]), List(name[T])) ::
+      ClassDescriptor(name[C], Some(name[A]), List(name[T2])) ::
       Nil).map(c => c.name -> c).toMap
 
     val descriptor = h.descriptor
@@ -174,4 +198,5 @@ class DOperableCatalogSuite extends FunSuite with Matchers {
     assert(subclasses.exists(x => x.isInstanceOf[OpA]))
     assert(subclasses.exists(x => x.isInstanceOf[OpB]))
   }
+
 }

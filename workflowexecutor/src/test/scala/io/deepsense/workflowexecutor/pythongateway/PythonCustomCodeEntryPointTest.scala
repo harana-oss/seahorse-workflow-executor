@@ -5,14 +5,17 @@ import java.util.concurrent.TimeoutException
 import scala.concurrent.duration._
 
 import org.apache.spark.SparkContext
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
-import io.deepsense.deeplang.{CustomCodeExecutor, DataFrameStorage, OperationExecutionDispatcher}
+import io.deepsense.deeplang.CustomCodeExecutor
+import io.deepsense.deeplang.DataFrameStorage
+import io.deepsense.deeplang.OperationExecutionDispatcher
 import io.deepsense.sparkutils.SparkSQLSession
 import io.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 
-class PythonCustomCodeEntryPointTest extends WordSpec with MockitoSugar with Matchers {
+class PythonCustomCodeEntryPointTest extends AnyWordSpec with MockitoSugar with Matchers {
 
   "PythonEntryPoint" should {
     "throw on uninitialized code executor" in {
@@ -30,7 +33,7 @@ class PythonCustomCodeEntryPointTest extends WordSpec with MockitoSugar with Mat
     }
 
     "return initialized code executor" in {
-      val entryPoint = createEntryPoint
+      val entryPoint   = createEntryPoint
       val mockExecutor = mock[CustomCodeExecutor]
       entryPoint.registerCodeExecutor(mockExecutor)
       entryPoint.getCodeExecutor(100.millis) shouldBe mockExecutor
@@ -43,7 +46,7 @@ class PythonCustomCodeEntryPointTest extends WordSpec with MockitoSugar with Mat
     }
 
     "return code executor initialized while waiting on it" in {
-      val entryPoint = createEntryPoint
+      val entryPoint   = createEntryPoint
       val mockExecutor = mock[CustomCodeExecutor]
 
       new Thread(new Runnable {
@@ -62,5 +65,7 @@ class PythonCustomCodeEntryPointTest extends WordSpec with MockitoSugar with Mat
       mock[SparkContext],
       mock[SparkSQLSession],
       mock[DataFrameStorage],
-      mock[OperationExecutionDispatcher])
+      mock[OperationExecutionDispatcher]
+    )
+
 }

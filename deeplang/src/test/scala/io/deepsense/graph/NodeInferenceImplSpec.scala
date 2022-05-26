@@ -1,23 +1,22 @@
 package io.deepsense.graph
 
 import io.deepsense.deeplang.inference.InferenceWarnings
-import io.deepsense.deeplang.inference.exceptions.{AllTypesNotCompilableException, NoInputEdgesException}
+import io.deepsense.deeplang.inference.exceptions.AllTypesNotCompilableException
+import io.deepsense.deeplang.inference.exceptions.NoInputEdgesException
 import io.deepsense.deeplang.inference.warnings.SomeTypesNotCompilableWarning
-import io.deepsense.deeplang.{DKnowledge, DOperable}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DOperable
 import io.deepsense.graph.DClassesForDOperations.A1
 import io.deepsense.graph.DeeplangGraph.DeeplangNode
 
 class NodeInferenceImplSpec extends AbstractInferenceSpec {
 
-  val nodeInference = new NodeInferenceImpl{}
+  val nodeInference = new NodeInferenceImpl {}
 
   "inputInferenceForNode" should {
     "return empty inference for node without input" in {
-      val inferenceResult = nodeInference.inputInferenceForNode(
-        nodeCreateA1,
-        inferenceCtx,
-        GraphKnowledge(),
-        IndexedSeq())
+      val inferenceResult =
+        nodeInference.inputInferenceForNode(nodeCreateA1, inferenceCtx, GraphKnowledge(), IndexedSeq())
       inferenceResult shouldBe NodeInferenceResult.empty
     }
     "return correct inference" in {
@@ -44,11 +43,8 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
     }
     "return default knowledge with errors when missing inference for input (missing edges)" in {
       val nodePredecessorsEndpoints = IndexedSeq(None, None)
-      val inferenceResult = nodeInference.inputInferenceForNode(
-        nodeA1A2ToFirst,
-        inferenceCtx,
-        GraphKnowledge(),
-        nodePredecessorsEndpoints)
+      val inferenceResult =
+        nodeInference.inputInferenceForNode(nodeA1A2ToFirst, inferenceCtx, GraphKnowledge(), nodePredecessorsEndpoints)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA1, knowledgeA2),
         errors = Vector(NoInputEdgesException(0), NoInputEdgesException(1))
@@ -56,32 +52,30 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
     }
     "return default knowledge with errors when missing inference for one input and invalid" +
       "type for other" in {
-      val predecessorId = Node.Id.randomId
-      val nodePredecessorsEndpoints = IndexedSeq(None, Some(Endpoint(predecessorId, 0)))
-      val graphKnowledge = GraphKnowledge(Map(
-        predecessorId -> NodeInferenceResult(
-          Vector(knowledgeA1)
-        )))
-      val inferenceResult = nodeInference.inputInferenceForNode(
-        nodeA1A2ToFirst,
-        inferenceCtx,
-        graphKnowledge,
-        nodePredecessorsEndpoints)
-      inferenceResult shouldBe NodeInferenceResult(
-        Vector(knowledgeA1, knowledgeA2),
-        errors = Vector(NoInputEdgesException(0), AllTypesNotCompilableException(1))
-      )
-    }
+        val predecessorId             = Node.Id.randomId
+        val nodePredecessorsEndpoints = IndexedSeq(None, Some(Endpoint(predecessorId, 0)))
+        val graphKnowledge = GraphKnowledge(
+          Map(
+            predecessorId -> NodeInferenceResult(
+              Vector(knowledgeA1)
+            )
+          )
+        )
+        val inferenceResult =
+          nodeInference.inputInferenceForNode(nodeA1A2ToFirst, inferenceCtx, graphKnowledge, nodePredecessorsEndpoints)
+        inferenceResult shouldBe NodeInferenceResult(
+          Vector(knowledgeA1, knowledgeA2),
+          errors = Vector(NoInputEdgesException(0), AllTypesNotCompilableException(1))
+        )
+      }
   }
+
   "inferKnowledge" should {
     "return correct knowledge" in {
       val node = nodeA1A2ToFirst
       setParametersValid(node)
       val inputInferenceForNode = NodeInferenceResult(Vector(knowledgeA1, knowledgeA2))
-      val inferenceResult = nodeInference.inferKnowledge(
-        node,
-        inferenceCtx,
-        inputInferenceForNode)
+      val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA1),
         warnings = InferenceWarnings(DOperationA1A2ToFirst.warning)
@@ -91,10 +85,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       val node = nodeA1A2ToFirst
       setParametersInvalid(node)
       val inputInferenceForNode = NodeInferenceResult(Vector(knowledgeA1, knowledgeA2))
-      val inferenceResult = nodeInference.inferKnowledge(
-        node,
-        inferenceCtx,
-        inputInferenceForNode)
+      val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
         errors = Vector(DOperationA1A2ToFirst.parameterInvalidError)
@@ -105,10 +96,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       setInferenceErrorThrowing(node)
       setParametersValid(node)
       val inputInferenceForNode = NodeInferenceResult(Vector(knowledgeA1, knowledgeA2))
-      val inferenceResult = nodeInference.inferKnowledge(
-        node,
-        inferenceCtx,
-        inputInferenceForNode)
+      val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
         errors = Vector(DOperationA1A2ToFirst.inferenceError)
@@ -118,15 +106,12 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       val node = nodeA1A2ToFirst
       setInferenceErrorThrowing(node)
       setParametersInvalid(node)
-      val inputInferenceForNode = NodeInferenceResult(
-        ports = Vector(knowledgeA1, knowledgeA2),
-        errors = Vector(
-          DOperationA1A2ToFirst.parameterInvalidError,
-          DOperationA1A2ToFirst.inferenceError))
-      val inferenceResult = nodeInference.inferKnowledge(
-        node,
-        inferenceCtx,
-        inputInferenceForNode)
+      val inputInferenceForNode =
+        NodeInferenceResult(
+          ports = Vector(knowledgeA1, knowledgeA2),
+          errors = Vector(DOperationA1A2ToFirst.parameterInvalidError, DOperationA1A2ToFirst.inferenceError)
+        )
+      val inferenceResult = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
         errors = Vector(
@@ -140,11 +125,9 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       setInferenceErrorMultiThrowing(node)
       val inputInferenceForNode = NodeInferenceResult(
         ports = Vector(knowledgeA1, knowledgeA2),
-        errors = Vector(DOperationA1A2ToFirst.parameterInvalidError))
-      val inferenceResult = nodeInference.inferKnowledge(
-        node,
-        inferenceCtx,
-        inputInferenceForNode)
+        errors = Vector(DOperationA1A2ToFirst.parameterInvalidError)
+      )
+      val inferenceResult = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
         errors = Vector(
@@ -157,20 +140,22 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
   def testInputInferenceForNode(
       predecessorPortIndex: Int,
       node: DeeplangNode,
-      predecessorKnowledge: Vector[DKnowledge[DOperable]]): NodeInferenceResult = {
+      predecessorKnowledge: Vector[DKnowledge[DOperable]]
+  ): NodeInferenceResult = {
     val predecessorId = Node.Id.randomId
     val nodePredecessorsEndpoints = IndexedSeq(
       Some(Endpoint(predecessorId, predecessorPortIndex))
     )
-    val graphKnowledge = GraphKnowledge(Map(
-      predecessorId -> NodeInferenceResult(
-        predecessorKnowledge
-      )))
-    val inferenceResult = nodeInference.inputInferenceForNode(
-      node,
-      inferenceCtx,
-      graphKnowledge,
-      nodePredecessorsEndpoints)
+    val graphKnowledge = GraphKnowledge(
+      Map(
+        predecessorId -> NodeInferenceResult(
+          predecessorKnowledge
+        )
+      )
+    )
+    val inferenceResult =
+      nodeInference.inputInferenceForNode(node, inferenceCtx, graphKnowledge, nodePredecessorsEndpoints)
     inferenceResult
   }
+
 }

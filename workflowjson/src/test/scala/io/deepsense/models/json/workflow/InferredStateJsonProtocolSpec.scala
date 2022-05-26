@@ -7,17 +7,19 @@ import spray.json._
 
 import io.deepsense.commons.models.Entity
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
-import io.deepsense.deeplang.doperables.descriptions.{ParamsInferenceResult, DataFrameInferenceResult}
+import io.deepsense.deeplang.doperables.descriptions.ParamsInferenceResult
+import io.deepsense.deeplang.doperables.descriptions.DataFrameInferenceResult
 import io.deepsense.deeplang.exceptions.DeepLangException
-import io.deepsense.deeplang.inference.{InferenceWarning, InferenceWarnings}
+import io.deepsense.deeplang.inference.InferenceWarning
+import io.deepsense.deeplang.inference.InferenceWarnings
 import io.deepsense.deeplang.params.Params
-import io.deepsense.deeplang.{DKnowledge, DOperable}
-import io.deepsense.graph.{GraphKnowledge, NodeInferenceResult}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DOperable
+import io.deepsense.graph.GraphKnowledge
+import io.deepsense.graph.NodeInferenceResult
 import io.deepsense.models.workflows._
 
-class InferredStateJsonProtocolSpec
-    extends WorkflowJsonTestSupport
-    with InferredStateJsonProtocol {
+class InferredStateJsonProtocolSpec extends WorkflowJsonTestSupport with InferredStateJsonProtocol {
 
   "InferredState" should {
     "be serializable to json" in {
@@ -27,7 +29,7 @@ class InferredStateJsonProtocolSpec
   }
 
   def inferredStateFixture: (InferredState, JsObject) = {
-    val workflowId = Workflow.Id.randomId
+    val workflowId                           = Workflow.Id.randomId
     val (graphKnowledge, graphKnowledgeJson) = graphKnowledgeFixture
 
     val (executionStates, statesJson) = executionStatesFixture
@@ -35,15 +37,15 @@ class InferredStateJsonProtocolSpec
     val workflow = InferredState(workflowId, graphKnowledge, executionStates)
 
     val workflowJson = JsObject(
-      "id" -> JsString(workflowId.toString),
+      "id"        -> JsString(workflowId.toString),
       "knowledge" -> graphKnowledgeJson,
-      "states" -> statesJson
+      "states"    -> statesJson
     )
     (workflow, workflowJson)
   }
 
   def graphKnowledgeFixture: (GraphKnowledge, JsObject) = {
-    val parametricOperable = mock[ParametricOperable]("ParametricOperable")
+    val parametricOperable    = mock[ParametricOperable]("ParametricOperable")
     val paramSchema: JsString = JsString("Js with ParamSchema")
     val paramValues: JsString = JsString("Js with ParamValues")
     when(parametricOperable.inferenceResult).thenReturn(
@@ -51,12 +53,14 @@ class InferredStateJsonProtocolSpec
     )
 
     val dataFrame = mock[DataFrame]
-    val meta = new MetadataBuilder().putString("someKey", "someValue").build()
+    val meta      = new MetadataBuilder().putString("someKey", "someValue").build()
     val dataFrameDescription = DataFrameInferenceResult(
-      StructType(Seq(
-        StructField("col1", StringType, nullable = true),
-        StructField("col2", DoubleType, nullable = false, metadata = meta)
-      ))
+      StructType(
+        Seq(
+          StructField("col1", StringType, nullable = true),
+          StructField("col2", DoubleType, nullable = false, metadata = meta)
+        )
+      )
     )
     when(dataFrame.inferenceResult).thenReturn(Some(dataFrameDescription))
 
@@ -69,9 +73,7 @@ class InferredStateJsonProtocolSpec
           DKnowledge(Set[DOperable](parametricOperable)),
           DKnowledge(Set[DOperable](dataFrame))
         ),
-        InferenceWarnings(
-          new InferenceWarning("warning1") {},
-          new InferenceWarning("warning2") {}),
+        InferenceWarnings(new InferenceWarning("warning1") {}, new InferenceWarning("warning2") {}),
         Vector(
           new DeepLangException("error1") {},
           new DeepLangException("error2") {}
@@ -80,21 +82,19 @@ class InferredStateJsonProtocolSpec
     )
 
     def dOperableJsName(o: DOperable): JsString = JsString(o.getClass.getCanonicalName)
-    val mockOperableName = dOperableJsName(operable)
-    val parametricOperableName = dOperableJsName(parametricOperable)
-    val dataFrameName = dOperableJsName(dataFrame)
+    val mockOperableName                        = dOperableJsName(operable)
+    val parametricOperableName                  = dOperableJsName(parametricOperable)
+    val dataFrameName                           = dOperableJsName(dataFrame)
 
     val knowledgeJson = JsObject(
       node1.id.toString -> JsObject(
         "ports" -> JsArray(
           JsObject(
-            "types" -> JsArray(mockOperableName),
+            "types"  -> JsArray(mockOperableName),
             "result" -> JsNull
           ),
           JsObject(
-            "types" -> JsArray(
-              mockOperableName,
-              parametricOperableName),
+            "types"  -> JsArray(mockOperableName, parametricOperableName),
             "result" -> JsNull
           ),
           JsObject(
@@ -112,16 +112,16 @@ class InferredStateJsonProtocolSpec
               "schema" -> JsObject(
                 "fields" -> JsArray(
                   JsObject(
-                    "name" -> JsString("col1"),
-                    "dataType" -> JsString("string"),
+                    "name"         -> JsString("col1"),
+                    "dataType"     -> JsString("string"),
                     "deeplangType" -> JsString("string"),
-                    "nullable" -> JsTrue
+                    "nullable"     -> JsTrue
                   ),
                   JsObject(
-                    "name" -> JsString("col2"),
-                    "dataType" -> JsString("double"),
+                    "name"         -> JsString("col2"),
+                    "dataType"     -> JsString("double"),
                     "deeplangType" -> JsString("numeric"),
-                    "nullable" -> JsFalse
+                    "nullable"     -> JsFalse
                   )
                 )
               )
@@ -142,10 +142,9 @@ class InferredStateJsonProtocolSpec
     (graphKnowledge, knowledgeJson)
   }
 
-
   def executionStatesFixture: (ExecutionReport, JsObject) = {
 
-    val startTimestamp = "2015-05-12T21:11:09.000Z"
+    val startTimestamp  = "2015-05-12T21:11:09.000Z"
     val finishTimestamp = "2015-05-12T21:12:50.000Z"
 
     val entity1Id = Entity.Id.randomId
@@ -159,14 +158,15 @@ class InferredStateJsonProtocolSpec
           Seq(entity1Id, entity2Id)
         )
       ),
-      None)
+      None
+    )
     val executionStatesJson = JsObject(
       "error" -> JsNull,
       "nodes" -> JsObject(
         node1.id.toString -> JsObject(
-          "status" -> JsString("COMPLETED"),
+          "status"  -> JsString("COMPLETED"),
           "started" -> JsString(startTimestamp),
-          "ended" -> JsString(finishTimestamp),
+          "ended"   -> JsString(finishTimestamp),
           "results" -> JsArray(
             JsString(entity1Id.toString),
             JsString(entity2Id.toString)
@@ -181,4 +181,5 @@ class InferredStateJsonProtocolSpec
   }
 
   abstract class ParametricOperable extends DOperable with Params
+
 }

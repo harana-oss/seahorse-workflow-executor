@@ -7,6 +7,7 @@ import io.deepsense.deeplang.doperations.spark.wrappers.estimators.ChiSqSelector
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
 class ChiSqSelectorExample extends AbstractOperationExample[ChiSqSelector] {
+
   override def dOperation: ChiSqSelector = {
     val op = new ChiSqSelector()
     op.estimator
@@ -25,4 +26,5 @@ class ChiSqSelectorExample extends AbstractOperationExample[ChiSqSelector] {
     )
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("features", "label")))
   }
+
 }

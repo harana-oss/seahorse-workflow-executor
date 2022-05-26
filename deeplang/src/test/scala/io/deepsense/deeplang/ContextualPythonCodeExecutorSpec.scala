@@ -10,12 +10,15 @@ import io.deepsense.commons.models.Id
 class ContextualPythonCodeExecutorSpec extends UnitSpec with BeforeAndAfter {
 
   val workflowId = Id.randomId
+
   val nodeId = Id.randomId
 
   val code = "some code"
 
   val pythonCodeExecutor = mock[CustomCodeExecutor]
+
   val operationExecutionDispatcher = mock[OperationExecutionDispatcher]
+
   val customCodeExecutionProvider = mock[CustomCodeExecutionProvider]
 
   var executor: ContextualCustomCodeExecutor = _
@@ -44,4 +47,5 @@ class ContextualPythonCodeExecutorSpec extends UnitSpec with BeforeAndAfter {
       executor.runPython(code)
     }
   }
+
 }

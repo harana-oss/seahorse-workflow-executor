@@ -9,10 +9,12 @@ import io.deepsense.deeplang.params.wrappers.spark.BooleanParamWrapper
 
 trait HasStandardization extends Params {
 
-  val standardization = new BooleanParamWrapper[
-      ml.param.Params { val standardization: ml.param.BooleanParam }](
+  val standardization = new BooleanParamWrapper[ml.param.Params { val standardization: ml.param.BooleanParam }](
     name = "standardization",
     description = Some("Whether to standardize the training features before fitting the model."),
-    sparkParamGetter = _.standardization)
+    sparkParamGetter = _.standardization
+  )
+
   setDefault(standardization, true)
+
 }

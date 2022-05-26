@@ -2,12 +2,14 @@ package io.deepsense.deeplang.doperables.spark.wrappers.estimators
 
 import scala.reflect.runtime.universe._
 
-import org.apache.spark.ml.classification.{GBTClassificationModel => SparkGBTClassificationModel, GBTClassifier => SparkGBTClassifier}
+import org.apache.spark.ml.classification.{GBTClassificationModel => SparkGBTClassificationModel}
+import org.apache.spark.ml.classification.{GBTClassifier => SparkGBTClassifier}
 
 import io.deepsense.commons.utils.Logging
 import io.deepsense.deeplang.TypeUtils
 import io.deepsense.deeplang.doperables.SparkEstimatorWrapper
-import io.deepsense.deeplang.doperables.spark.wrappers.models.{GBTClassificationModel, VanillaGBTClassificationModel}
+import io.deepsense.deeplang.doperables.spark.wrappers.models.GBTClassificationModel
+import io.deepsense.deeplang.doperables.spark.wrappers.models.VanillaGBTClassificationModel
 import io.deepsense.deeplang.doperables.spark.wrappers.params.GBTParams
 import io.deepsense.deeplang.doperables.spark.wrappers.params.common.HasClassificationImpurityParam
 import io.deepsense.deeplang.doperables.stringindexingwrapper.StringIndexingEstimatorWrapper
@@ -16,23 +18,22 @@ import io.deepsense.deeplang.params.choice.Choice
 import io.deepsense.deeplang.params.wrappers.spark.ChoiceParamWrapper
 
 class GBTClassifier private (val vanillaGBTClassifier: VanillaGBTClassifier)
-  extends StringIndexingEstimatorWrapper[
-    SparkGBTClassificationModel,
-    SparkGBTClassifier,
-    VanillaGBTClassificationModel,
-    GBTClassificationModel](vanillaGBTClassifier) {
+    extends StringIndexingEstimatorWrapper[
+      SparkGBTClassificationModel,
+      SparkGBTClassifier,
+      VanillaGBTClassificationModel,
+      GBTClassificationModel
+    ](vanillaGBTClassifier) {
 
   def this() = this(new VanillaGBTClassifier())
+
 }
 
 class VanillaGBTClassifier()
-  extends SparkEstimatorWrapper[
-    SparkGBTClassificationModel,
-    SparkGBTClassifier,
-    VanillaGBTClassificationModel]
-  with GBTParams
-  with HasClassificationImpurityParam
-  with Logging {
+    extends SparkEstimatorWrapper[SparkGBTClassificationModel, SparkGBTClassifier, VanillaGBTClassificationModel]
+    with GBTParams
+    with HasClassificationImpurityParam
+    with Logging {
 
   import GBTClassifier._
 
@@ -43,25 +44,18 @@ class VanillaGBTClassifier()
   val lossType = new ChoiceParamWrapper[SparkGBTClassifier, LossType](
     name = "loss function",
     description = Some("The loss function which GBT tries to minimize."),
-    sparkParamGetter = _.lossType)
+    sparkParamGetter = _.lossType
+  )
+
   setDefault(lossType, Logistic())
 
   override val params: Array[Param[_]] = Array(
-    impurity,
-    lossType,
-    maxBins,
-    maxDepth,
-    maxIterations,
-    minInfoGain,
-    minInstancesPerNode,
-    seed,
-    stepSize,
-    subsamplingRate,
-    labelColumn,
-    featuresColumn,
-    predictionColumn)
+    impurity, lossType, maxBins, maxDepth, maxIterations, minInfoGain, minInstancesPerNode, seed, stepSize,
+    subsamplingRate, labelColumn, featuresColumn, predictionColumn
+  )
 
   override protected def estimatorName: String = classOf[GBTClassifier].getSimpleName
+
 }
 
 object GBTClassifier {
@@ -73,7 +67,9 @@ object GBTClassifier {
     override val choiceOrder: List[Class[_ <: Choice]] = List(
       classOf[Logistic]
     )
+
   }
+
   case class Logistic() extends LossType("logistic")
 
 }

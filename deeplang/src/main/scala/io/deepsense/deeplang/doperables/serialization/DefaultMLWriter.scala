@@ -1,9 +1,9 @@
-
 package io.deepsense.deeplang.doperables.serialization
 
 import org.apache.hadoop.fs.Path
 import org.apache.spark.SparkContext
-import org.apache.spark.ml.param.{ParamPair, Params}
+import org.apache.spark.ml.param.ParamPair
+import org.apache.spark.ml.param.Params
 import org.apache.spark.ml.util.MLWriter
 import org.json4s.JsonDSL._
 import org.json4s._
@@ -20,19 +20,19 @@ class DefaultMLWriter[T <: Params](instance: T) extends MLWriter with MLWriterWi
     CustomPersistence.save(sparkContext, instance, modelPath)
   }
 
-  /**
-    * Saves metadata + Params to: path + "/metadata"
-    *  - class
-    *  - timestamp
-    *  - sparkVersion
-    *  - uid
-    *  - paramMap
-    *  - (optionally, extra metadata)
+  /** Saves metadata + Params to: path + "/metadata"
+    *   - class
+    *   - timestamp
+    *   - sparkVersion
+    *   - uid
+    *   - paramMap
+    *   - (optionally, extra metadata)
     *
-    * @param extraMetadata  Extra metadata to be saved at same level as uid, paramMap, etc.
-    * @param paramMap  If given, this is saved in the "paramMap" field.
-    *                  Otherwise, all [[org.apache.spark.ml.param.Param]]s are encoded using
-    *                  [[org.apache.spark.ml.param.Param.jsonEncode()]].
+    * @param extraMetadata
+    *   Extra metadata to be saved at same level as uid, paramMap, etc.
+    * @param paramMap
+    *   If given, this is saved in the "paramMap" field. Otherwise, all [[org.apache.spark.ml.param.Param]]s are encoded
+    *   using [[org.apache.spark.ml.param.Param.jsonEncode()]].
     */
   // Copied from org.apache.spark.ml.util.DefaultParamWriter.
   // We need to be consistent with Spark Format, but this method is private.
@@ -41,18 +41,19 @@ class DefaultMLWriter[T <: Params](instance: T) extends MLWriter with MLWriterWi
       path: String,
       sc: SparkContext,
       extraMetadata: Option[JObject] = None,
-      paramMap: Option[JValue] = None): Unit = {
-    val uid = instance.uid
-    val cls = instance.getClass.getName
+      paramMap: Option[JValue] = None
+  ): Unit = {
+    val uid    = instance.uid
+    val cls    = instance.getClass.getName
     val params = instance.extractParamMap().toSeq.asInstanceOf[Seq[ParamPair[Any]]]
     val jsonParams = paramMap.getOrElse(render(params.map { case ParamPair(p, v) =>
       p.name -> parse(p.jsonEncode(v))
     }.toList))
     val basicMetadata = ("class" -> cls) ~
-      ("timestamp" -> System.currentTimeMillis()) ~
+      ("timestamp"    -> System.currentTimeMillis()) ~
       ("sparkVersion" -> sc.version) ~
-      ("uid" -> uid) ~
-      ("paramMap" -> jsonParams)
+      ("uid"          -> uid) ~
+      ("paramMap"     -> jsonParams)
     val metadata = extraMetadata match {
       case Some(jObject) =>
         basicMetadata ~ jObject
@@ -63,4 +64,5 @@ class DefaultMLWriter[T <: Params](instance: T) extends MLWriter with MLWriterWi
     val metadataJson = compact(render(metadata))
     sc.parallelize(Seq(metadataJson), 1).saveAsTextFile(metadataPath)
   }
+
 }

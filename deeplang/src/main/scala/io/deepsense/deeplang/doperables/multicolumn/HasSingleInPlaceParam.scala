@@ -6,9 +6,12 @@ import io.deepsense.deeplang.params.Params
 import io.deepsense.deeplang.params.choice.ChoiceParam
 
 trait HasSingleInPlaceParam extends Params {
+
   val singleInPlaceChoice = ChoiceParam[SingleColumnInPlaceChoice](
     name = "output",
     description = Some("Output generation mode.")
   )
+
   setDefault(singleInPlaceChoice -> YesInPlaceChoice())
+
 }

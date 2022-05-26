@@ -9,12 +9,18 @@ trait NodeJsonProtocol extends DefaultJsonProtocol with IdJsonProtocol {
   import OperationJsonProtocol.DOperationWriter
 
   implicit object NodeWriter extends JsonWriter[DeeplangNode] {
+
     override def write(node: DeeplangNode): JsValue = JsObject(
       Map(NodeJsonProtocol.Id -> node.id.toJson) ++
-        node.value.toJson.asJsObject.fields)
+        node.value.toJson.asJsObject.fields
+    )
+
   }
+
 }
 
 object NodeJsonProtocol extends NodeJsonProtocol {
+
   val Id = "id"
+
 }

@@ -10,7 +10,7 @@ class WriteDatasourceSpec extends UnitSpec {
     "return declared datasources" when {
       "datasource param is defined" in {
         val someDatasourceId = UUID.randomUUID()
-        val wds = WriteDatasource().setDatasourceId(someDatasourceId)
+        val wds              = WriteDatasource().setDatasourceId(someDatasourceId)
         wds.getDatasourcesId shouldBe Set(someDatasourceId)
       }
     }
@@ -21,4 +21,5 @@ class WriteDatasourceSpec extends UnitSpec {
       }
     }
   }
+
 }

@@ -8,10 +8,12 @@ import io.deepsense.deeplang._
 import io.deepsense.deeplang.doperables._
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.MockDOperablesFactory._
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
 import io.deepsense.deeplang.params.ParamMap
 
 class EstimatorAsOperationSpec extends UnitSpec with DeeplangTestSupport {
+
   import EstimatorAsOperationSpec._
 
   "EstimatorAsOperation" should {
@@ -20,15 +22,12 @@ class EstimatorAsOperationSpec extends UnitSpec with DeeplangTestSupport {
       val op = createMockOperation
       op.params shouldBe op.estimator.params
     }
-   "have the same default values for parameters as Estimator" in {
-     val op = createMockOperation
-     op.extractParamMap() shouldBe ParamMap(createMockOperation.estimator.paramA -> DefaultForA)
+    "have the same default values for parameters as Estimator" in {
+      val op = createMockOperation
+      op.extractParamMap() shouldBe ParamMap(createMockOperation.estimator.paramA -> DefaultForA)
     }
     "execute fit using properly set parameters" in {
-      def testFit(
-          op: MockEstimatorOperation,
-          expectedDataFrame: DataFrame,
-          expectedTransformer: Transformer): Unit = {
+      def testFit(op: MockEstimatorOperation, expectedDataFrame: DataFrame, expectedTransformer: Transformer): Unit = {
         val Vector(outputDataFrame: DataFrame, outputTransformer: Transformer) =
           op.executeUntyped(Vector(mock[DataFrame]))(mock[ExecutionContext])
         outputDataFrame shouldBe expectedDataFrame
@@ -43,9 +42,10 @@ class EstimatorAsOperationSpec extends UnitSpec with DeeplangTestSupport {
       def testInference(
           op: MockEstimatorOperation,
           expectedSchema: StructType,
-          expectedTransformerKnowledge: DKnowledge[Transformer]): Unit = {
+          expectedTransformerKnowledge: DKnowledge[Transformer]
+      ): Unit = {
 
-        val inputDF = DataFrame.forInference(createSchema())
+        val inputDF               = DataFrame.forInference(createSchema())
         val (knowledge, warnings) = op.inferKnowledgeUntyped(Vector(DKnowledge(inputDF)))(mock[InferContext])
         // Warnings should be a sum of transformer inference warnings
         // and estimator inference warnings. Currently, either both of them
@@ -62,14 +62,19 @@ class EstimatorAsOperationSpec extends UnitSpec with DeeplangTestSupport {
       testInference(op, transformedDataFrameSchema2, transformerKnowledge2)
     }
   }
+
 }
 
 object EstimatorAsOperationSpec extends UnitSpec {
-  class MockEstimatorOperation
-    extends EstimatorAsOperation[MockEstimator, Transformer] {
-    override val id: Id = Id.randomId
-    override val name: String = "Mock Estimator as an Operation"
-    override val description: String = "Description"
-  }
-}
 
+  class MockEstimatorOperation extends EstimatorAsOperation[MockEstimator, Transformer] {
+
+    override val id: Id = Id.randomId
+
+    override val name: String = "Mock Estimator as an Operation"
+
+    override val description: String = "Description"
+
+  }
+
+}

@@ -3,28 +3,35 @@ package io.deepsense.deeplang.doperables
 import scala.language.reflectiveCalls
 
 import org.apache.spark.ml
-import org.apache.spark.ml.param.{Params, ParamMap => SparkParamMap}
+import org.apache.spark.ml.param.Params
+import org.apache.spark.ml.param.{ParamMap => SparkParamMap}
 import org.apache.spark.sql.types.StructType
 
 import io.deepsense.deeplang.ExecutionContext
-import io.deepsense.deeplang.doperables.dataframe.{DataFrame, DataFrameColumnsGetter}
+import io.deepsense.deeplang.doperables.dataframe.DataFrame
+import io.deepsense.deeplang.doperables.dataframe.DataFrameColumnsGetter
 import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleColumnInPlaceChoice
-import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.{NoInPlaceChoice, YesInPlaceChoice}
+import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
+import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.YesInPlaceChoice
 import io.deepsense.deeplang.doperables.multicolumn._
-import io.deepsense.deeplang.doperables.spark.wrappers.params.common.{HasInputColumn, HasOutputColumn}
+import io.deepsense.deeplang.doperables.spark.wrappers.params.common.HasInputColumn
+import io.deepsense.deeplang.doperables.spark.wrappers.params.common.HasOutputColumn
 import io.deepsense.deeplang.params.Param
 import io.deepsense.deeplang.params.wrappers.spark.ParamsWithSparkWrappers
 
-abstract class SparkSingleColumnModelWrapper[
-    MD <: ml.Model[MD]{ val outputCol: ml.param.Param[String]},
-    E <: ml.Estimator[MD]{ val outputCol: ml.param.Param[String]}]
-  extends SparkModelWrapper[MD, E]
-  with ParamsWithSparkWrappers
-  with HasInputColumn
-  with HasSingleInPlaceParam
-  with HasSpecificParams {
+abstract class SparkSingleColumnModelWrapper[MD <: ml.Model[
+  MD
+] { val outputCol: ml.param.Param[String] }, E <: ml.Estimator[
+  MD
+] { val outputCol: ml.param.Param[String] }]
+    extends SparkModelWrapper[MD, E]
+    with ParamsWithSparkWrappers
+    with HasInputColumn
+    with HasSingleInPlaceParam
+    with HasSpecificParams {
 
   def convertInputNumericToVector: Boolean = false
+
   def convertOutputVectorToDouble: Boolean = false
 
   private var outputColumnValue: Option[String] = None
@@ -33,16 +40,16 @@ abstract class SparkSingleColumnModelWrapper[
     Array(inputColumn, singleInPlaceChoice) ++ getSpecificParams
 
   override private[deeplang] def _transform(ctx: ExecutionContext, df: DataFrame): DataFrame = {
-    val schema = df.schema.get
+    val schema          = df.schema.get
     val inputColumnName = DataFrameColumnsGetter.getColumnName(schema, $(inputColumn))
     val conversionDoubleToVectorIsNecessary = convertInputNumericToVector &&
       NumericToVectorUtils.isColumnNumeric(schema, inputColumnName)
-    val convertedDataFrame = if (conversionDoubleToVectorIsNecessary) {
-      // Automatically convert numeric input column to one-element vector column
-      DataFrame.fromSparkDataFrame(NumericToVectorUtils.convertDataFrame(df, inputColumnName, ctx))
-    } else {
-      df
-    }
+    val convertedDataFrame =
+      if (conversionDoubleToVectorIsNecessary)
+        // Automatically convert numeric input column to one-element vector column
+        DataFrame.fromSparkDataFrame(NumericToVectorUtils.convertDataFrame(df, inputColumnName, ctx))
+      else
+        df
 
     val transformedDataFrame = $(singleInPlaceChoice) match {
       case YesInPlaceChoice() =>
@@ -50,12 +57,13 @@ abstract class SparkSingleColumnModelWrapper[
           convertedDataFrame.getColumnName($(inputColumn)),
           convertedDataFrame,
           ctx,
-          transformTo(ctx, convertedDataFrame))
+          transformTo(ctx, convertedDataFrame)
+        )
       case no: NoInPlaceChoice =>
         transformTo(ctx, convertedDataFrame)(no.getOutputColumn)
     }
 
-    if(conversionDoubleToVectorIsNecessary && convertOutputVectorToDouble) {
+    if (conversionDoubleToVectorIsNecessary && convertOutputVectorToDouble) {
       val expectedSchema = _transformSchema(schema)
       val revertedTransformedDf =
         NumericToVectorUtils.revertDataFrame(
@@ -64,23 +72,23 @@ abstract class SparkSingleColumnModelWrapper[
           inputColumnName,
           getOutputColumnName(inputColumnName),
           ctx,
-          convertOutputVectorToDouble)
+          convertOutputVectorToDouble
+        )
       DataFrame.fromSparkDataFrame(revertedTransformedDf)
-    } else {
+    } else
       transformedDataFrame
-    }
   }
 
   override private[deeplang] def _transformSchema(schema: StructType): Option[StructType] = {
     val inputColumnName = DataFrameColumnsGetter.getColumnName(schema, $(inputColumn))
     val conversionDoubleToVectorIsNecessary = convertInputNumericToVector &&
       NumericToVectorUtils.isColumnNumeric(schema, inputColumnName)
-    val convertedSchema = if (conversionDoubleToVectorIsNecessary) {
-      // Automatically convert numeric input column to one-element vector column
-      NumericToVectorUtils.convertSchema(schema, inputColumnName)
-    } else {
-      schema
-    }
+    val convertedSchema =
+      if (conversionDoubleToVectorIsNecessary)
+        // Automatically convert numeric input column to one-element vector column
+        NumericToVectorUtils.convertSchema(schema, inputColumnName)
+      else
+        schema
 
     val transformedSchemaOption = $(singleInPlaceChoice) match {
       case YesInPlaceChoice() =>
@@ -101,71 +109,61 @@ abstract class SparkSingleColumnModelWrapper[
         transformSchemaTo(convertedSchema, no.getOutputColumn)
     }
 
-    if(conversionDoubleToVectorIsNecessary && convertOutputVectorToDouble) {
+    if (conversionDoubleToVectorIsNecessary && convertOutputVectorToDouble)
       transformedSchemaOption.map { case transformedSchema =>
         NumericToVectorUtils.revertSchema(
           transformedSchema,
           inputColumnName,
           getOutputColumnName(inputColumnName),
-          convertOutputVectorToDouble)
+          convertOutputVectorToDouble
+        )
       }
-    } else {
+    else
       transformedSchemaOption
-    }
   }
 
   override def sparkParamMap(sparkEntity: Params, schema: StructType): SparkParamMap = {
-    val map = super.sparkParamMap(sparkEntity, schema).put(
-      ml.param.ParamPair(
-        parentEstimator.sparkEstimator.outputCol, outputColumnValue.orNull))
+    val map = super
+      .sparkParamMap(sparkEntity, schema)
+      .put(ml.param.ParamPair(parentEstimator.sparkEstimator.outputCol, outputColumnValue.orNull))
 
-    if (serializableModel != null) {
+    if (serializableModel != null)
       map.put(ml.param.ParamPair(sparkModel.outputCol, outputColumnValue.orNull))
-    } else {
+    else
       map
-    }
   }
 
-  def setSingleInPlaceParam(value: SingleColumnInPlaceChoice): this.type = {
+  def setSingleInPlaceParam(value: SingleColumnInPlaceChoice): this.type =
     set(singleInPlaceChoice -> value)
-  }
 
-  private def transformTo(
-    ctx: ExecutionContext,
-    df: DataFrame)(outputColumnName: String): DataFrame = {
+  private def transformTo(ctx: ExecutionContext, df: DataFrame)(outputColumnName: String): DataFrame =
     withOutputColumnValue(outputColumnName) {
       super._transform(ctx, df)
     }
-  }
 
-  private def transformSchemaTo(
-      schema: StructType,
-      temporaryColumnName: String): Option[StructType] = {
+  private def transformSchemaTo(schema: StructType, temporaryColumnName: String): Option[StructType] =
     withOutputColumnValue(temporaryColumnName) {
       super._transformSchema(schema)
     }
-  }
 
   private def withOutputColumnValue[T](columnName: String)(f: => T): T = {
     outputColumnValue = Some(columnName)
-    try {
+    try
       f
-    } finally {
+    finally
       outputColumnValue = None
-    }
   }
 
-  private def getOutputColumnName(inputColumnName: String): String = {
+  private def getOutputColumnName(inputColumnName: String): String =
     $(singleInPlaceChoice) match {
-      case YesInPlaceChoice() => inputColumnName
+      case YesInPlaceChoice()  => inputColumnName
       case no: NoInPlaceChoice => no.getOutputColumn
     }
-  }
 
-  override def replicate(
-      extra: io.deepsense.deeplang.params.ParamMap): SparkSingleColumnModelWrapper.this.type = {
+  override def replicate(extra: io.deepsense.deeplang.params.ParamMap): SparkSingleColumnModelWrapper.this.type = {
     val model = super.replicate(extractParamMap(extra))
     model.outputColumnValue = outputColumnValue
     model
   }
+
 }

@@ -6,6 +6,7 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators.PCA
 
 class PCAExample extends AbstractOperationExample[PCA] {
+
   override def dOperation: PCA = {
     val op = new PCA()
     op.estimator
@@ -23,4 +24,5 @@ class PCAExample extends AbstractOperationExample[PCA] {
     ).map(Tuple1(_))
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("features")))
   }
+
 }

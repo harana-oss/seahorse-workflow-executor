@@ -2,15 +2,16 @@ package io.deepsense.deeplang.params.choice
 
 import scala.reflect.runtime.universe._
 
-import spray.json.{DeserializationException, JsObject}
+import spray.json.DeserializationException
+import spray.json.JsObject
 
 import io.deepsense.deeplang.params.exceptions.NoArgumentConstructorRequiredException
-import io.deepsense.deeplang.params.{AbstractParamSpec, Param}
+import io.deepsense.deeplang.params.AbstractParamSpec
+import io.deepsense.deeplang.params.Param
 
 abstract class AbstractChoiceParamSpec[T, U <: Param[T]] extends AbstractParamSpec[T, U] {
 
-  protected def createChoiceParam[V <: Choice : TypeTag](
-    name: String, description: String): Param[V]
+  protected def createChoiceParam[V <: Choice: TypeTag](name: String, description: String): Param[V]
 
   className should {
     "throw an exception when choices don't have no-arg constructor" in {
@@ -30,4 +31,5 @@ abstract class AbstractChoiceParamSpec[T, U <: Param[T]] extends AbstractParamSp
         createChoiceParam[ChoiceWithoutDeclaration]("name", "description")
     }
   }
+
 }

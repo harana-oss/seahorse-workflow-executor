@@ -3,7 +3,9 @@ package io.deepsense.models.json.graph
 import spray.json._
 
 import io.deepsense.commons.datetime.DateTimeConverter
-import io.deepsense.commons.exception.{DeepSenseFailure, FailureCode, FailureDescription}
+import io.deepsense.commons.exception.DeepSenseFailure
+import io.deepsense.commons.exception.FailureCode
+import io.deepsense.commons.exception.FailureDescription
 import io.deepsense.commons.models.Entity
 import io.deepsense.graph.nodestate._
 
@@ -52,9 +54,8 @@ class NodeStatusJsonProtocolSpec extends GraphJsonTestSupport {
     }
   }
 
-  def fromJs(queuedJson: JsObject): NodeStatus = {
+  def fromJs(queuedJson: JsObject): NodeStatus =
     queuedJson.convertTo[NodeStatus]
-  }
 
   def toJs(state: NodeStatus): JsValue = state.toJson
 
@@ -64,18 +65,21 @@ class NodeStatusJsonProtocolSpec extends GraphJsonTestSupport {
       NodeStatusJsonProtocol.Started,
       NodeStatusJsonProtocol.Ended,
       NodeStatusJsonProtocol.Results,
-      NodeStatusJsonProtocol.Error).map(key => key -> None).toMap[String, Option[JsValue]]
+      NodeStatusJsonProtocol.Error
+    ).map(key => key -> None).toMap[String, Option[JsValue]]
 
     val jsFields = (emptyMap ++ fields.toMap.mapValues(Some(_)) +
-        (NodeStatusJsonProtocol.Status -> Some(JsString(state)))).mapValues {
-      case None => JsNull
+      (NodeStatusJsonProtocol.Status -> Some(JsString(state)))).mapValues {
+      case None    => JsNull
       case Some(v) => v
     }
     JsObject(jsFields)
   }
 
   val started = DateTimeConverter.now
+
   val ended = started.plusDays(1)
+
   val error = FailureDescription(
     DeepSenseFailure.Id.randomId,
     FailureCode.CannotUpdateRunningWorkflow,
@@ -83,22 +87,27 @@ class NodeStatusJsonProtocolSpec extends GraphJsonTestSupport {
     Some("This is a long test description"),
     Map("detail1" -> "value1", "detail2" -> "value2")
   )
+
   val results = Seq(Entity.Id.randomId, Entity.Id.randomId, Entity.Id.randomId)
 
   val failed = Failed(started, ended, error)
+
   val completed = Completed(started, ended, results)
+
   val running: Running = Running(started, results)
-  val failedJson: JsObject = js("FAILED",
-    "started" -> started.toJson,
-    "ended" -> ended.toJson,
-    "error" -> error.toJson)
-  val completedJson: JsObject = js("COMPLETED",
-    "started" -> started.toJson,
-    "ended" -> ended.toJson,
-    "results" -> results.toJson)
+
+  val failedJson: JsObject = js("FAILED", "started" -> started.toJson, "ended" -> ended.toJson, "error" -> error.toJson)
+
+  val completedJson: JsObject =
+    js("COMPLETED", "started" -> started.toJson, "ended" -> ended.toJson, "results" -> results.toJson)
+
   val runningJson: JsObject =
     js("RUNNING", "started" -> started.toJson, "results" -> results.toJson)
+
   val abortedJson: JsObject = js("ABORTED", "results" -> results.toJson)
+
   val queuedJson: JsObject = js("QUEUED", "results" -> results.toJson)
+
   val draftJson: JsObject = js("DRAFT", "results" -> results.toJson)
+
 }

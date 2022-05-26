@@ -2,16 +2,22 @@ package io.deepsense.models.json.graph
 
 import spray.json._
 
-import io.deepsense.graph.{Edge, Endpoint, Node}
+import io.deepsense.graph.Edge
+import io.deepsense.graph.Endpoint
+import io.deepsense.graph.Node
 
 class EdgeJsonProtocolSpec extends GraphJsonTestSupport {
 
   import io.deepsense.models.json.graph.EdgeJsonProtocol._
 
   val expectedFromId: Node.Id = Node.Id.randomId
+
   val expectedFromPort = 1989
+
   val expectedToId: Node.Id = Node.Id.randomId
+
   val expectedToPort = 1337
+
   val edge = Edge(
     Endpoint(expectedFromId, expectedFromPort),
     Endpoint(expectedToId, expectedToPort)
@@ -30,4 +36,5 @@ class EdgeJsonProtocolSpec extends GraphJsonTestSupport {
       edge.toJson.convertTo[Edge] shouldBe edge
     }
   }
+
 }

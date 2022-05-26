@@ -10,14 +10,12 @@ class DatasourceIdForReadParamSpec extends AbstractParamSpec[UUID, DatasourceIdF
   override def className: String = "DatasourceIdForReadParam"
 
   override def paramFixture: (DatasourceIdForReadParam, JsValue) = {
-    val param = DatasourceIdForReadParam(
-      name = "Ds for read parameter name",
-      description = None)
+    val param = DatasourceIdForReadParam(name = "Ds for read parameter name", description = None)
     val expectedJson = JsObject(
-      "type" -> JsString("datasourceIdForRead"),
-      "name" -> JsString(param.name),
+      "type"        -> JsString("datasourceIdForRead"),
+      "name"        -> JsString(param.name),
       "description" -> JsString(""),
-      "default" -> JsNull,
+      "default"     -> JsNull,
       "isGriddable" -> JsFalse
     )
     (param, expectedJson)
@@ -27,4 +25,5 @@ class DatasourceIdForReadParamSpec extends AbstractParamSpec[UUID, DatasourceIdF
     val value = UUID.randomUUID()
     (value, JsString(value.toString))
   }
+
 }

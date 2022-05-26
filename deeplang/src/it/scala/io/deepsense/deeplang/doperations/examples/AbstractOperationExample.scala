@@ -1,17 +1,18 @@
 package io.deepsense.deeplang.doperations.examples
 
-import java.io.{File, PrintWriter}
+import java.io.File
+import java.io.PrintWriter
 
 import io.deepsense.commons.utils.Logging
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.ReadDataFrame
 import io.deepsense.deeplang.doperations.inout.CsvParameters.ColumnSeparatorChoice.Comma
 import io.deepsense.deeplang.doperations.readwritedataframe.FileScheme
-import io.deepsense.deeplang.{DOperable, DOperation, DeeplangIntegTestSupport}
+import io.deepsense.deeplang.DOperable
+import io.deepsense.deeplang.DOperation
+import io.deepsense.deeplang.DeeplangIntegTestSupport
 
-abstract class AbstractOperationExample[T <: DOperation]
-    extends DeeplangIntegTestSupport
-    with Logging {
+abstract class AbstractOperationExample[T <: DOperation] extends DeeplangIntegTestSupport with Logging {
 
   def dOperation: T
 
@@ -19,7 +20,7 @@ abstract class AbstractOperationExample[T <: DOperation]
 
   def fileNames: Seq[String] = Seq.empty
 
-  def loadCsv(fileName: String): DataFrame = {
+  def loadCsv(fileName: String): DataFrame =
     ReadDataFrame(
       FileScheme.File.pathPrefix + this.getClass.getResource(s"/test_files/$fileName.csv").getPath,
       Comma(),
@@ -28,7 +29,6 @@ abstract class AbstractOperationExample[T <: DOperation]
     ).executeUntyped(Vector.empty[DOperable])(executionContext)
       .head
       .asInstanceOf[DataFrame]
-  }
 
   def inputDataFrames: Seq[DataFrame] = fileNames.map(loadCsv)
 
@@ -42,8 +42,7 @@ abstract class AbstractOperationExample[T <: DOperation]
         ExampleHtmlFormatter.exampleHtml(op, inputDataFrames, outputDfs)
 
       // TODO Make it not rely on relative path it's run from
-      val examplePageFile = new File(
-        "docs/operations/examples/" + className + ".md")
+      val examplePageFile = new File("docs/operations/examples/" + className + ".md")
 
       examplePageFile.getParentFile.mkdirs()
       examplePageFile.createNewFile()
@@ -54,8 +53,8 @@ abstract class AbstractOperationExample[T <: DOperation]
       // scalastyle:on println
       writer.flush()
       writer.close()
-      logger.info(
-        "Created doc page for " + className)
+      logger.info("Created doc page for " + className)
     }
   }
+
 }

@@ -1,14 +1,15 @@
 package io.deepsense.workflowexecutor.partialexecution
 
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito
 import org.mockito.Mockito._
-import org.scalatest.{GivenWhenThen, Inspectors}
-
+import org.scalatest.GivenWhenThen
+import org.scalatest.Inspectors
 import io.deepsense.commons.exception.FailureDescription
 import io.deepsense.commons.models.Entity
 import io.deepsense.commons.serialization.Serialization
-import io.deepsense.commons.{StandardSpec, UnitTestSupport}
+import io.deepsense.commons.StandardSpec
+import io.deepsense.commons.UnitTestSupport
 import io.deepsense.deeplang.DOperable
 import io.deepsense.deeplang.exceptions.DeepLangException
 import io.deepsense.deeplang.inference.InferContext
@@ -18,21 +19,27 @@ import io.deepsense.graph.RandomNodeFactory._
 import io.deepsense.graph._
 import io.deepsense.graph.graphstate._
 import io.deepsense.graph.nodestate.NodeStatus
-import io.deepsense.models.workflows.{EntitiesMap, NodeState, NodeStateWithResults}
+import io.deepsense.models.workflows.EntitiesMap
+import io.deepsense.models.workflows.NodeState
+import io.deepsense.models.workflows.NodeStateWithResults
 import io.deepsense.reportlib.model.factory.ReportContentTestFactory
 import io.deepsense.workflowexecutor.partialexecution.StatefulGraphSpec.TestException
+import org.scalatestplus.mockito.MockitoSugar
 
 class StatefulGraphSpec
-  extends StandardSpec
-  with UnitTestSupport
-  with Serialization
-  with Inspectors
-  with GivenWhenThen
-  with GraphTestSupport {
+    extends StandardSpec
+    with UnitTestSupport
+    with Serialization
+    with Inspectors
+    with GivenWhenThen
+    with GraphTestSupport
+    with MockitoSugar {
 
-  val statuses: Map[Node.Id, NodeStatus] = nodeIds.zip(
-    Seq(nodeCompleted, nodeCompleted, nodeCompleted, nodeCompleted, nodeCompleted)).toMap
+  val statuses: Map[Node.Id, NodeStatus] =
+    nodeIds.zip(Seq(nodeCompleted, nodeCompleted, nodeCompleted, nodeCompleted, nodeCompleted)).toMap
+
   val illegalForFinished = Seq(nodestate.Draft, nodestate.Queued, nodeRunning)
+
   val illegalForCompleted = illegalForFinished ++ Seq(nodeFailed, nodestate.Aborted)
 
   "StatefulGraph" should {
@@ -53,7 +60,7 @@ class StatefulGraphSpec
       }
       "last Running node completed successfully and other nodes are Completed" in {
         val completedNodes: Map[Id, NodeStateWithResults] =
-          Seq(idA, idB, idC, idD).map { id => id -> nodeState(nodeCompleted) }.toMap
+          Seq(idA, idB, idC, idD).map(id => id -> nodeState(nodeCompleted)).toMap
         val statuses = completedNodes + (idE -> nodeState(nodeRunning))
         val g = graph(nodeSet, edgeSet, statuses, Running)
           .nodeFinished(idE, Seq(mock[Entity.Id], mock[Entity.Id]), Map(), Map())
@@ -70,18 +77,20 @@ class StatefulGraphSpec
 
           g.hasFailedNodes shouldBe true
 
-          forAll(Seq(idB, idC, idD, idE)) { id =>
-            g.states(id) shouldBe 'Aborted
-          }
+          forAll(Seq(idB, idC, idD, idE))(id => g.states(id) shouldBe 'Aborted)
         }
         "a node finishes" in {
-          val states = nodeIds.zip(
-            Seq(
-              nodeState(nodeCompleted),
-              nodeState(nodeCompleted),
-              nodeState(nodeCompleted),
-              nodeState(nodeFailed),
-              nodeState(nodeRunning))).toMap
+          val states = nodeIds
+            .zip(
+              Seq(
+                nodeState(nodeCompleted),
+                nodeState(nodeCompleted),
+                nodeState(nodeCompleted),
+                nodeState(nodeFailed),
+                nodeState(nodeRunning)
+              )
+            )
+            .toMap
 
           graph(nodeSet, edgeSet, states, Running)
             .nodeFinished(idE, Seq(mock[Entity.Id]), Map(), Map())
@@ -91,17 +100,15 @@ class StatefulGraphSpec
     }
     "be aborted" when {
       "there are Knowledge errors (inference)" in {
-        val g = StatefulGraph(nodeSet, edgeSet)
-          .enqueue
+        val g = StatefulGraph(nodeSet, edgeSet).enqueue
           .inferAndApplyKnowledge(mock[InferContext])
-        forAll(List(idA, idB, idC, idD, idE)) { id => g.states(id) shouldBe 'Aborted}
+        forAll(List(idA, idB, idC, idD, idE))(id => g.states(id) shouldBe 'Aborted)
       }
     }
     "be running" when {
       "enqueued" in {
-        val enqueued = StatefulGraph(nodeSet, edgeSet)
-          .enqueue
-        nodeIds.foreach { id => enqueued.states(id) shouldBe 'Queued  }
+        val enqueued = StatefulGraph(nodeSet, edgeSet).enqueue
+        nodeIds.foreach(id => enqueued.states(id) shouldBe 'Queued)
       }
       "no ready nodes but running" in {
         val running = StatefulGraph(nodeSet, edgeSet).enqueue
@@ -109,23 +116,24 @@ class StatefulGraphSpec
 
         running.readyNodes shouldBe 'Empty
         running.states(idA) shouldBe 'Running
-        Seq(idB, idC, idD, idE).foreach { id => running.states(id) shouldBe 'Queued  }
+        Seq(idB, idC, idD, idE).foreach(id => running.states(id) shouldBe 'Queued)
       }
       "no running nodes but ready" in {
-        val g = StatefulGraph(nodeSet, edgeSet)
-          .enqueue
+        val g = StatefulGraph(nodeSet, edgeSet).enqueue
           .nodeStarted(idA)
           .nodeFinished(
             idA,
             results(idA),
             Map(results(idA).head -> ReportContentTestFactory.someReport),
-            Map(results(idA).head -> mock[DOperable]))
+            Map(results(idA).head -> mock[DOperable])
+          )
           .nodeStarted(idB)
           .nodeFinished(
             idB,
             results(idB),
             Map(results(idB).head -> ReportContentTestFactory.someReport),
-            Map(results(idB).head -> mock[DOperable]))
+            Map(results(idB).head -> mock[DOperable])
+          )
 
         g.readyNodes should have size 2
         g.states(idB) shouldBe 'Completed
@@ -133,7 +141,7 @@ class StatefulGraphSpec
     }
     "list nodes ready for execution" in {
       def verifyNodeReady(id: Node.Id, inputSize: Int, g: StatefulGraph): Unit = {
-        val readyNodes = g.readyNodes
+        val readyNodes    = g.readyNodes
         val readyNodesIds = readyNodes.map(n => n.node.id)
         readyNodesIds should contain(id)
         val readyNode = readyNodes.find(_.node.id == id).get
@@ -154,22 +162,25 @@ class StatefulGraphSpec
         idA,
         results(idA),
         Map(results(idA).head -> ReportContentTestFactory.someReport),
-        Map(results(idA).head -> mock[DOperable]))
+        Map(results(idA).head -> mock[DOperable])
+      )
       running2.readyNodes should have size 1
       verifyNodeReady(idB, 1, running2)
 
-      val running3 = running2.nodeStarted(idB).nodeFinished(
-        idB,
-        results(idB),
-        Map(results(idB).head -> ReportContentTestFactory.someReport),
-        Map(results(idB).head -> mock[DOperable]))
+      val running3 = running2
+        .nodeStarted(idB)
+        .nodeFinished(
+          idB,
+          results(idB),
+          Map(results(idB).head -> ReportContentTestFactory.someReport),
+          Map(results(idB).head -> mock[DOperable])
+        )
       running3.readyNodes should have size 2
       verifyNodeReady(idC, 1, running3)
       verifyNodeReady(idE, 2, running3)
     }
     "be still running after Abort until execution is finished" in {
-      val aborted = StatefulGraph(nodeSet, edgeSet)
-        .enqueue
+      val aborted = StatefulGraph(nodeSet, edgeSet).enqueue
         .nodeStarted(idA)
         .nodeFinished(idA, results(idA), Map(), Map())
         .nodeStarted(idB)
@@ -190,13 +201,9 @@ class StatefulGraphSpec
       finished should not be 'Running
     }
     "have nodes that certainly won't finish aborted" in {
-      /** Diamond graph:
-        *    S
-        *   / \
-        *  U   V
-        *   \ /
-        *    T
-        * When V fails, there is no possibility that T succeeds, hence it should be aborted.
+
+      /** Diamond graph: S / \ U V \ / T When V fails, there is no possibility that T succeeds, hence it should be
+        * aborted.
         */
       val Seq((idS, nodeS), (idU, nodeU), (idV, nodeV), (idT, nodeT)) = generateNodes(op0To1, op1To1, op1To1, op2To2)
       val edges = Set(
@@ -205,8 +212,7 @@ class StatefulGraphSpec
         Edge(Endpoint(idU, 0), Endpoint(idT, 0)),
         Edge(Endpoint(idV, 0), Endpoint(idT, 1))
       )
-      val graph = StatefulGraph(Set(nodeS, nodeU, nodeV, nodeT), edges)
-        .enqueue
+      val graph = StatefulGraph(Set(nodeS, nodeU, nodeV, nodeT), edges).enqueue
         .nodeStarted(idS)
         .nodeFinished(idS, Seq(mock[Entity.Id]), Map(), Map())
         .nodeStarted(idV)
@@ -220,8 +226,8 @@ class StatefulGraphSpec
     "be serializable" in {
       import io.deepsense.graph.DOperationTestClasses._
       val operationWithInitializedLogger = new DOperationAToALogging
-      val id = Node.Id.randomId
-      val id2 = Node.Id.randomId
+      val id                             = Node.Id.randomId
+      val id2                            = Node.Id.randomId
       val nodes = Seq(
         randomNode(DOperationCreateA1()),
         Node(id2, DOperationA1ToA()),
@@ -234,7 +240,7 @@ class StatefulGraphSpec
         Edge(nodes(1), 0, nodes(3), 0),
         Edge(nodes(2), 0, nodes(3), 1)
       )
-      val graph = StatefulGraph(nodes.toSet, edges)
+      val graph   = StatefulGraph(nodes.toSet, edges)
       val graphIn = serializeDeserialize(graph)
       graphIn shouldBe graph
       val operation = graphIn.node(id).value.asInstanceOf[DOperationAToALogging]
@@ -247,25 +253,21 @@ class StatefulGraphSpec
         idB -> mock[NodeStateWithResults],
         idC -> mock[NodeStateWithResults],
         idD -> mock[NodeStateWithResults],
-        idE -> mock[NodeStateWithResults])
-      val g1 = StatefulGraph(
-        DeeplangGraph(nodeSet, edgeSet),
-        states,
-        None)
+        idE -> mock[NodeStateWithResults]
+      )
+      val g1 = StatefulGraph(DeeplangGraph(nodeSet, edgeSet), states, None)
       val nodeFailedStatus =
         NodeStateWithResults(NodeState(nodeFailed, Some(EntitiesMap())), Map(), None)
       val description: Some[FailureDescription] = Some(mock[FailureDescription])
-      val g2 = StatefulGraph(
-        DeeplangGraph(Set(nodeB), Set()),
-        Map(idB -> nodeFailedStatus),
-        description)
-      val updated = g1.updateStates(g2)
+      val g2                                    = StatefulGraph(DeeplangGraph(Set(nodeB), Set()), Map(idB -> nodeFailedStatus), description)
+      val updated                               = g1.updateStates(g2)
       updated.states should contain theSameElementsAs g1.states.updated(idB, nodeFailedStatus)
       updated.executionFailure shouldBe description
     }
     "recursively mark nodes as draft" in {
       val statusCompleted = nodeCompleted
-      val drafted = StatefulGraph(DeeplangGraph(nodeSet, edgeSet),
+      val drafted = StatefulGraph(
+        DeeplangGraph(nodeSet, edgeSet),
         Map(
           idA -> nodeState(statusCompleted),
           idB -> nodeState(nodeFailed),
@@ -287,7 +289,8 @@ class StatefulGraphSpec
     "mark nodes failed" when {
       "inferrenced knowledge contains errors" in {
         val statusCompleted = nodeCompleted
-        val graph = StatefulGraph(DeeplangGraph(nodeSet, edgeSet),
+        val graph = StatefulGraph(
+          DeeplangGraph(nodeSet, edgeSet),
           Map(
             idA -> nodeState(statusCompleted),
             idB -> nodeState(nodeFailed),
@@ -303,7 +306,7 @@ class StatefulGraphSpec
         )
 
         val graphSpy = Mockito.spy(graph)
-        doReturn(graphKnowledge).when(graphSpy).inferKnowledge(any(), any())
+        doReturn(graphKnowledge, Nil: _*).when(graphSpy).inferKnowledge(any(), any())
         val updatedGraph = graphSpy.inferAndApplyKnowledge(mock[InferContext])
 
         updatedGraph.states(idA) shouldBe 'Completed
@@ -315,18 +318,17 @@ class StatefulGraphSpec
     }
   }
 
-  def completedGraph: StatefulGraph = {
-    nodeIds.foldLeft(StatefulGraph(nodeSet, edgeSet).enqueue) {
-      case (graph, nodeId) =>
-        graph.nodeStarted(nodeId).nodeFinished(nodeId, results(nodeId), Map(), Map())
+  def completedGraph: StatefulGraph =
+    nodeIds.foldLeft(StatefulGraph(nodeSet, edgeSet).enqueue) { case (graph, nodeId) =>
+      graph.nodeStarted(nodeId).nodeFinished(nodeId, results(nodeId), Map(), Map())
     }
-  }
 
   private def graph(
       nodes: Set[DeeplangNode],
       edges: Set[Edge],
       states: Map[Node.Id, NodeStateWithResults],
-      state: GraphState): StatefulGraph = {
+      state: GraphState
+  ): StatefulGraph = {
     val directedGraph = DeeplangGraph(nodes, edges)
     StatefulGraph(directedGraph, states, None)
   }
@@ -336,33 +338,31 @@ class StatefulGraphSpec
     illegalToNodeFail(completedGraph)
   }
 
-  private def illegalToNodeFail(completedGraph: StatefulGraph): Unit = {
+  private def illegalToNodeFail(completedGraph: StatefulGraph): Unit =
     an[IllegalStateException] shouldBe thrownBy {
       completedGraph.nodeFailed(idB, new IllegalStateException("It is illegal to fail!"))
     }
-  }
 
-  private def illegalToNodeFinish(completedGraph: StatefulGraph): Unit = {
+  private def illegalToNodeFinish(completedGraph: StatefulGraph): Unit =
     an[IllegalStateException] shouldBe thrownBy {
       completedGraph.nodeFinished(idB, results(idB), Map(), Map())
     }
-  }
 
-  private def illegalToEnqueue(completedGraph: StatefulGraph): Unit = {
+  private def illegalToEnqueue(completedGraph: StatefulGraph): Unit =
     an[IllegalStateException] shouldBe thrownBy {
       completedGraph.enqueue
     }
-  }
 
-  private def nodeState(status: NodeStatus): NodeStateWithResults = {
+  private def nodeState(status: NodeStatus): NodeStateWithResults =
     NodeStateWithResults(NodeState(status, Some(EntitiesMap())), Map(), None)
-  }
+
 }
 
 object StatefulGraphSpec {
 
-  case class TestException() extends DeepLangException(
-    "This is a test exception thrown on purpose."
-  )
+  case class TestException()
+      extends DeepLangException(
+        "This is a test exception thrown on purpose."
+      )
 
 }

@@ -1,6 +1,7 @@
 package io.deepsense.deeplang.doperations.readwritedataframe.googlestorage
 
-import java.io.{ByteArrayInputStream, FileOutputStream}
+import java.io.ByteArrayInputStream
+import java.io.FileOutputStream
 import java.util
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
@@ -8,7 +9,8 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.FileContent
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.model.File
-import com.google.api.services.drive.{Drive, DriveScopes}
+import com.google.api.services.drive.Drive
+import com.google.api.services.drive.DriveScopes
 
 import io.deepsense.commons.resources.ManagedResource
 import io.deepsense.commons.utils.LoggerForCallerClass
@@ -28,7 +30,7 @@ private[googlestorage] object GoogleDriveClient {
       credentials: GoogleCretendialsJson,
       sheetId: GoogleSheetId,
       filePath: String
-    ): Unit = {
+  ): Unit = {
     val fileMetadata = new File().setMimeType("application/vnd.google-apps.spreadsheet")
     val mediaContent = new FileContent("text/csv", new java.io.File(filePath))
 
@@ -39,7 +41,7 @@ private[googlestorage] object GoogleDriveClient {
       credentials: GoogleCretendialsJson,
       sheetId: GoogleSheetId,
       filePath: String
-    ): Unit = {
+  ): Unit = {
     val file = new java.io.File(filePath)
     file.getParentFile.mkdirs()
 

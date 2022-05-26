@@ -10,14 +10,12 @@ class LoadFromLibraryParamSpec extends AbstractParamSpec[String, LoadFromLibrary
 
   override def paramFixture: (LoadFromLibraryParam, JsValue) = {
     val description = "Load parameter description"
-    val param = LoadFromLibraryParam(
-      name = "Load parameter name",
-      description = Some(description))
+    val param       = LoadFromLibraryParam(name = "Load parameter name", description = Some(description))
     val expectedJson = JsObject(
-      "type" -> JsString("loadFromLibrary"),
-      "name" -> JsString(param.name),
+      "type"        -> JsString("loadFromLibrary"),
+      "name"        -> JsString(param.name),
       "description" -> JsString(description),
-      "default" -> JsNull,
+      "default"     -> JsNull,
       "isGriddable" -> JsFalse
     )
     (param, expectedJson)
@@ -27,4 +25,5 @@ class LoadFromLibraryParamSpec extends AbstractParamSpec[String, LoadFromLibrary
     val value = "input abcdefghij"
     (value, JsString(value))
   }
+
 }

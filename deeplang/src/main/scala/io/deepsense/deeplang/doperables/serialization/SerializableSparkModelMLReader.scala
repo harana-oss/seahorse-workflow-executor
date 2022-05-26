@@ -1,4 +1,3 @@
-
 package io.deepsense.deeplang.doperables.serialization
 
 import org.apache.spark.ml.util.MLReader
@@ -15,4 +14,5 @@ class SerializableSparkModelMLReader[M <: ML.Model[M]]
     val modelPath = Transformer.modelFilePath(path)
     new SerializableSparkModel(CustomPersistence.load[M](sparkContext, modelPath))
   }
+
 }

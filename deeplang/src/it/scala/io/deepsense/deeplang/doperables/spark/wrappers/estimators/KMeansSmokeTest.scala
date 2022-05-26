@@ -12,12 +12,14 @@ class KMeansSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
   import estimator._
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    featuresColumn -> NameSingleColumnSelection("myFeatures"),
-    k -> 3.0,
-    maxIterations -> 20.0,
+    featuresColumn   -> NameSingleColumnSelection("myFeatures"),
+    k                -> 3.0,
+    maxIterations    -> 20.0,
     predictionColumn -> "cluster",
-    seed -> 123.0,
-    tolerance -> 1E-7,
-    initMode -> KMeans.ParallelInitMode(),
-    initSteps -> 8)
+    seed             -> 123.0,
+    tolerance        -> 1e-7,
+    initMode         -> KMeans.ParallelInitMode(),
+    initSteps        -> 8
+  )
+
 }

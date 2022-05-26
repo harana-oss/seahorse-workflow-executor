@@ -1,18 +1,23 @@
 package io.deepsense.deeplang.doperables
 
 import org.apache.spark.ml
-import org.apache.spark.ml.param.{BooleanParam, DoubleParam, ParamMap}
+import org.apache.spark.ml.param.BooleanParam
+import org.apache.spark.ml.param.DoubleParam
+import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame => SparkDataFrame, Dataset}
+import org.apache.spark.sql.{DataFrame => SparkDataFrame}
+import org.apache.spark.sql.Dataset
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperables.report.Report
 import io.deepsense.deeplang.inference.exceptions.SparkTransformSchemaException
 import io.deepsense.deeplang.params.Param
 import io.deepsense.deeplang.params.wrappers.spark.DoubleParamWrapper
-import io.deepsense.deeplang.{DeeplangTestSupport, ExecutionContext, UnitSpec}
+import io.deepsense.deeplang.DeeplangTestSupport
+import io.deepsense.deeplang.ExecutionContext
+import io.deepsense.deeplang.UnitSpec
 import io.deepsense.sparkutils.ML
 
 class SparkTransformerWrapperSpec extends UnitSpec with DeeplangTestSupport {
@@ -24,7 +29,7 @@ class SparkTransformerWrapperSpec extends UnitSpec with DeeplangTestSupport {
       val sparkTransformerWrapper =
         ExampleSparkTransformerWrapper().setParamWrapper(paramValueToSet)
 
-      val context = mock[ExecutionContext]
+      val context        = mock[ExecutionContext]
       val inputDataFrame = createDataFrame()
 
       sparkTransformerWrapper._transform(context, inputDataFrame) shouldBe
@@ -39,7 +44,7 @@ class SparkTransformerWrapperSpec extends UnitSpec with DeeplangTestSupport {
     }
     "forward an exception thrown by transformSchema wrapped in DeepLangException" in {
       val inputSchema = createSchema()
-      val wrapper = ExampleSparkTransformerWrapper().setParamWrapper(paramValueToSet)
+      val wrapper     = ExampleSparkTransformerWrapper().setParamWrapper(paramValueToSet)
       wrapper.sparkTransformer.setTransformSchemaShouldThrow(true)
       val e = intercept[SparkTransformSchemaException] {
         wrapper._transformSchema(inputSchema)
@@ -47,23 +52,23 @@ class SparkTransformerWrapperSpec extends UnitSpec with DeeplangTestSupport {
       e.exception shouldBe exceptionThrownByTransformSchema
     }
   }
+
 }
 
 object SparkTransformerWrapperSpec extends MockitoSugar {
 
-  case class ExampleSparkTransformerWrapper()
-    extends SparkTransformerWrapper[ParamValueCheckingTransformer] {
+  case class ExampleSparkTransformerWrapper() extends SparkTransformerWrapper[ParamValueCheckingTransformer] {
 
-    val paramWrapper = new DoubleParamWrapper[ParamValueCheckingTransformer](
-      "name",
-      Some("description"),
-      _.param)
+    val paramWrapper = new DoubleParamWrapper[ParamValueCheckingTransformer]("name", Some("description"), _.param)
+
     setDefault(paramWrapper, 0.0)
 
     def setParamWrapper(value: Double): this.type = set(paramWrapper, value)
 
     override val params: Array[Param[_]] = Array(paramWrapper)
+
     override def report: Report = ???
+
   }
 
   class ParamValueCheckingTransformer extends ML.Transformer {
@@ -78,31 +83,34 @@ object SparkTransformerWrapperSpec extends MockitoSugar {
     }
 
     val shouldTransformSchemaThrowParam = new BooleanParam("id", "shouldThrow", "description")
+
     setDefault(shouldTransformSchemaThrowParam, false)
 
     def setTransformSchemaShouldThrow(b: Boolean): this.type =
       set(shouldTransformSchemaThrowParam, b)
 
     override def transformSchema(schema: StructType): StructType = {
-      if ($(shouldTransformSchemaThrowParam)) {
+      if ($(shouldTransformSchemaThrowParam))
         throw exceptionThrownByTransformSchema
-      }
       require($(param) == paramValueToSet)
       outputSchema
     }
 
     override val uid: String = "id"
 
-    override def copy(extra: ParamMap): ml.Transformer = {
+    override def copy(extra: ParamMap): ml.Transformer =
       defaultCopy(extra)
-    }
+
   }
 
   val outputSchema = StructType(Seq())
+
   val outputDataFrame = mock[SparkDataFrame]
+
   when(outputDataFrame.schema).thenReturn(outputSchema)
 
   val paramValueToSet = 12.0
 
   val exceptionThrownByTransformSchema = new Exception("mock exception")
+
 }

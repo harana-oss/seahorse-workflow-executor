@@ -2,7 +2,8 @@ package io.deepsense.deeplang.doperations
 
 import org.apache.spark.ml
 import org.apache.spark.ml.evaluation
-import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
+import org.apache.spark.ml.tuning.CrossValidator
+import org.apache.spark.ml.tuning.ParamGridBuilder
 import spray.json._
 
 import io.deepsense.commons.utils.DoubleUtils
@@ -11,7 +12,8 @@ import io.deepsense.deeplang.doperables.report.Report
 import io.deepsense.deeplang.doperables.spark.wrappers.estimators.LinearRegression
 import io.deepsense.deeplang.doperables.spark.wrappers.evaluators.RegressionEvaluator
 import io.deepsense.deeplang.doperations.exceptions.ColumnDoesNotExistException
-import io.deepsense.deeplang.{DKnowledge, DeeplangIntegTestSupport}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DeeplangIntegTestSupport
 import io.deepsense.sparkutils.Linalg
 import io.deepsense.sparkutils.Linalg.Vectors
 
@@ -22,19 +24,19 @@ class GridSearchIntegSpec extends DeeplangIntegTestSupport with DefaultJsonProto
   "GridSearch" should {
     "find best params" in {
       val gridSearch = new GridSearch()
-      val estimator = new LinearRegression()
-      val dataFrame = buildDataFrame()
-      val evaluator = new RegressionEvaluator()
+      val estimator  = new LinearRegression()
+      val dataFrame  = buildDataFrame()
+      val evaluator  = new RegressionEvaluator()
       gridSearch.setEstimatorParams(estimatorParams)
       gridSearch.setNumberOfFolds(2)
 
       val results = gridSearch.executeUntyped(Vector(estimator, dataFrame, evaluator))(executionContext)
-      val report = results.head.asInstanceOf[Report]
+      val report  = results.head.asInstanceOf[Report]
 
       val tables = report.content.tables
 
       val expectedMetrics: Array[Double] = pureSparkImplementation()
-      val expectedBestMetric = expectedMetrics.toList.min
+      val expectedBestMetric             = expectedMetrics.toList.min
 
       val bestMetricsTable = tables.head
       bestMetricsTable.values.size shouldBe 1
@@ -44,7 +46,8 @@ class GridSearchIntegSpec extends DeeplangIntegTestSupport with DefaultJsonProto
       val expectedMetricsTable = List(
         List(Some("10.0"), Some("5.0"), doubleToCell(expectedMetrics(2))),
         List(Some("10.0"), Some("0.5"), doubleToCell(expectedMetrics(1))),
-        List(Some("10.0"), Some("0.01"), doubleToCell(expectedMetrics(0))))
+        List(Some("10.0"), Some("0.01"), doubleToCell(expectedMetrics(0)))
+      )
       val metricsTable = tables(1)
       metricsTable.values.size shouldBe 3
       metricsTable.values shouldBe expectedMetricsTable
@@ -53,40 +56,48 @@ class GridSearchIntegSpec extends DeeplangIntegTestSupport with DefaultJsonProto
     "throw an exception in inference" when {
       "estimator params are invalid" in {
         val gridSearch = new GridSearch()
-        val estimator = new LinearRegression()
-        val dataFrame = buildDataFrame()
-        val evaluator = new RegressionEvaluator()
-        val params = JsObject(estimatorParams.fields.updated(
-          "features column", JsObject(
-            "type" -> JsString("column"),
-            "value" -> JsString("invalid")
-          )))
+        val estimator  = new LinearRegression()
+        val dataFrame  = buildDataFrame()
+        val evaluator  = new RegressionEvaluator()
+        val params = JsObject(
+          estimatorParams.fields.updated(
+            "features column",
+            JsObject(
+              "type"  -> JsString("column"),
+              "value" -> JsString("invalid")
+            )
+          )
+        )
         gridSearch.setEstimatorParams(params)
         gridSearch.setNumberOfFolds(2)
 
         a[ColumnDoesNotExistException] should be thrownBy {
-          gridSearch.inferKnowledgeUntyped(
-            Vector(DKnowledge(estimator), DKnowledge(dataFrame), DKnowledge(evaluator)))(
-            executionContext.inferContext)
+          gridSearch.inferKnowledgeUntyped(Vector(DKnowledge(estimator), DKnowledge(dataFrame), DKnowledge(evaluator)))(
+            executionContext.inferContext
+          )
         }
       }
       "evaluator params are invalid" in {
         val gridSearch = new GridSearch()
-        val estimator = new LinearRegression()
-        val dataFrame = buildDataFrame()
-        val evaluator = new RegressionEvaluator()
-        val params = JsObject(evaluator.paramValuesToJson.asJsObject.fields.updated(
-          "label column", JsObject(
-            "type" -> JsString("column"),
-            "value" -> JsString("invalid")
-          )))
+        val estimator  = new LinearRegression()
+        val dataFrame  = buildDataFrame()
+        val evaluator  = new RegressionEvaluator()
+        val params = JsObject(
+          evaluator.paramValuesToJson.asJsObject.fields.updated(
+            "label column",
+            JsObject(
+              "type"  -> JsString("column"),
+              "value" -> JsString("invalid")
+            )
+          )
+        )
         gridSearch.setEvaluatorParams(params)
         gridSearch.setNumberOfFolds(2)
 
         a[ColumnDoesNotExistException] should be thrownBy {
-          gridSearch.inferKnowledgeUntyped(
-            Vector(DKnowledge(estimator), DKnowledge(dataFrame), DKnowledge(evaluator)))(
-            executionContext.inferContext)
+          gridSearch.inferKnowledgeUntyped(Vector(DKnowledge(estimator), DKnowledge(dataFrame), DKnowledge(evaluator)))(
+            executionContext.inferContext
+          )
         }
       }
     }
@@ -95,32 +106,28 @@ class GridSearchIntegSpec extends DeeplangIntegTestSupport with DefaultJsonProto
   private val estimatorParams = JsObject(
     "regularization param" -> seqParam(Seq(0.01, 0.5, 5.0)),
     "features column" -> JsObject(
-      "type" -> JsString("column"),
+      "type"  -> JsString("column"),
       "value" -> JsString("features")
     ),
     "max iterations" -> JsNumber(10.0)
   )
 
-  private def seqParam(values: Seq[Double]): JsObject = {
+  private def seqParam(values: Seq[Double]): JsObject =
     JsObject(
       "values" -> JsArray(
         JsObject(
-          "type" -> JsString("seq"),
-          "value" -> JsObject(
-            "sequence" -> values.toJson)
+          "type"  -> JsString("seq"),
+          "value" -> JsObject("sequence" -> values.toJson)
         )
       )
     )
-  }
 
   private def buildDataFrame(): DataFrame = {
     val districtFactors = Seq(0.6, 0.8, 1.0)
     val priceForMeterSq = 7000
     val apartments = Range(40, 300, 5).map { case flatSize =>
       val districtFactor = districtFactors(flatSize % districtFactors.length)
-      Apartment(
-        Vectors.dense(flatSize, districtFactor),
-        (flatSize * districtFactor * priceForMeterSq).toLong)
+      Apartment(Vectors.dense(flatSize, districtFactor), (flatSize * districtFactor * priceForMeterSq).toLong)
     }
     DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(apartments))
   }
@@ -140,6 +147,7 @@ class GridSearchIntegSpec extends DeeplangIntegTestSupport with DefaultJsonProto
   }
 
   private def doubleToCell(d: Double) = Some(DoubleUtils.double2String(d))
+
 }
 
 private case class Apartment(features: Linalg.Vector, label: Double)

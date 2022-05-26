@@ -7,8 +7,9 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.GetFromVector
 
 class GetFromVectorExample extends AbstractOperationExample[GetFromVector] {
+
   override def dOperation: GetFromVector = {
-    val op = new GetFromVector()
+    val op          = new GetFromVector()
     val transformer = new GetFromVectorTransformer()
     op.transformer.setIndex(1)
     op.transformer.setSingleColumn("features", "second_feature")
@@ -22,7 +23,9 @@ class GetFromVectorExample extends AbstractOperationExample[GetFromVector] {
       null,
       Vectors.sparse(3, Seq((1, 0.91), (2, 3.2))),
       Vectors.sparse(3, Seq((0, 5.7), (2, 2.7))),
-      Vectors.sparse(3, Seq()).toDense).map(Tuple1(_))
+      Vectors.sparse(3, Seq()).toDense
+    ).map(Tuple1(_))
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("features")))
   }
+
 }

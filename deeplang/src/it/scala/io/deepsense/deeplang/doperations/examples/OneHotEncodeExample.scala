@@ -4,7 +4,8 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators.StringIndexer
 import io.deepsense.deeplang.doperations.spark.wrappers.transformers.OneHotEncode
 
-class OneHotEncodeExample extends AbstractOperationExample[OneHotEncode]{
+class OneHotEncodeExample extends AbstractOperationExample[OneHotEncode] {
+
   override def dOperation: OneHotEncode = {
     val op = new OneHotEncode()
     op.transformer
@@ -21,4 +22,5 @@ class OneHotEncodeExample extends AbstractOperationExample[OneHotEncode]{
       .executeUntyped(Vector(rawDataFrame))(executionContext)
     Seq(x.head.asInstanceOf[DataFrame])
   }
+
 }

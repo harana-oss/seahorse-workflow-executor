@@ -1,12 +1,17 @@
 package io.deepsense.workflowexecutor
 
-import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.testkit.{TestActorRef, TestKit, TestProbe}
-import org.mockito.Matchers._
+import akka.actor.ActorRef
+import akka.actor.ActorSystem
+import akka.actor.Props
+import akka.testkit.TestActorRef
+import akka.testkit.TestKit
+import akka.testkit.TestProbe
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.Eventually
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.BeforeAndAfter
+import org.scalatest.BeforeAndAfterAll
 
 import io.deepsense.deeplang._
 import io.deepsense.deeplang.doperables.report.Report
@@ -15,17 +20,22 @@ import io.deepsense.graph.DeeplangGraph.DeeplangNode
 import io.deepsense.graph.Node
 import io.deepsense.reportlib.model.ReportContent
 import io.deepsense.sparkutils.AkkaUtils
-import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.{NodeCompleted, NodeFailed, NodeStarted}
-import io.deepsense.workflowexecutor.WorkflowNodeExecutorActor.Messages.{Delete, Start}
+import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeCompleted
+import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeFailed
+import io.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeStarted
+import io.deepsense.workflowexecutor.WorkflowNodeExecutorActor.Messages.Delete
+import io.deepsense.workflowexecutor.WorkflowNodeExecutorActor.Messages.Start
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 
 class WorkflowNodeExecutorActorSpec
-  extends TestKit(ActorSystem("WorkflowNodeExecutorActorSpec"))
-  with WordSpecLike
-  with Matchers
-  with MockitoSugar
-  with BeforeAndAfter
-  with BeforeAndAfterAll
-  with Eventually {
+    extends TestKit(ActorSystem("WorkflowNodeExecutorActorSpec"))
+    with AnyWordSpecLike
+    with Matchers
+    with MockitoSugar
+    with BeforeAndAfter
+    with BeforeAndAfterAll
+    with Eventually {
 
   override protected def afterAll(): Unit = AkkaUtils.terminate(system)
 
@@ -51,11 +61,11 @@ class WorkflowNodeExecutorActorSpec
         when(node.value).thenReturn(dOperation)
 
         val removedExecutedContext = mock[ExecutionContext]
-        val dataFrameStorage = mock[ContextualDataFrameStorage]
+        val dataFrameStorage       = mock[ContextualDataFrameStorage]
         when(removedExecutedContext.dataFrameStorage).thenReturn(dataFrameStorage)
 
-        val wnea: TestActorRef[WorkflowNodeExecutorActor] = TestActorRef(
-          new WorkflowNodeExecutorActor(removedExecutedContext, node, Vector.empty))
+        val wnea: TestActorRef[WorkflowNodeExecutorActor] =
+          TestActorRef(new WorkflowNodeExecutorActor(removedExecutedContext, node, Vector.empty))
         val probe = TestProbe()
         probe.send(wnea, Delete())
 
@@ -101,10 +111,8 @@ class WorkflowNodeExecutorActorSpec
     }
   }
 
-  private def nodeExecutorActor(input: Vector[DOperable], node: DeeplangNode): ActorRef = {
-    system.actorOf(
-      Props(new WorkflowNodeExecutorActor(executionContext, node, input)))
-  }
+  private def nodeExecutorActor(input: Vector[DOperable], node: DeeplangNode): ActorRef =
+    system.actorOf(Props(new WorkflowNodeExecutorActor(executionContext, node, input)))
 
   private def inferableOperable: DOperable = {
     val operable = mock[DOperable]
@@ -113,7 +121,7 @@ class WorkflowNodeExecutorActorSpec
 
   private def operableWithReports: DOperable = {
     val operable = mock[DOperable]
-    val report = mock[Report]
+    val report   = mock[Report]
     when(report.content).thenReturn(mock[ReportContent])
     when(operable.report).thenReturn(report)
     operable
@@ -125,53 +133,50 @@ class WorkflowNodeExecutorActorSpec
     dOperation
   }
 
-  private def fixtureFailingInference()
-      : (TestProbe, ActorRef, DeeplangNode, NullPointerException) = {
+  private def fixtureFailingInference(): (TestProbe, ActorRef, DeeplangNode, NullPointerException) = {
     val operation = mockOperation
-    val cause = new NullPointerException("test exception")
+    val cause     = new NullPointerException("test exception")
     when(operation.inferKnowledgeUntyped(any())(any()))
       .thenThrow(cause)
     val (probe, testedActor, node, _, _) = fixtureWithOperation(operation)
     (probe, testedActor, node, cause)
   }
 
-  private def fixtureFailingOperation()
-      : (TestProbe, ActorRef, DeeplangNode, NullPointerException) = {
+  private def fixtureFailingOperation(): (TestProbe, ActorRef, DeeplangNode, NullPointerException) = {
     val operation = mockOperation
-    val cause = new NullPointerException("test exception")
+    val cause     = new NullPointerException("test exception")
     when(operation.executeUntyped(any[Vector[DOperable]]())(any[ExecutionContext]()))
       .thenThrow(cause)
     val (probe, testedActor, node, _, _) = fixtureWithOperation(operation)
     (probe, testedActor, node, cause)
   }
 
-  private def fixtureFailingOperationError()
-  : (TestProbe, ActorRef, DeeplangNode, Throwable) = {
+  private def fixtureFailingOperationError(): (TestProbe, ActorRef, DeeplangNode, Throwable) = {
     val operation = mockOperation
-    val cause = new AssertionError("test exception")
+    val cause     = new AssertionError("test exception")
     when(operation.executeUntyped(any[Vector[DOperable]]())(any[ExecutionContext]()))
       .thenThrow(cause)
     val (probe, testedActor, node, _, _) = fixtureWithOperation(operation)
     (probe, testedActor, node, cause)
   }
 
-  private def fixtureSucceedingOperation()
-      : (TestProbe, ActorRef, DeeplangNode, Vector[DOperable]) = {
+  private def fixtureSucceedingOperation(): (TestProbe, ActorRef, DeeplangNode, Vector[DOperable]) = {
     val operation = mockOperation
-    val output = Vector(operableWithReports, operableWithReports)
+    val output    = Vector(operableWithReports, operableWithReports)
     when(operation.executeUntyped(any())(any()))
       .thenReturn(output)
     val (probe, testedActor, node, _, _) = fixtureWithOperation(operation)
     (probe, testedActor, node, output)
   }
 
-  private def fixtureWithOperation(dOperation: DOperation):
-      (TestProbe, ActorRef, DeeplangNode, DOperation, Vector[DOperable]) = {
+  private def fixtureWithOperation(
+      dOperation: DOperation
+  ): (TestProbe, ActorRef, DeeplangNode, DOperation, Vector[DOperable]) = {
     val node = mock[DeeplangNode]
     when(node.id).thenReturn(Node.Id.randomId)
     when(node.value).thenReturn(dOperation)
-    val probe = TestProbe()
-    val input = Vector(inferableOperable, inferableOperable)
+    val probe       = TestProbe()
+    val input       = Vector(inferableOperable, inferableOperable)
     val testedActor = nodeExecutorActor(input, node)
     (probe, testedActor, node, dOperation, input)
   }

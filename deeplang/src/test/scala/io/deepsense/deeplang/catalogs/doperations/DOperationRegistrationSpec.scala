@@ -1,6 +1,7 @@
 package io.deepsense.deeplang.catalogs.doperations
 
-import io.deepsense.deeplang.{CatalogRecorder, UnitSpec}
+import io.deepsense.deeplang.CatalogRecorder
+import io.deepsense.deeplang.UnitSpec
 
 class DOperationRegistrationSpec extends UnitSpec {
 
@@ -10,4 +11,5 @@ class DOperationRegistrationSpec extends UnitSpec {
       catalog.operations.keys.foreach(id => catalog.createDOperation(id))
     }
   }
+
 }

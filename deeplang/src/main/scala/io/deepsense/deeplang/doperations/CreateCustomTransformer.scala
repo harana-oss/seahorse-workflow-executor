@@ -9,25 +9,30 @@ import io.deepsense.deeplang.DOperation.Id
 import io.deepsense.deeplang._
 import io.deepsense.deeplang.documentation.OperationDocumentation
 import io.deepsense.deeplang.doperables.CustomTransformer
-import io.deepsense.deeplang.doperations.custom.{Sink, Source}
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
-import io.deepsense.deeplang.params.{Param, WorkflowParam}
+import io.deepsense.deeplang.doperations.custom.Sink
+import io.deepsense.deeplang.doperations.custom.Source
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
+import io.deepsense.deeplang.params.Param
+import io.deepsense.deeplang.params.WorkflowParam
 import io.deepsense.deeplang.utils.CustomTransformerFactory
-import io.deepsense.graph.{GraphKnowledge, Node}
+import io.deepsense.graph.GraphKnowledge
+import io.deepsense.graph.Node
 
-case class CreateCustomTransformer() extends TransformerAsFactory[CustomTransformer] with OperationDocumentation  {
+case class CreateCustomTransformer() extends TransformerAsFactory[CustomTransformer] with OperationDocumentation {
 
   import DefaultCustomTransformerWorkflow._
 
   override val id: Id = CreateCustomTransformer.id
+
   override val name: String = "Create Custom Transformer"
+
   override val description: String = "Creates custom transformer"
 
   override val since: Version = Version(1, 0, 0)
 
-  val innerWorkflow = WorkflowParam(
-    name = "inner workflow",
-    description = None)
+  val innerWorkflow = WorkflowParam(name = "inner workflow", description = None)
+
   setDefault(innerWorkflow, defaultWorkflow)
 
   // Inner workflow should be of type InnerWorkflow instead of raw json.
@@ -39,6 +44,7 @@ case class CreateCustomTransformer() extends TransformerAsFactory[CustomTransfor
   // and use InnerWorkflow type here instead of raw json.
 
   def getInnerWorkflow: JsObject = $(innerWorkflow)
+
   def setInnerWorkflow(workflow: JsObject): this.type = set(innerWorkflow, workflow)
 
   override val params: Array[Param[_]] = Array(innerWorkflow)
@@ -58,13 +64,15 @@ case class CreateCustomTransformer() extends TransformerAsFactory[CustomTransfor
     innerWorkflowValue.graph.inferKnowledge(context, GraphKnowledge())
   }
 
-  private def customTransformer(innerWorkflowParser: InnerWorkflowParser): CustomTransformer = {
+  private def customTransformer(innerWorkflowParser: InnerWorkflowParser): CustomTransformer =
     CustomTransformerFactory.createCustomTransformer(innerWorkflowParser, $(innerWorkflow))
-  }
+
 }
 
 object CreateCustomTransformer {
+
   val id: Id = "65240399-2987-41bd-ba7e-2944d60a3404"
+
 }
 
 object DefaultCustomTransformerWorkflow {
@@ -73,7 +81,7 @@ object DefaultCustomTransformerWorkflow {
     JsObject(
       "id" -> JsString(nodeId.toString),
       "operation" -> JsObject(
-        "id" -> JsString(operation.id.toString),
+        "id"   -> JsString(operation.id.toString),
         "name" -> JsString(operation.name)
       ),
       "parameters" -> JsObject()
@@ -82,24 +90,26 @@ object DefaultCustomTransformerWorkflow {
   private def connection(from: Node.Id, to: Node.Id): JsObject =
     JsObject(
       "from" -> JsObject(
-        "nodeId" -> JsString(from.toString),
+        "nodeId"    -> JsString(from.toString),
         "portIndex" -> JsNumber(0)
       ),
       "to" -> JsObject(
-        "nodeId" -> JsString(to.toString),
+        "nodeId"    -> JsString(to.toString),
         "portIndex" -> JsNumber(0)
       )
     )
 
   private val sourceNodeId: Node.Id = "2603a7b5-aaa9-40ad-9598-23f234ec5c32"
+
   private val sinkNodeId: Node.Id = "d7798d5e-b1c6-4027-873e-a6d653957418"
 
   val defaultWorkflow = JsObject(
     "workflow" -> JsObject(
-      "nodes" -> JsArray(node(Source(), sourceNodeId), node(Sink(), sinkNodeId)),
+      "nodes"       -> JsArray(node(Source(), sourceNodeId), node(Sink(), sinkNodeId)),
       "connections" -> JsArray(connection(sourceNodeId, sinkNodeId))
     ),
     "thirdPartyData" -> JsObject(),
-    "publicParams" -> JsArray()
+    "publicParams"   -> JsArray()
   )
+
 }

@@ -2,23 +2,27 @@ package io.deepsense.deeplang.doperables
 
 import io.deepsense.deeplang.OperationExecutionDispatcher._
 import io.deepsense.deeplang.ExecutionContext
-import io.deepsense.deeplang.params.{CodeSnippetLanguage, CodeSnippetParam}
+import io.deepsense.deeplang.params.CodeSnippetLanguage
+import io.deepsense.deeplang.params.CodeSnippetParam
 
 class REvaluator extends CustomCodeEvaluator {
 
   override val codeParameter = CodeSnippetParam(
     name = "R evaluator code",
     description = None,
-    language = CodeSnippetLanguage(CodeSnippetLanguage.r))
-  setDefault(codeParameter ->
-    """evaluate <- function(dataframe){
-      |    n <- nrow(dataframe)
-      |    sq.error.column <- (dataframe$label - dataframe$prediction) ^ 2
-      |    sq.error.sum.column <- sum(sq.error.column)
-      |    sq.error.sum <- as.data.frame(agg(dataframe, sq.error.sum.column))
-      |    rmse <- sqrt(sq.error.sum / n)
-      |    return(rmse)
-      |}""".stripMargin
+    language = CodeSnippetLanguage(CodeSnippetLanguage.r)
+  )
+
+  setDefault(
+    codeParameter ->
+      """evaluate <- function(dataframe){
+        |    n <- nrow(dataframe)
+        |    sq.error.column <- (dataframe$label - dataframe$prediction) ^ 2
+        |    sq.error.sum.column <- sum(sq.error.column)
+        |    sq.error.sum <- as.data.frame(agg(dataframe, sq.error.sum.column))
+        |    rmse <- sqrt(sq.error.sum / n)
+        |    return(rmse)
+        |}""".stripMargin
   )
 
   override def runCode(context: ExecutionContext, code: String): Result =
@@ -29,7 +33,7 @@ class REvaluator extends CustomCodeEvaluator {
 
   // Creating a dataframe is a workaround. Currently we can pass to jvm DataFrames only.
   // TODO DS-3695 Fix a metric value - dataframe workaround.
-  override def getComposedCode(userCode: String): String = {
+  override def getComposedCode(userCode: String): String =
     s"""
        |$userCode
        |
@@ -45,6 +49,5 @@ class REvaluator extends CustomCodeEvaluator {
        |    return(result.df)
        |}
       """.stripMargin
-  }
-}
 
+}

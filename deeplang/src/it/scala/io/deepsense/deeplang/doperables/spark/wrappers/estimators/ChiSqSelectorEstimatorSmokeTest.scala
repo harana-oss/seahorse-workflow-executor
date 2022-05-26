@@ -3,8 +3,7 @@ package io.deepsense.deeplang.doperables.spark.wrappers.estimators
 import io.deepsense.deeplang.params.ParamPair
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
-class ChiSqSelectorEstimatorSmokeTest
-  extends AbstractEstimatorModelWrapperSmokeTest {
+class ChiSqSelectorEstimatorSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
 
   override def className: String = "ChiSqSelector"
 
@@ -15,7 +14,8 @@ class ChiSqSelectorEstimatorSmokeTest
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
     numTopFeatures -> 2,
     featuresColumn -> NameSingleColumnSelection("myFeatures"),
-    labelColumn -> NameSingleColumnSelection("myLabel"),
-    outputColumn -> "output"
+    labelColumn    -> NameSingleColumnSelection("myLabel"),
+    outputColumn   -> "output"
   )
+
 }

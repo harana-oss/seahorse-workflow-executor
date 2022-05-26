@@ -6,6 +6,7 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.spark.wrappers.transformers.Normalize
 
 class NormalizeExample extends AbstractOperationExample[Normalize] {
+
   override def dOperation: Normalize = {
     val op = new Normalize()
     op.transformer
@@ -20,7 +21,9 @@ class NormalizeExample extends AbstractOperationExample[Normalize] {
       Vectors.dense(0.6, -1.1, -3.0),
       Vectors.sparse(3, Seq((1, 0.91), (2, 3.2))).toDense,
       Vectors.sparse(3, Seq((0, 5.7), (1, 0.72), (2, 2.7))).toDense,
-      Vectors.sparse(3, Seq()).toDense).map(Tuple1(_))
+      Vectors.sparse(3, Seq()).toDense
+    ).map(Tuple1(_))
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("features")))
   }
+
 }

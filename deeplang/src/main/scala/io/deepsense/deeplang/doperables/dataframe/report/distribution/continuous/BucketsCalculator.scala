@@ -7,6 +7,7 @@ import io.deepsense.deeplang.doperables.dataframe.report.distribution.ColumnStat
 object BucketsCalculator {
 
   val DefaultBucketsNumber = 20
+
   val DoubleTolerance = 0.000001
 
   def calculateBuckets(dataType: DataType, columnStats: ColumnStats): Array[Double] = {
@@ -15,15 +16,12 @@ object BucketsCalculator {
   }
 
   private def numberOfSteps(columnStats: ColumnStats, dataType: DataType): Int =
-    if (columnStats.max - columnStats.min < DoubleTolerance) {
+    if (columnStats.max - columnStats.min < DoubleTolerance)
       1
-    } else if (isIntegerLike(dataType)) {
-      Math.min(
-        columnStats.max.toLong - columnStats.min.toLong + 1,
-        DefaultBucketsNumber).toInt
-    } else {
+    else if (isIntegerLike(dataType))
+      Math.min(columnStats.max.toLong - columnStats.min.toLong + 1, DefaultBucketsNumber).toInt
+    else
       DefaultBucketsNumber
-    }
 
   private def customRange(min: Double, max: Double, steps: Int): Array[Double] = {
     val span = max - min
@@ -33,6 +31,7 @@ object BucketsCalculator {
   private def isIntegerLike(dataType: DataType): Boolean =
     dataType match {
       case ByteType | ShortType | IntegerType | LongType | TimestampType | DateType => true
-      case _ => false
+      case _                                                                        => false
     }
+
 }

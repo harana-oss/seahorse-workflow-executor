@@ -1,136 +1,164 @@
 package io.deepsense.deeplang.doperations.readwritedatasource
 
-import org.scalatest.{FreeSpec, Matchers}
-
 import io.deepsense.api.datasourcemanager.model._
 import io.deepsense.deeplang.doperations.ReadDataFrame.ReadDataFrameParameters
 import io.deepsense.deeplang.doperations.WriteDataFrame
 import io.deepsense.deeplang.doperations.inout.CsvParameters.ColumnSeparatorChoice
 import io.deepsense.deeplang.doperations.inout._
-import io.deepsense.deeplang.params.{Param, Params}
+import io.deepsense.deeplang.params.Param
+import io.deepsense.deeplang.params.Params
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
 
-class ToDatasourceConvertersSpec extends FreeSpec with Matchers {
+class ToDatasourceConvertersSpec extends AnyFreeSpec with Matchers {
 
-  case class SeparatorTest(
-      setup: Setup,
-      sepName: String,
-      separator: ColumnSeparatorChoice,
-      expected: CsvSeparatorType)
+  case class SeparatorTest(setup: Setup, sepName: String, separator: ColumnSeparatorChoice, expected: CsvSeparatorType)
 
-  case class InputFileFormatTest(
-      setup: Setup,
-      formatName: String,
-      format: InputFileFormatChoice,
-      expected: FileFormat)
+  case class InputFileFormatTest(setup: Setup, formatName: String, format: InputFileFormatChoice, expected: FileFormat)
 
   case class OutputFileFormatTest(
       setup: Setup,
       formatName: String,
       format: OutputFileFormatChoice,
-      expected: FileFormat)
+      expected: FileFormat
+  )
 
   case class OutParamsTest[Params](
       setup: Setup,
       paramsName: String,
       conversion: Setup => OutputStorageTypeChoice.File => Params,
       extractPath: Params => String,
-      extractFileFormat: Params => FileFormat)
+      extractFileFormat: Params => FileFormat
+  )
 
   case class InParamsTest[Params](
       setup: Setup,
       paramsName: String,
       conversion: Setup => InputStorageTypeChoice.File => Params,
       extractPath: Params => String,
-      extractFileFormat: Params => FileFormat)
+      extractFileFormat: Params => FileFormat
+  )
 
   val uutName = ToDatasourceConverters.getClass.getSimpleName.filterNot(_ == '$')
 
   trait Setup {
+
     val uut = ToDatasourceConverters
 
     def customSeparatorString = "|"
 
     val csvParameters = new Params with CsvParameters with HasShouldConvertToBooleanParam {
+
       override def params: Array[Param[_]] = ???
+
     }
 
     val csvParametersWithoutShouldConvertToBoolean = new Params with CsvParameters {
+
       override def params: Array[Param[_]] = ???
+
     }
 
     val separatorChoice = new ColumnSeparatorChoice.Custom
+
     separatorChoice.setCustomColumnSeparator(customSeparatorString)
 
     val expectedSeparatorType = CsvSeparatorType.CUSTOM
 
     csvParameters.setCsvColumnSeparator(separatorChoice)
+
     csvParametersWithoutShouldConvertToBoolean.setCsvColumnSeparator(separatorChoice)
 
     def shouldConvertToBoolean = true
+
     csvParameters.setShouldConvertToBoolean(shouldConvertToBoolean)
 
     def namesIncluded = true
+
     csvParameters.setNamesIncluded(namesIncluded)
+
     csvParametersWithoutShouldConvertToBoolean.setNamesIncluded(namesIncluded)
 
     def path = "library://file_in_library.csv"
 
     val inputCsvFileFormat = new InputFileFormatChoice.Csv
-    inputCsvFileFormat.setNamesIncluded(namesIncluded)
-    .setShouldConvertToBoolean(shouldConvertToBoolean)
-    .setCsvColumnSeparator(separatorChoice)
+
+    inputCsvFileFormat
+      .setNamesIncluded(namesIncluded)
+      .setShouldConvertToBoolean(shouldConvertToBoolean)
+      .setCsvColumnSeparator(separatorChoice)
 
     val outputCsvFileFormat = new OutputFileFormatChoice.Csv
-    outputCsvFileFormat.setNamesIncluded(namesIncluded)
-    .setCsvColumnSeparator(separatorChoice)
+
+    outputCsvFileFormat
+      .setNamesIncluded(namesIncluded)
+      .setCsvColumnSeparator(separatorChoice)
 
     val inputFileChoice = new InputStorageTypeChoice.File
-    inputFileChoice.setSourceFile(path)
-    .setFileFormat(inputCsvFileFormat)
+
+    inputFileChoice
+      .setSourceFile(path)
+      .setFileFormat(inputCsvFileFormat)
 
     val outputFileChoice = new OutputStorageTypeChoice.File
-    outputFileChoice.setOutputFile(path)
-    .setFileFormat(outputCsvFileFormat)
+
+    outputFileChoice
+      .setOutputFile(path)
+      .setFileFormat(outputCsvFileFormat)
 
     val googleSheetParams = new Params
       with GoogleSheetParams
       with NamesIncludedParam
       with HasShouldConvertToBooleanParam {
+
       override def params: Array[Param[_]] = ???
+
     }
 
-    googleSheetParams.setShouldConvertToBoolean(shouldConvertToBoolean)
-    .setNamesIncluded(namesIncluded)
+    googleSheetParams
+      .setShouldConvertToBoolean(shouldConvertToBoolean)
+      .setNamesIncluded(namesIncluded)
 
     def googleSheetId = "googleSheetId"
+
     def googleSheetCredentials = "googleSheetCredentials"
-    googleSheetParams.setGoogleServiceAccountCredentials(googleSheetCredentials)
-    .setGoogleSheetId(googleSheetId)
+
+    googleSheetParams
+      .setGoogleServiceAccountCredentials(googleSheetCredentials)
+      .setGoogleSheetId(googleSheetId)
 
     val jdbcParams = new Params with JdbcParameters {
+
       override def params: Array[Param[_]] = ???
+
     }
 
     def jdbcTableName = "table"
+
     def jdbcDriver = "jdbc.driver.Driver"
+
     def jdbcUrl = "jdbc:scheme:db"
-    jdbcParams.setJdbcTableName(jdbcTableName)
-    .setJdbcDriverClassName(jdbcDriver)
-    .setJdbcUrl(jdbcUrl)
+
+    jdbcParams
+      .setJdbcTableName(jdbcTableName)
+      .setJdbcDriverClassName(jdbcDriver)
+      .setJdbcUrl(jdbcUrl)
+
   }
 
   def allSeparatorTests(s: => Setup): Seq[SeparatorTest] = Seq[SeparatorTest](
     {
       val setup = s
-      SeparatorTest(setup, "custom",
-        {
+      SeparatorTest(
+        setup,
+        "custom", {
           val sep = new ColumnSeparatorChoice.Custom
           sep.setCustomColumnSeparator(setup.customSeparatorString)
           sep
         },
-        CsvSeparatorType.CUSTOM)
+        CsvSeparatorType.CUSTOM
+      )
     },
-
     SeparatorTest(s, "comma", new ColumnSeparatorChoice.Comma, CsvSeparatorType.COMMA),
     SeparatorTest(s, "colon", new ColumnSeparatorChoice.Colon, CsvSeparatorType.COLON),
     SeparatorTest(s, "semi-colon", new ColumnSeparatorChoice.Semicolon, CsvSeparatorType.SEMICOLON),
@@ -420,7 +448,7 @@ class ToDatasourceConvertersSpec extends FreeSpec with Matchers {
         }
       }
 
-      "convert jdbc ReadDataFrameParams to DatasourceParams" in  {
+      "convert jdbc ReadDataFrameParams to DatasourceParams" in {
         new Setup {
           val jdbcFileChoice = new InputStorageTypeChoice.Jdbc
           jdbcFileChoice.setJdbcUrl(jdbcUrl)
@@ -441,7 +469,7 @@ class ToDatasourceConvertersSpec extends FreeSpec with Matchers {
         }
       }
 
-      "convert jdbc WriteDataFrame to DatasourceParams" in  {
+      "convert jdbc WriteDataFrame to DatasourceParams" in {
         new Setup {
           val jdbcFileChoice = new OutputStorageTypeChoice.Jdbc
           jdbcFileChoice.setJdbcUrl(jdbcUrl)
@@ -459,7 +487,6 @@ class ToDatasourceConvertersSpec extends FreeSpec with Matchers {
 
         }
       }
-
 
       "convert library ReadDataFrameParams to DatasourceParams" in {
         new Setup {
@@ -520,4 +547,5 @@ class ToDatasourceConvertersSpec extends FreeSpec with Matchers {
       }
     }
   }
+
 }

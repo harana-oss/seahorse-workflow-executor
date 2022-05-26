@@ -12,8 +12,9 @@ class MulticlassClassificationEvaluatorSmokeTest extends AbstractEvaluatorSmokeT
     new MulticlassClassificationEvaluator()
 
   override val evaluatorParams: Seq[ParamPair[_]] = Seq(
-    evaluator.metricName -> MulticlassClassificationEvaluator.F1(),
+    evaluator.metricName       -> MulticlassClassificationEvaluator.F1(),
     evaluator.predictionColumn -> NameSingleColumnSelection("prediction"),
-    evaluator.labelColumn -> NameSingleColumnSelection("label")
+    evaluator.labelColumn      -> NameSingleColumnSelection("label")
   )
+
 }

@@ -13,7 +13,9 @@ class StopWordsRemover extends SparkTransformerAsMultiColumnTransformer[SparkSto
   val caseSensitive = new BooleanParamWrapper[SparkStopWordsRemover](
     name = "case sensitive",
     description = Some("Whether to do a case sensitive comparison over the stop words."),
-    sparkParamGetter = _.caseSensitive)
+    sparkParamGetter = _.caseSensitive
+  )
+
   setDefault(caseSensitive, false)
 
   override protected def getSpecificParams: Array[Param[_]] = Array(caseSensitive)
@@ -23,14 +25,15 @@ class StopWordsRemover extends SparkTransformerAsMultiColumnTransformer[SparkSto
   override def transformSingleColumnSchema(
       inputColumn: String,
       outputColumn: String,
-      schema: StructType): Option[StructType] = {
+      schema: StructType
+  ): Option[StructType] = {
     try {
       val inputFields = schema.fieldNames
-      require(!inputFields.contains(outputColumn),
-        s"Output column $outputColumn already exists.")
+      require(!inputFields.contains(outputColumn), s"Output column $outputColumn already exists.")
     } catch {
       case e: Exception => throw new SparkTransformSchemaException(e)
     }
     super.transformSingleColumnSchema(inputColumn, outputColumn, schema)
   }
+
 }

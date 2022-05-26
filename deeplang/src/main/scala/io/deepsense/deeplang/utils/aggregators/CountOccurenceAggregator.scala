@@ -4,13 +4,12 @@ case class CountOccurenceAggregator[T](elementToCount: T) extends Aggregator[Lon
 
   override def initialElement: Long = 0
 
-  override def mergeValue(acc: Long, elem: T): Long = {
-    if (elem == elementToCount) {
+  override def mergeValue(acc: Long, elem: T): Long =
+    if (elem == elementToCount)
       acc + 1
-    } else {
+    else
       acc
-    }
-  }
 
   override def mergeCombiners(left: Long, right: Long): Long = left + right
+
 }

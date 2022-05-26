@@ -4,8 +4,7 @@ import io.deepsense.models.json.graph.GraphJsonProtocol.GraphWriter
 import io.deepsense.models.workflows._
 import spray.json._
 
-class WorkflowWithVariablesJsonProtocolSpec extends WorkflowJsonTestSupport
-    with WorkflowWithVariablesJsonProtocol {
+class WorkflowWithVariablesJsonProtocolSpec extends WorkflowJsonTestSupport with WorkflowWithVariablesJsonProtocol {
 
   "WorkflowWithVariables" should {
 
@@ -29,12 +28,13 @@ class WorkflowWithVariablesJsonProtocolSpec extends WorkflowJsonTestSupport
       WorkflowMetadata(WorkflowType.Batch, "0.4.0"),
       graph,
       JsObject("example" -> JsArray(JsNumber(1), JsNumber(2), JsNumber(3))),
-      Variables())
+      Variables()
+    )
 
     val workflowJson = JsObject(
       "id" -> JsString(workflowId.toString),
       "metadata" -> JsObject(
-        "type" -> JsString("batch"),
+        "type"       -> JsString("batch"),
         "apiVersion" -> JsString("0.4.0")
       ),
       "workflow" -> graph.toJson(GraphWriter),

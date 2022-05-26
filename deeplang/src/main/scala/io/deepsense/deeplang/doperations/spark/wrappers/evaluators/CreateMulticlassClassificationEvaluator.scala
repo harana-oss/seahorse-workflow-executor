@@ -7,11 +7,13 @@ import io.deepsense.deeplang.doperables.spark.wrappers.evaluators.MulticlassClas
 import io.deepsense.deeplang.doperations.EvaluatorAsFactory
 
 class CreateMulticlassClassificationEvaluator
-  extends EvaluatorAsFactory[MulticlassClassificationEvaluator]
-  with SparkOperationDocumentation {
+    extends EvaluatorAsFactory[MulticlassClassificationEvaluator]
+    with SparkOperationDocumentation {
 
   override val id: Id = "3129848c-8a1c-449e-b006-340fec5b42ae"
+
   override val name: String = "Multiclass Classification Evaluator"
+
   override val description: String = "Creates a multiclass classification evaluator. " +
     "Multiclass classification evaluator does not assume any label class is special, " +
     "thus it cannot be used for calculation of metrics specific for binary classification " +
@@ -19,5 +21,7 @@ class CreateMulticlassClassificationEvaluator
 
   override protected[this] val docsGuideLocation =
     Some("mllib-evaluation-metrics.html#multiclass-classification")
+
   override val since: Version = Version(1, 0, 0)
+
 }

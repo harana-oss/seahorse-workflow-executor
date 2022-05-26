@@ -1,19 +1,18 @@
 package io.deepsense.deeplang.params
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, WordSpec}
-import spray.json.{JsObject, JsValue}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+import spray.json.JsObject
+import spray.json.JsValue
 
-abstract class AbstractParamSpec[T, U <: Param[T]]
-  extends WordSpec
-  with Matchers
-  with MockitoSugar {
+abstract class AbstractParamSpec[T, U <: Param[T]] extends AnyWordSpec with Matchers with MockitoSugar {
 
   def className: String
 
-  def paramFixture: (U, JsValue)  // param + its json description
+  def paramFixture: (U, JsValue) // param + its json description
 
-  def valueFixture: (T, JsValue)  // value + its json description
+  def valueFixture: (T, JsValue) // value + its json description
 
   val defaultValue: T = valueFixture._1
 
@@ -37,7 +36,7 @@ abstract class AbstractParamSpec[T, U <: Param[T]]
 
   it should {
     "serialize value to JSON" in {
-      val param = paramFixture._1
+      val param                 = paramFixture._1
       val (value, expectedJson) = valueFixture
       param.valueToJson(value) shouldBe expectedJson
     }
@@ -45,10 +44,11 @@ abstract class AbstractParamSpec[T, U <: Param[T]]
 
   it should {
     "deserialize value from JSON" in {
-      val param = paramFixture._1
+      val param                      = paramFixture._1
       val (expectedValue, valueJson) = valueFixture
-      val extractedValue = param.valueFromJson(valueJson)
+      val extractedValue             = param.valueFromJson(valueJson)
       extractedValue shouldBe expectedValue
     }
   }
+
 }

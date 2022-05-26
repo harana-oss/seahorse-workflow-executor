@@ -1,10 +1,11 @@
 package io.deepsense.reportlib.model
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import io.deepsense.commons.types.ColumnType
 
-class TableSpec extends WordSpec with Matchers  {
+class TableSpec extends AnyWordSpec with Matchers {
 
   "Table" should {
     "throw IllegalArgumentException" when {
@@ -16,8 +17,7 @@ class TableSpec extends WordSpec with Matchers  {
             Some(List("col1", "col2")),
             List(ColumnType.string, ColumnType.string, ColumnType.string),
             None,
-            List(
-              List(Some("v1"), None, None))
+            List(List(Some("v1"), None, None))
           )
       }
       "created one data row of size different than columnTypes size" in {
@@ -28,8 +28,7 @@ class TableSpec extends WordSpec with Matchers  {
             Some(List("col1", "col2", "col3")),
             List(ColumnType.string, ColumnType.string, ColumnType.string),
             None,
-            List(
-              List(Some("v1"), None))
+            List(List(Some("v1"), None))
           )
       }
     }
@@ -41,8 +40,7 @@ class TableSpec extends WordSpec with Matchers  {
           None,
           List(ColumnType.string, ColumnType.string, ColumnType.string),
           None,
-          List(
-            List(Some("v1"), None, None))
+          List(List(Some("v1"), None, None))
         )
         info("Table created")
       }
@@ -59,4 +57,5 @@ class TableSpec extends WordSpec with Matchers  {
       }
     }
   }
+
 }

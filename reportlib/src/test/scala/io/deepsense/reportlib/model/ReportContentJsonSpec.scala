@@ -1,30 +1,27 @@
 package io.deepsense.reportlib.model
 
 import io.deepsense.reportlib.model.factory.ReportContentTestFactory
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import spray.json._
 
-class ReportContentJsonSpec
-  extends WordSpec
-  with Matchers
-  with ReportContentTestFactory
-  with ReportJsonProtocol {
+class ReportContentJsonSpec extends AnyWordSpec with Matchers with ReportContentTestFactory with ReportJsonProtocol {
 
   import ReportContentTestFactory._
 
   "ReportContent" should {
 
     val emptyReportJson: JsObject = JsObject(
-      "name" -> JsString(reportName),
-      "reportType" -> JsString(reportType.toString),
-      "tables" -> JsArray(),
+      "name"          -> JsString(reportName),
+      "reportType"    -> JsString(reportType.toString),
+      "tables"        -> JsArray(),
       "distributions" -> JsObject()
     )
     val report = testReport
     val reportJson: JsObject = JsObject(
-      "name" -> JsString(reportName),
-      "reportType" -> JsString(reportType.toString),
-      "tables" -> JsArray(report.tables.map(_.toJson): _*),
+      "name"          -> JsString(reportName),
+      "reportType"    -> JsString(reportType.toString),
+      "tables"        -> JsArray(report.tables.map(_.toJson): _*),
       "distributions" -> JsObject(report.distributions.mapValues(_.toJson))
     )
 
@@ -40,12 +37,12 @@ class ReportContentJsonSpec
     }
     "deserialize" when {
       "empty report" in {
-        emptyReportJson.convertTo[ReportContent] shouldBe ReportContent(
-          reportName, reportType)
+        emptyReportJson.convertTo[ReportContent] shouldBe ReportContent(reportName, reportType)
       }
       "full report" in {
         reportJson.convertTo[ReportContent] shouldBe report
       }
     }
   }
+
 }

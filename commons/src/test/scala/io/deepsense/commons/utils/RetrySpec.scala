@@ -1,20 +1,24 @@
 package io.deepsense.commons.utils
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
 
-import io.deepsense.commons.utils.RetryActor.{RetriableException, RetryLimitReachedException}
+import io.deepsense.commons.utils.RetryActor.RetriableException
+import io.deepsense.commons.utils.RetryActor.RetryLimitReachedException
+import org.scalatest.wordspec.AnyWordSpec
 
-class RetrySpec extends WordSpec with Matchers {
+class RetrySpec extends AnyWordSpec with Matchers {
 
   val uutName = classOf[Retry[_]].getSimpleName.filterNot(_ == '$')
 
   trait Setup {
+
     def generateUUT[T](retryLimitCount: Int)(toDo: => Future[T]): Retry[T] = new {
       override val workDescription = Some("test work")
 
@@ -27,8 +31,11 @@ class RetrySpec extends WordSpec with Matchers {
       override val timeout = Timeout(1 minute)
 
     } with Retry[T] {
+
       override def work: Future[T] = toDo
+
     }
+
   }
 
   s"A $uutName" should {
@@ -39,8 +46,7 @@ class RetrySpec extends WordSpec with Matchers {
             Future.successful(2 * 3 + 8)
           }
 
-          Await.result(
-            uut.tryWork, Duration.Inf) shouldBe 14
+          Await.result(uut.tryWork, Duration.Inf) shouldBe 14
         }
       }
 
@@ -51,13 +57,13 @@ class RetrySpec extends WordSpec with Matchers {
             if (count > 0) {
               count -= 1
               Future.failed(RetriableException(s"Thrown because count is ${count + 1}", None))
-            } else {
+            } else
               Future.successful("success")
-            }
           }
 
           Await.result(
-            uut.tryWork, Duration.Inf
+            uut.tryWork,
+            Duration.Inf
           ) shouldBe "success"
 
           count shouldBe 0
@@ -72,7 +78,7 @@ class RetrySpec extends WordSpec with Matchers {
             Future.failed(RetriableException(s"This will never succeed, yet we keep trying", None))
           }
 
-          a [RetryLimitReachedException] shouldBe thrownBy (Await.result(uut.tryWork, Duration.Inf))
+          a[RetryLimitReachedException] shouldBe thrownBy(Await.result(uut.tryWork, Duration.Inf))
 
         }
       }
@@ -81,18 +87,19 @@ class RetrySpec extends WordSpec with Matchers {
         var count = 1
         new Setup {
           val uut = generateUUT(10) {
-            if (count == 0) {
+            if (count == 0)
               Future.failed(new RuntimeException("Thrown because counter reached zero"))
-            } else {
+            else {
               count -= 1
               Future.failed(RetriableException(s"Thrown because counter was ${count + 1}", None))
             }
           }
 
-          a [RuntimeException] shouldBe thrownBy (Await.result(uut.tryWork, Duration.Inf))
+          a[RuntimeException] shouldBe thrownBy(Await.result(uut.tryWork, Duration.Inf))
           count shouldBe 0
         }
       }
     }
   }
+
 }

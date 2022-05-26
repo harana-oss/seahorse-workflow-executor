@@ -2,25 +2,29 @@ package io.deepsense.deeplang.doperables
 
 import io.deepsense.deeplang.OperationExecutionDispatcher.Result
 import io.deepsense.deeplang._
-import io.deepsense.deeplang.params.{CodeSnippetLanguage, CodeSnippetParam}
+import io.deepsense.deeplang.params.CodeSnippetLanguage
+import io.deepsense.deeplang.params.CodeSnippetParam
 
 case class PythonEvaluator() extends CustomCodeEvaluator {
 
   override val codeParameter = CodeSnippetParam(
     name = "python evaluator code",
     description = None,
-    language = CodeSnippetLanguage(CodeSnippetLanguage.python))
-  setDefault(codeParameter ->
-    """from math import sqrt
-      |from operator import add
-      |
-      |def evaluate(dataframe):
-      |    # Example Root-Mean-Square Error implementation
-      |    n = dataframe.count()
-      |    row_to_sq_error = lambda row: (row['label'] - row['prediction'])**2
-      |    sum_sq_error = dataframe.rdd.map(row_to_sq_error).reduce(add)
-      |    rmse = sqrt(sum_sq_error / n)
-      |    return rmse""".stripMargin
+    language = CodeSnippetLanguage(CodeSnippetLanguage.python)
+  )
+
+  setDefault(
+    codeParameter ->
+      """from math import sqrt
+        |from operator import add
+        |
+        |def evaluate(dataframe):
+        |    # Example Root-Mean-Square Error implementation
+        |    n = dataframe.count()
+        |    row_to_sq_error = lambda row: (row['label'] - row['prediction'])**2
+        |    sum_sq_error = dataframe.rdd.map(row_to_sq_error).reduce(add)
+        |    rmse = sqrt(sum_sq_error / n)
+        |    return rmse""".stripMargin
   )
 
   override def runCode(context: ExecutionContext, code: String): Result =
@@ -31,7 +35,7 @@ case class PythonEvaluator() extends CustomCodeEvaluator {
 
   // Creating a dataframe is a workaround. Currently we can pass to jvm DataFrames only.
   // TODO DS-3695 Fix a metric value - dataframe workaround.
-  override def getComposedCode(userCode: String): String = {
+  override def getComposedCode(userCode: String): String =
     s"""
        |$userCode
        |
@@ -50,5 +54,5 @@ case class PythonEvaluator() extends CustomCodeEvaluator {
        |    result_df = spark.createDataFrame([[float_result]])
        |    return result_df
       """.stripMargin
-  }
+
 }

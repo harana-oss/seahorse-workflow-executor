@@ -1,27 +1,30 @@
 package io.deepsense.deeplang
 
-import org.scalatest.FunSuite
-
 import io.deepsense.deeplang.catalogs.doperable.DOperableCatalog
 import io.deepsense.deeplang.doperables.DOperableMock
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
+import org.scalatest.funsuite.AnyFunSuite
 
 object DClassesForDMethods {
+
   class S extends DOperableMock
+
   case class A(i: Int) extends S { def this() = this(0) }
+
   case class B(i: Int) extends S { def this() = this(0) }
+
 }
 
-class DMethodSuite extends FunSuite with DeeplangTestSupport {
+class DMethodSuite extends AnyFunSuite with DeeplangTestSupport {
 
   test("It is possible to implement class having DMethod") {
     import DClassesForDMethods._
 
     class C extends DOperableMock {
       val f: DMethod1To1[Int, A, B] = new DMethod1To1[Int, A, B] {
-        override def apply(context: ExecutionContext)(parameters: Int)(t0: A): B = {
+        override def apply(context: ExecutionContext)(parameters: Int)(t0: A): B =
           B(t0.i + parameters)
-        }
       }
     }
 
@@ -32,7 +35,7 @@ class DMethodSuite extends FunSuite with DeeplangTestSupport {
     h.registerDOperable[A]()
     h.registerDOperable[B]()
 
-    val context = createInferContext(h)
+    val context            = createInferContext(h)
     val (result, warnings) = c.f.infer(context)(2)(DKnowledge(new A()))
     assert(result == DKnowledge(new B()))
     assert(warnings == InferenceWarnings.empty)
@@ -46,10 +49,8 @@ class DMethodSuite extends FunSuite with DeeplangTestSupport {
     class C extends DOperableMock {
       val f: DMethod0To1[Int, S] = new DMethod0To1[Int, S] {
         override def apply(context: ExecutionContext)(parameters: Int)(): S = A(parameters)
-        override def infer(context: InferContext)(parameters: Int)()
-            : (DKnowledge[S], InferenceWarnings) = {
+        override def infer(context: InferContext)(parameters: Int)(): (DKnowledge[S], InferenceWarnings) =
           (DKnowledge(new A), mockedWarnings)
-        }
       }
     }
 
@@ -59,9 +60,10 @@ class DMethodSuite extends FunSuite with DeeplangTestSupport {
     h.registerDOperable[A]()
     h.registerDOperable[B]()
 
-    val context = createInferContext(h)
+    val context            = createInferContext(h)
     val (result, warnings) = c.f.infer(context)(2)()
     assert(result == DKnowledge(new A()))
     assert(warnings == mockedWarnings)
   }
+
 }

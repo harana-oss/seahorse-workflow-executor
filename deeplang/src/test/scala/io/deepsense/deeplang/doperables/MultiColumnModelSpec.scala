@@ -13,4 +13,5 @@ class MultiColumnModelSpec extends UnitSpec {
       model.replicate(ParamMap.empty)
     }
   }
+
 }

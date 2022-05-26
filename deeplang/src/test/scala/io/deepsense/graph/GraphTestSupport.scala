@@ -1,8 +1,8 @@
 package io.deepsense.graph
 
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import io.deepsense.commons.datetime.DateTimeConverter
 import io.deepsense.commons.exception.FailureDescription
@@ -33,25 +33,24 @@ trait GraphTestSupport {
     m
   }
 
-  /**
-   * Creates edges for a graph like this one:
-   *   A -(1)-> B -(2)-> C -(3)-> D
-   *     \      \
-   *     \      (5)
-   *     \       \
-   *     \        ->
-   *      ---(4)---> E
-   * To each node assigns the specified Id.
-   */
+  /** Creates edges for a graph like this one: A -(1)-> B -(2)-> C -(3)-> D \ \ \ (5) \ \ \ ->
+    * ---(4)---> E To each node assigns the specified Id.
+    */
 
   val nodesSeq = generateNodes(op0To1, op1To1, op1To1, op1To1, op2To2)
+
   val nodeSet = nodesSeq.map(_._2).toSet
+
   val idA :: idB :: idC :: idD :: idE :: Nil = nodesSeq.map(_._1).toList
+
   val nodeA :: nodeB :: nodeC :: nodeD :: nodeE :: Nil = nodesSeq.map(_._2).toList
 
   val edgeList: List[Edge] = edges(idA, idB, idC, idD, idE)
+
   val edge1 :: edge2 :: edge3 :: edge4 :: edge5 :: Nil = edgeList
+
   val edgeSet = edgeList.toSet
+
   val nodeIds = Seq(idA, idB, idC, idD, idE)
 
   val results = Map(
@@ -62,13 +61,7 @@ trait GraphTestSupport {
     idE -> Seq(mock[Entity.Id], mock[Entity.Id])
   )
 
-
-  private def edges(
-      idA: Node.Id,
-      idB: Node.Id,
-      idC: Node.Id,
-      idD: Node.Id,
-      idE: Node.Id): List[Edge] = {
+  private def edges(idA: Node.Id, idB: Node.Id, idC: Node.Id, idD: Node.Id, idE: Node.Id): List[Edge] =
     List(
       Edge(Endpoint(idA, 0), Endpoint(idB, 0)),
       Edge(Endpoint(idB, 0), Endpoint(idC, 0)),
@@ -76,10 +69,9 @@ trait GraphTestSupport {
       Edge(Endpoint(idA, 0), Endpoint(idE, 0)),
       Edge(Endpoint(idB, 0), Endpoint(idE, 1))
     )
-  }
 
   protected def generateNodes(ops: DOperation*): Seq[(Node.Id, DeeplangNode)] = {
-    val nodes = ops.map { o => Node(Node.Id.randomId, o)}
+    val nodes = ops.map(o => Node(Node.Id.randomId, o))
     nodes.map(n => n.id -> n)
   }
 
@@ -97,4 +89,5 @@ trait GraphTestSupport {
     val date = DateTimeConverter.now
     nodestate.Completed(date, date.plusMinutes(1), results(nodeId))
   }
+
 }

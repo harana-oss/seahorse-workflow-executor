@@ -13,4 +13,5 @@ abstract class AbstractColumnSelectorParam[T: JsonFormat] extends ParamWithJsFor
 
   override protected def extraJsFields: Map[String, JsValue] =
     super.extraJsFields ++ Map("isSingle" -> isSingle.toJson, "portIndex" -> portIndex.toJson)
+
 }

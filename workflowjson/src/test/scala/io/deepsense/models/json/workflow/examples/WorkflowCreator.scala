@@ -6,7 +6,9 @@ import spray.json._
 
 import io.deepsense.deeplang.DOperation
 import io.deepsense.graph.DeeplangGraph.DeeplangNode
-import io.deepsense.graph.{DeeplangGraph, Edge, Node}
+import io.deepsense.graph.DeeplangGraph
+import io.deepsense.graph.Edge
+import io.deepsense.graph.Node
 import io.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import io.deepsense.models.json.workflow.WorkflowWithVariablesJsonProtocol
 import io.deepsense.models.workflows._
@@ -26,10 +28,10 @@ abstract class WorkflowCreator extends WorkflowWithVariablesJsonProtocol {
   override val graphReader: GraphReader = null
 
   def buildWorkflow(): WorkflowWithVariables = {
-    val metadata = WorkflowMetadata(WorkflowType.Batch, apiVersion)
-    val graph: DeeplangGraph = DeeplangGraph(nodes.toSet, edges.toSet)
+    val metadata                 = WorkflowMetadata(WorkflowType.Batch, apiVersion)
+    val graph: DeeplangGraph     = DeeplangGraph(nodes.toSet, edges.toSet)
     val thirdPartyData: JsObject = JsObject()
-    val variables: Variables = Variables()
+    val variables: Variables     = Variables()
     val result =
       WorkflowWithVariables(Workflow.Id.randomId, metadata, graph, thirdPartyData, variables)
     // scalastyle:off println
@@ -37,4 +39,5 @@ abstract class WorkflowCreator extends WorkflowWithVariablesJsonProtocol {
     // scalastyle:on println
     result
   }
+
 }

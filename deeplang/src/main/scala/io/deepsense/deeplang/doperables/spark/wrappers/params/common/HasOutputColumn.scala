@@ -10,13 +10,13 @@ import io.deepsense.deeplang.params.wrappers.spark.SingleColumnCreatorParamWrapp
 
 trait HasOutputColumn extends Params {
 
-  val outputColumn = new SingleColumnCreatorParamWrapper[
-      ml.param.Params { val outputCol: ml.param.Param[String] }](
+  val outputColumn = new SingleColumnCreatorParamWrapper[ml.param.Params { val outputCol: ml.param.Param[String] }](
     name = "output column",
     description = Some("The output column name."),
-    sparkParamGetter = _.outputCol)
+    sparkParamGetter = _.outputCol
+  )
 
-  def setOutputColumn(value: String): this.type = {
+  def setOutputColumn(value: String): this.type =
     set(outputColumn, value)
-  }
+
 }

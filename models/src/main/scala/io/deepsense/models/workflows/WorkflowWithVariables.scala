@@ -9,4 +9,5 @@ case class WorkflowWithVariables(
     metadata: WorkflowMetadata,
     graph: DeeplangGraph,
     thirdPartyData: JsObject,
-    variables: Variables)
+    variables: Variables
+)

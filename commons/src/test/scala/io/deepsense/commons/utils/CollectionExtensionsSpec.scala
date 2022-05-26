@@ -18,4 +18,5 @@ class CollectionExtensionsSpec extends StandardSpec {
       s.hasDuplicates shouldBe true
     }
   }
+
 }

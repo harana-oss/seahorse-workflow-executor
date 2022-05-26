@@ -4,67 +4,85 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings, SqlInferenceWarning}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
+import io.deepsense.deeplang.inference.SqlInferenceWarning
 import io.deepsense.deeplang.params.exceptions.ParamsEqualException
-import io.deepsense.deeplang.{DKnowledge, DeeplangIntegTestSupport}
+import io.deepsense.deeplang.DKnowledge
+import io.deepsense.deeplang.DeeplangIntegTestSupport
 
 class SqlCombineSpec extends DeeplangIntegTestSupport {
 
   import DeeplangIntegTestSupport._
 
   private val leftName = "left"
+
   private val leftData = Seq(
     Row("c", 5.0, true),
     Row("a", 5.0, null),
     Row("b", null, false),
     Row(null, 2.1, true)
   )
+
   private val (firstLeftColumn, secondLeftColumn, thirdLeftColumn) = ("left1", "left2", "left3")
-  private val leftSchema = StructType(Seq(
-    StructField(firstLeftColumn, StringType),
-    StructField(secondLeftColumn, DoubleType),
-    StructField(thirdLeftColumn, BooleanType)
-  ))
+
+  private val leftSchema = StructType(
+    Seq(
+      StructField(firstLeftColumn, StringType),
+      StructField(secondLeftColumn, DoubleType),
+      StructField(thirdLeftColumn, BooleanType)
+    )
+  )
+
   private val leftDf = createDataFrame(leftData, leftSchema)
+
   private val rightName = "right"
+
   private val rightData = Seq(
     Row(5.0, "x"),
     Row(null, "y"),
     Row(null, null)
   )
+
   private val (firstRightColumn, secondRightColumn) = ("right1", "right2")
-  private val rightSchema = StructType(Seq(
-    StructField(firstRightColumn, DoubleType),
-    StructField(secondRightColumn, StringType)
-  ))
+
+  private val rightSchema = StructType(
+    Seq(
+      StructField(firstRightColumn, DoubleType),
+      StructField(secondRightColumn, StringType)
+    )
+  )
+
   private val rightDf = createDataFrame(rightData, rightSchema)
 
   "SqlCombine" should {
     "recognize left dataframe name" in {
       val expression = s"SELECT * FROM $leftName"
-      val result = executeSqlCombine(expression, leftName, leftDf, rightName, rightDf)
+      val result     = executeSqlCombine(expression, leftName, leftDf, rightName, rightDf)
       assertDataFramesEqual(result, leftDf)
     }
     "recognize right dataFrame name" in {
       val expression = s"SELECT * FROM $rightName"
-      val result = executeSqlCombine(expression, leftName, leftDf, rightName, rightDf)
+      val result     = executeSqlCombine(expression, leftName, leftDf, rightName, rightDf)
       assertDataFramesEqual(result, rightDf)
     }
     "allow an arbitrary operation using both dataFrames" in {
       val expression =
         s"""SELECT l.$firstLeftColumn AS first_letter,
-            |r.$secondRightColumn AS second_letter
-            |FROM $leftName l INNER JOIN $rightName r ON l.$secondLeftColumn = r.$firstRightColumn
+           |r.$secondRightColumn AS second_letter
+           |FROM $leftName l INNER JOIN $rightName r ON l.$secondLeftColumn = r.$firstRightColumn
          """.stripMargin
       val result = executeSqlCombine(expression, leftName, leftDf, rightName, rightDf)
       val expectedData = Seq(
         Row("c", "x"),
         Row("a", "x")
       )
-      val expectedSchema = StructType(Seq(
-        StructField("first_letter", StringType),
-        StructField("second_letter", StringType)
-      ))
+      val expectedSchema = StructType(
+        Seq(
+          StructField("first_letter", StringType),
+          StructField("second_letter", StringType)
+        )
+      )
       val expected = createDataFrame(expectedData, expectedSchema)
       assertDataFramesEqual(result, expected)
     }
@@ -75,7 +93,7 @@ class SqlCombineSpec extends DeeplangIntegTestSupport {
         .setRightTableName("x")
         .setSqlCombineExpression(expression)
       combine.validateParams should
-        contain (ParamsEqualException("left dataframe id", "right dataframe id", "x"))
+        contain(ParamsEqualException("left dataframe id", "right dataframe id", "x"))
     }
     "infer schema" in {
       val expression =
@@ -83,36 +101,40 @@ class SqlCombineSpec extends DeeplangIntegTestSupport {
            |$rightName.$secondRightColumn
            |FROM $leftName, $rightName
          """.stripMargin
-      val (result, warnings) = inferSqlCombineSchema(expression, leftName, leftSchema,
-        rightName, rightSchema)
+      val (result, warnings) = inferSqlCombineSchema(expression, leftName, leftSchema, rightName, rightSchema)
 
-      val expectedSchema = StructType(Seq(
-        StructField("x", DoubleType),
-        StructField(secondRightColumn, StringType)
-      ))
+      val expectedSchema = StructType(
+        Seq(
+          StructField("x", DoubleType),
+          StructField(secondRightColumn, StringType)
+        )
+      )
       warnings shouldBe empty
       result shouldEqual expectedSchema
     }
     "fail schema inference for invalid expression" in {
       val expression =
         s"""SELEC $leftName.$firstLeftColumn FROM $leftName"""
-      val (_, warnings) = inferSqlCombineSchema(expression, leftName, leftSchema,
-        rightName, rightSchema)
+      val (_, warnings) = inferSqlCombineSchema(expression, leftName, leftSchema, rightName, rightSchema)
 
       warnings.warnings.length shouldBe 1
       val warning = warnings.warnings(0)
-      warning shouldBe a [SqlInferenceWarning]
+      warning shouldBe a[SqlInferenceWarning]
     }
     "not throw exception during inference when its parameters are not set" in {
-      val expression = s"""SELECT * from $leftName"""
+      val expression           = s"""SELECT * from $leftName"""
       val parameterlessCombine = new SqlCombine()
       inferSqlCombineSchema(parameterlessCombine, expression, leftName, leftSchema, rightName, rightSchema)
     }
   }
 
-  private def executeSqlCombine(expression: String,
-                                leftName: String, leftData: DataFrame,
-                                rightName: String, rightData: DataFrame): DataFrame = {
+  private def executeSqlCombine(
+      expression: String,
+      leftName: String,
+      leftData: DataFrame,
+      rightName: String,
+      rightData: DataFrame
+  ): DataFrame = {
     val combine = new SqlCombine()
       .setLeftTableName(leftName)
       .setRightTableName(rightName)
@@ -123,22 +145,35 @@ class SqlCombineSpec extends DeeplangIntegTestSupport {
 
   private def inferSqlCombineSchema(
       expression: String,
-      leftName: String, leftSchema: StructType,
-      rightName: String, rightSchema: StructType): (StructType, InferenceWarnings) = {
+      leftName: String,
+      leftSchema: StructType,
+      rightName: String,
+      rightSchema: StructType
+  ): (StructType, InferenceWarnings) = {
     val combine = new SqlCombine()
       .setLeftTableName(leftName)
       .setRightTableName(rightName)
       .setSqlCombineExpression(expression)
     inferSqlCombineSchema(combine, expression, leftName, leftSchema, rightName, rightSchema)
   }
-  private def inferSqlCombineSchema(combine: SqlCombine, expression: String, leftName: String, leftSchema: StructType,
-                                    rightName: String, rightSchema: StructType) = {
-    val (knowledge, warnings) = combine.inferKnowledgeUntyped(Vector(
-      DKnowledge(DataFrame.forInference(leftSchema)),
-      DKnowledge(DataFrame.forInference(rightSchema))
-    ))(mock[InferContext])
+
+  private def inferSqlCombineSchema(
+      combine: SqlCombine,
+      expression: String,
+      leftName: String,
+      leftSchema: StructType,
+      rightName: String,
+      rightSchema: StructType
+  ) = {
+    val (knowledge, warnings) = combine.inferKnowledgeUntyped(
+      Vector(
+        DKnowledge(DataFrame.forInference(leftSchema)),
+        DKnowledge(DataFrame.forInference(rightSchema))
+      )
+    )(mock[InferContext])
 
     val dataFrameKnowledge = knowledge.head.single.asInstanceOf[DataFrame]
     (dataFrameKnowledge.schema.get, warnings)
   }
+
 }

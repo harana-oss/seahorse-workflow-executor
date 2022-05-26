@@ -8,11 +8,9 @@ import io.deepsense.deeplang.TypeUtils
 import io.deepsense.deeplang.exceptions.DeepLangException
 import io.deepsense.deeplang.params.exceptions.NoArgumentConstructorRequiredException
 
-case class ParamsSequence[T <: Params](
-    override val name: String,
-    override val description: Option[String])
-    (implicit tag: TypeTag[T])
-  extends Param[Seq[T]] {
+case class ParamsSequence[T <: Params](override val name: String, override val description: Option[String])(implicit
+    tag: TypeTag[T]
+) extends Param[Seq[T]] {
 
   val parameterType = ParameterType.Multiplier
 
@@ -29,11 +27,12 @@ case class ParamsSequence[T <: Params](
 
   override def valueFromJson(jsValue: JsValue): Seq[T] = jsValue match {
     case JsArray(vector) =>
-      for (innerJsValue <- vector) yield {
-        innerParamsInstance.setParamsFromJson(innerJsValue)
-      }
-    case _ => throw new DeserializationException(s"Cannot fill parameters sequence" +
-      s"with $jsValue: array expected.")
+      for (innerJsValue <- vector) yield innerParamsInstance.setParamsFromJson(innerJsValue)
+    case _ =>
+      throw new DeserializationException(
+        s"Cannot fill parameters sequence" +
+          s"with $jsValue: array expected."
+      )
   }
 
   override def extraJsFields: Map[String, JsValue] = Map(
@@ -42,7 +41,7 @@ case class ParamsSequence[T <: Params](
 
   override def replicate(name: String): ParamsSequence[T] = copy(name = name)
 
-  override def validate(value: Seq[T]): Vector[DeepLangException] = {
+  override def validate(value: Seq[T]): Vector[DeepLangException] =
     value.flatMap(_.validateParams).toVector
-  }
+
 }

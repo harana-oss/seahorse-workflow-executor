@@ -10,14 +10,12 @@ class SaveToLibraryParamSpec extends AbstractParamSpec[String, SaveToLibraryPara
 
   override def paramFixture: (SaveToLibraryParam, JsValue) = {
     val description = "Save parameter description"
-    val param = SaveToLibraryParam(
-      name = "Save parameter name",
-      description = Some(description))
+    val param       = SaveToLibraryParam(name = "Save parameter name", description = Some(description))
     val expectedJson = JsObject(
-      "type" -> JsString("saveToLibrary"),
-      "name" -> JsString(param.name),
+      "type"        -> JsString("saveToLibrary"),
+      "name"        -> JsString(param.name),
       "description" -> JsString(description),
-      "default" -> JsNull,
+      "default"     -> JsNull,
       "isGriddable" -> JsFalse
     )
     (param, expectedJson)
@@ -27,4 +25,5 @@ class SaveToLibraryParamSpec extends AbstractParamSpec[String, SaveToLibraryPara
     val value = "output abcdefghij"
     (value, JsString(value))
   }
+
 }

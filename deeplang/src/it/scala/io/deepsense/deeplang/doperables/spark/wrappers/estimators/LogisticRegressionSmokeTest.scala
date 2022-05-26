@@ -4,8 +4,7 @@ import io.deepsense.deeplang.doperables.spark.wrappers.params.common.OptionalWei
 import io.deepsense.deeplang.params.ParamPair
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
-class LogisticRegressionSmokeTest
-  extends AbstractEstimatorModelWrapperSmokeTest {
+class LogisticRegressionSmokeTest extends AbstractEstimatorModelWrapperSmokeTest {
 
   override def className: String = "LogisticRegression"
 
@@ -13,22 +12,24 @@ class LogisticRegressionSmokeTest
 
   import estimator._
 
-  val weightColumnChoice = OptionalWeightColumnChoice.WeightColumnYesOption()
+  val weightColumnChoice = OptionalWeightColumnChoice
+    .WeightColumnYesOption()
     .setWeightColumn(NameSingleColumnSelection("myWeight"))
 
   override val estimatorParams: Seq[ParamPair[_]] = Seq(
-    elasticNetParam -> 0.8,
-    fitIntercept -> true,
-    maxIterations -> 2.0,
-    regularizationParam -> 0.1,
-    tolerance -> 0.01,
-    standardization -> true,
-    featuresColumn -> NameSingleColumnSelection("myFeatures"),
-    labelColumn -> NameSingleColumnSelection("myLabel"),
-    probabilityColumn -> "prob",
-    rawPredictionColumn -> "rawPred",
-    predictionColumn -> "pred",
-    threshold -> 0.3,
+    elasticNetParam      -> 0.8,
+    fitIntercept         -> true,
+    maxIterations        -> 2.0,
+    regularizationParam  -> 0.1,
+    tolerance            -> 0.01,
+    standardization      -> true,
+    featuresColumn       -> NameSingleColumnSelection("myFeatures"),
+    labelColumn          -> NameSingleColumnSelection("myLabel"),
+    probabilityColumn    -> "prob",
+    rawPredictionColumn  -> "rawPred",
+    predictionColumn     -> "pred",
+    threshold            -> 0.3,
     optionalWeightColumn -> weightColumnChoice
   )
+
 }

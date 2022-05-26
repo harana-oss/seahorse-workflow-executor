@@ -4,9 +4,10 @@ import java.util.UUID
 
 import io.deepsense.deeplang.ExecutionContext
 import io.deepsense.deeplang.OperationExecutionDispatcher.Result
-import io.deepsense.deeplang.params.{CodeSnippetLanguage, CodeSnippetParam, Param}
+import io.deepsense.deeplang.params.CodeSnippetLanguage
+import io.deepsense.deeplang.params.CodeSnippetParam
+import io.deepsense.deeplang.params.Param
 import org.apache.spark.sql.types.DataType
-
 
 class RColumnTransformer() extends CustomCodeColumnTransformer {
 
@@ -15,10 +16,12 @@ class RColumnTransformer() extends CustomCodeColumnTransformer {
     description = None,
     language = CodeSnippetLanguage(CodeSnippetLanguage.r)
   )
-  setDefault(codeParameter ->
-    """transform.column <- function(column, column.name) {
-      |  return(column)
-      |}""".stripMargin
+
+  setDefault(
+    codeParameter ->
+      """transform.column <- function(column, column.name) {
+        |  return(column)
+        |}""".stripMargin
   )
 
   override def getSpecificParams: Array[Param[_]] =
@@ -28,7 +31,8 @@ class RColumnTransformer() extends CustomCodeColumnTransformer {
       userCode: String,
       inputColumn: String,
       outputColumn: String,
-      targetType: DataType): String = {
+      targetType: DataType
+  ): String = {
     val newFieldName = UUID.randomUUID().toString.replace("-", "")
 
     s"""
@@ -47,4 +51,5 @@ class RColumnTransformer() extends CustomCodeColumnTransformer {
 
   override def isValid(context: ExecutionContext, code: String): Boolean =
     context.customCodeExecutor.isRValid(code)
+
 }

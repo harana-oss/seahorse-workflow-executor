@@ -6,8 +6,7 @@ import spray.json._
 
 import Constants.JsonKeys._
 
-class DefaultJsonMessageSerializer[T : JsonWriter : ClassTag](typeName: String)
-  extends JsonMessageSerializer {
+class DefaultJsonMessageSerializer[T: JsonWriter: ClassTag](typeName: String) extends JsonMessageSerializer {
 
   val serialize: PartialFunction[Any, JsObject] = {
     case o if isHandled(o) => handle(o.asInstanceOf[T])
@@ -19,4 +18,5 @@ class DefaultJsonMessageSerializer[T : JsonWriter : ClassTag](typeName: String)
     messageTypeKey -> JsString(typeName),
     messageBodyKey -> body.toJson
   )
+
 }

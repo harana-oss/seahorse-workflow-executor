@@ -1,17 +1,15 @@
 package io.deepsense.workflowexecutor.pythongateway
 
 import org.scalatest.BeforeAndAfter
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import io.deepsense.commons.StandardSpec
 import io.deepsense.commons.models.Id
 import io.deepsense.deeplang.OperationExecutionDispatcher
 
-class OperationExecutionDispatcherSpec
-    extends StandardSpec
-    with MockitoSugar
-    with BeforeAndAfter {
+class OperationExecutionDispatcherSpec extends StandardSpec with MockitoSugar with BeforeAndAfter {
 
   val workflowId = Id.randomId
+
   val nodeId = Id.randomId
 
   var dispatcher: OperationExecutionDispatcher = _
@@ -71,4 +69,5 @@ class OperationExecutionDispatcherSpec
       }
     }
   }
+
 }

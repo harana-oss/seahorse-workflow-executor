@@ -3,8 +3,7 @@ package io.deepsense.deeplang.params
 import spray.json._
 import spray.json.DefaultJsonProtocol._
 
-class MultipleColumnCreatorParamSpec
-  extends AbstractParamSpec[Array[String], MultipleColumnCreatorParam] {
+class MultipleColumnCreatorParamSpec extends AbstractParamSpec[Array[String], MultipleColumnCreatorParam] {
 
   override def className: String = "MultipleColumnCreatorParam"
 
@@ -15,11 +14,11 @@ class MultipleColumnCreatorParamSpec
       description = Some(description)
     )
     val expectedJson = JsObject(
-      "type" -> JsString("multipleCreator"),
-      "name" -> JsString(param.name),
+      "type"        -> JsString("multipleCreator"),
+      "name"        -> JsString(param.name),
       "description" -> JsString(description),
       "isGriddable" -> JsFalse,
-      "default" -> JsNull
+      "default"     -> JsNull
     )
     (param, expectedJson)
   }
@@ -28,4 +27,5 @@ class MultipleColumnCreatorParamSpec
     val value = Array("a", "b", "c")
     (value, value.toJson)
   }
+
 }

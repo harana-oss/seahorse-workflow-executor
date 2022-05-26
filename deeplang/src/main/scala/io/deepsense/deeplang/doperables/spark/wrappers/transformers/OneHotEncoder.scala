@@ -11,8 +11,11 @@ class OneHotEncoder extends SparkTransformerAsMultiColumnTransformer[SparkOneHot
   val dropLast = new BooleanParamWrapper[SparkOneHotEncoder](
     name = "drop last",
     description = Some("Whether to drop the last category in the encoded vector."),
-    sparkParamGetter = _.dropLast)
+    sparkParamGetter = _.dropLast
+  )
+
   setDefault(dropLast, true)
 
   override protected def getSpecificParams: Array[Param[_]] = Array(dropLast)
+
 }

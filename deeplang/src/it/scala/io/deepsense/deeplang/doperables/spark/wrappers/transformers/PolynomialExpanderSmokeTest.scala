@@ -8,8 +8,8 @@ import io.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTra
 import io.deepsense.deeplang.params.selections.NameSingleColumnSelection
 
 class PolynomialExpanderSmokeTest
-  extends AbstractTransformerWrapperSmokeTest[PolynomialExpander]
-  with MultiColumnTransformerWrapperTestSupport {
+    extends AbstractTransformerWrapperSmokeTest[PolynomialExpander]
+    with MultiColumnTransformerWrapperTestSupport {
 
   override def transformerWithParams: PolynomialExpander = {
     val inPlace = NoInPlaceChoice()
@@ -20,10 +20,12 @@ class PolynomialExpanderSmokeTest
       .setInPlace(inPlace)
 
     val transformer = new PolynomialExpander()
-    transformer.set(Seq(
-      transformer.singleOrMultiChoiceParam -> single,
-      transformer.degree -> 3
-    ): _*)
+    transformer.set(
+      Seq(
+        transformer.singleOrMultiChoiceParam -> single,
+        transformer.degree                   -> 3
+      ): _*
+    )
   }
 
   override def testValues: Seq[(Any, Any)] = {
@@ -43,4 +45,5 @@ class PolynomialExpanderSmokeTest
   override def inputType: DataType = new io.deepsense.sparkutils.Linalg.VectorUDT
 
   override def outputType: DataType = new io.deepsense.sparkutils.Linalg.VectorUDT
+
 }

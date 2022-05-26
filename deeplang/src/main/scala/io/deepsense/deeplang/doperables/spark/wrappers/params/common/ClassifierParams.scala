@@ -7,11 +7,14 @@ import org.apache.spark.ml
 import io.deepsense.deeplang.params.wrappers.spark.SingleColumnCreatorParamWrapper
 
 trait ClassifierParams extends PredictorParams {
+
   val rawPredictionColumn =
-    new SingleColumnCreatorParamWrapper[
-        ml.param.Params { val rawPredictionCol: ml.param.Param[String] }](
+    new SingleColumnCreatorParamWrapper[ml.param.Params { val rawPredictionCol: ml.param.Param[String] }](
       name = "raw prediction column",
       description = Some("The raw prediction (confidence) column."),
-      sparkParamGetter = _.rawPredictionCol)
+      sparkParamGetter = _.rawPredictionCol
+    )
+
   setDefault(rawPredictionColumn, "rawPrediction")
+
 }

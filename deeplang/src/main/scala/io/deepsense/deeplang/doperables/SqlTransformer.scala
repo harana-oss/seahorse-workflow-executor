@@ -6,8 +6,12 @@ import org.apache.spark.sql.types.StructType
 import io.deepsense.deeplang.ExecutionContext
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.exceptions.SqlExpressionException
-import io.deepsense.deeplang.inference.{SqlInferenceWarning, SqlSchemaInferrer}
-import io.deepsense.deeplang.params.{CodeSnippetLanguage, CodeSnippetParam, Param, StringParam}
+import io.deepsense.deeplang.inference.SqlInferenceWarning
+import io.deepsense.deeplang.inference.SqlSchemaInferrer
+import io.deepsense.deeplang.params.CodeSnippetLanguage
+import io.deepsense.deeplang.params.CodeSnippetParam
+import io.deepsense.deeplang.params.Param
+import io.deepsense.deeplang.params.StringParam
 import io.deepsense.sparkutils.SparkSQLSession
 import io.deepsense.sparkutils.SQL
 
@@ -15,28 +19,41 @@ class SqlTransformer extends Transformer {
 
   val dataFrameId = StringParam(
     name = "dataframe id",
-    description = Some("An identifier that can be used in " +
-      "the SQL expression to refer to the input DataFrame."))
+    description = Some(
+      "An identifier that can be used in " +
+        "the SQL expression to refer to the input DataFrame."
+    )
+  )
+
   setDefault(dataFrameId -> "df")
+
   def getDataFrameId: String = $(dataFrameId)
+
   def setDataFrameId(value: String): this.type = set(dataFrameId, value)
 
-  val expression = CodeSnippetParam(
-    name = "expression",
-    description = Some("SQL Expression to be executed on the DataFrame."),
-    language = CodeSnippetLanguage(CodeSnippetLanguage.sql))
+  val expression =
+    CodeSnippetParam(
+      name = "expression",
+      description = Some("SQL Expression to be executed on the DataFrame."),
+      language = CodeSnippetLanguage(CodeSnippetLanguage.sql)
+    )
+
   setDefault(expression -> "SELECT * FROM df")
+
   def getExpression: String = $(expression)
+
   def setExpression(value: String): this.type = set(expression, value)
 
   override val params: Array[Param[_]] = Array(dataFrameId, expression)
 
   override private[deeplang] def _transform(ctx: ExecutionContext, df: DataFrame): DataFrame = {
-    logger.debug(s"SqlExpression(expression = '$getExpression'," +
-      s" dataFrameId = '$getDataFrameId')")
+    logger.debug(
+      s"SqlExpression(expression = '$getExpression'," +
+        s" dataFrameId = '$getDataFrameId')"
+    )
 
     val localSparkSQLSession = ctx.sparkSQLSession.newSession()
-    val localDataFrame = moveToSparkSQLSession(df.sparkDataFrame, localSparkSQLSession)
+    val localDataFrame       = moveToSparkSQLSession(df.sparkDataFrame, localSparkSQLSession)
 
     SQL.registerTempTable(localDataFrame, getDataFrameId)
     try {
@@ -63,4 +80,5 @@ class SqlTransformer extends Transformer {
 
   private def moveToSparkSQLSession(df: sql.DataFrame, destinationSession: SparkSQLSession): sql.DataFrame =
     destinationSession.createDataFrame(df.rdd, df.schema)
+
 }

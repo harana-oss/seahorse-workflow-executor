@@ -1,19 +1,3 @@
-/**
-  * Copyright 2016, deepsense.io
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  *     http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
-
 package io.deepsense.deeplang.doperables
 
 import java.sql.Date
@@ -40,73 +24,65 @@ class SortTransformationIntegSpec extends DeeplangIntegTestSupport with Transfor
     implicit def sortableDataFrame(implicit rowOrdering: Ordering[Row]): Sortable[DataFrame] =
       new Sortable[DataFrame] {
 
-      override def isSorted(sequence: DataFrame): Boolean =
-        implicitly[Sortable[Array[Row]]].isSorted(sequence.sparkDataFrame.collect())
-    }
+        override def isSorted(sequence: DataFrame): Boolean =
+          implicitly[Sortable[Array[Row]]].isSorted(sequence.sparkDataFrame.collect())
 
-    case class OrderingSpec[T] (
-      columnIndex: Int,
-      descendingFlag: Boolean,
-      scalaOrderingForColumnValues: Ordering[T])
+      }
 
-    /**
-      * <p>
-      * Creates lexicographic <code>Ordering</code> for <code>Row</code>s
-      * taking into account column indices, ascending/descending flag
-      * and the importance of columns as given in the <code>Seq</code>
-      * (more important columns come first).
-      * </p>
-      * <p>
-      * Also returns a <code>Seq</code> of <code>SortColumnParam</code>s to
-      * be given to the <code>SortTransformer</code> which should match
-      * the <code>Ordering</code> in order to pass the test.
-      * </p>
-      * <p>
-      * In other words - after running the transformer parameterized with
-      * the <code>SortColumnParam</code>s the resulting <code>DataFrame</code>
-      * should be sorted according to the lexicographical <code>Ordering</code>.
-      * </p>
+    case class OrderingSpec[T](columnIndex: Int, descendingFlag: Boolean, scalaOrderingForColumnValues: Ordering[T])
+
+    /** <p> Creates lexicographic <code>Ordering</code> for <code>Row</code>s taking into account column indices,
+      * ascending/descending flag and the importance of columns as given in the <code>Seq</code> (more important columns
+      * come first). </p> <p> Also returns a <code>Seq</code> of <code>SortColumnParam</code>s to be given to the
+      * <code>SortTransformer</code> which should match the <code>Ordering</code> in order to pass the test. </p> <p> In
+      * other words - after running the transformer parameterized with the <code>SortColumnParam</code>s the resulting
+      * <code>DataFrame</code> should be sorted according to the lexicographical <code>Ordering</code>. </p>
       *
-      * @param columnIndices sequence of <code>OrderingSpecs</code>
-      * @return <code>Row Ordering</code> and <code>SortColumnParam</code>s
-      *         to be used in test
+      * @param columnIndices
+      *   sequence of <code>OrderingSpecs</code>
+      * @return
+      *   <code>Row Ordering</code> and <code>SortColumnParam</code>s to be used in test
       */
-    def generateOrderingAndSortColumnParams(columnIndices: Seq[OrderingSpec[_]]):
-    (Ordering[Row], Seq[SortColumnParam]) = {
-      (new Ordering[Row] {
+    def generateOrderingAndSortColumnParams(
+        columnIndices: Seq[OrderingSpec[_]]
+    ): (Ordering[Row], Seq[SortColumnParam]) =
+      (
+        new Ordering[Row] {
 
-        val tieredOrdering: Ordering[Row] =
-          columnIndices.map({
-            case OrderingSpec(i, desc, o) => new Ordering[Row] {
-              override def compare(x: Row, y: Row): Int = {
-                val ordering = if (desc) {
-                  o.reverse
-                } else {
-                  o
+          val tieredOrdering: Ordering[Row] =
+            columnIndices.map { case OrderingSpec(i, desc, o) =>
+              new Ordering[Row] {
+
+                override def compare(x: Row, y: Row): Int = {
+                  val ordering =
+                    if (desc)
+                      o.reverse
+                    else
+                      o
+                  ordering.asInstanceOf[Ordering[Any]].compare(x.get(i), y.get(i))
                 }
-                ordering.asInstanceOf[Ordering[Any]].compare(x.get(i), y.get(i))
+
+              }
+            }.reduceRight { (o1: Ordering[Row], o2: Ordering[Row]) =>
+              new Ordering[Row] {
+                override def compare(x: Row, y: Row): Int = {
+                  val cmp = o1.compare(x, y)
+                  if (cmp == 0)
+                    o2.compare(x, y)
+                  else
+                    cmp
+                }
               }
             }
-          }).reduceRight((o1: Ordering[Row], o2: Ordering[Row]) => {
-            new Ordering[Row] {
-              override def compare(x: Row, y: Row): Int = {
-                val cmp = o1.compare(x, y)
-                if (cmp == 0) {
-                  o2.compare(x, y)
-                } else {
-                  cmp
-                }
-              }
-            }
-          })
 
-        override def compare(x: Row, y: Row): Int = {
-          tieredOrdering.compare(x, y)
+          override def compare(x: Row, y: Row): Int =
+            tieredOrdering.compare(x, y)
+
+        },
+        columnIndices.map { case OrderingSpec(i, desc, _) =>
+          SortColumnParam(i, desc)
         }
-      }, columnIndices.map({
-        case OrderingSpec(i, desc, _) => SortColumnParam(i, desc)
-      }))
-    }
+      )
 
     val data = Seq[Row](
       Row("2016-01-01": Date, 2, "A"),
@@ -119,18 +95,23 @@ class SortTransformationIntegSpec extends DeeplangIntegTestSupport with Transfor
     )
 
     val col1StructField = StructField("col1", DateType)
+
     val col2StructField = StructField("col2", IntegerType)
+
     val col3StructField = StructField("col3", StringType)
 
-    val schema = StructType(Seq(
-      col1StructField,
-      col2StructField,
-      col3StructField
-    ))
+    val schema = StructType(
+      Seq(
+        col1StructField,
+        col2StructField,
+        col3StructField
+      )
+    )
 
     val transformer = new SortTransformer()
 
     val df = createDataFrame(data, schema)
+
   }
 
   "SortTransformer" should {
@@ -189,7 +170,7 @@ class SortTransformationIntegSpec extends DeeplangIntegTestSupport with Transfor
 
         val resDf = transformer.applyTransformationAndSerialization(tempDir, df)
         resDf.sparkDataFrame.collect() should contain
-          theSameElementsAs (df.sparkDataFrame.collect())
+        theSameElementsAs(df.sparkDataFrame.collect())
 
         resDf shouldBe sorted
       }
@@ -211,10 +192,11 @@ class SortTransformationIntegSpec extends DeeplangIntegTestSupport with Transfor
 
         val resDf = transformer.applyTransformationAndSerialization(tempDir, df)
         resDf.sparkDataFrame.collect() should contain
-        theSameElementsAs (df.sparkDataFrame.collect())
+        theSameElementsAs(df.sparkDataFrame.collect())
 
         resDf shouldBe sorted
       }
     }
   }
+
 }

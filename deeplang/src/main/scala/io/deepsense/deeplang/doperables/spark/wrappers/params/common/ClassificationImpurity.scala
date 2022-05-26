@@ -1,6 +1,7 @@
 package io.deepsense.deeplang.doperables.spark.wrappers.params.common
 
-import io.deepsense.deeplang.doperables.spark.wrappers.params.common.ClassificationImpurity.{Gini, Entropy}
+import io.deepsense.deeplang.doperables.spark.wrappers.params.common.ClassificationImpurity.Gini
+import io.deepsense.deeplang.doperables.spark.wrappers.params.common.ClassificationImpurity.Entropy
 import io.deepsense.deeplang.params.Param
 import io.deepsense.deeplang.params.choice.Choice
 
@@ -12,9 +13,13 @@ sealed abstract class ClassificationImpurity(override val name: String) extends 
     classOf[Entropy],
     classOf[Gini]
   )
+
 }
 
 object ClassificationImpurity {
+
   case class Entropy() extends ClassificationImpurity("entropy")
+
   case class Gini() extends ClassificationImpurity("gini")
+
 }

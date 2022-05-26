@@ -10,14 +10,14 @@ import io.deepsense.deeplang.params.wrappers.spark.SingleColumnSelectorParamWrap
 
 trait HasInputColumn extends Params {
 
-  val inputColumn = new SingleColumnSelectorParamWrapper[
-      ml.param.Params { val inputCol: ml.param.Param[String] }](
+  val inputColumn = new SingleColumnSelectorParamWrapper[ml.param.Params { val inputCol: ml.param.Param[String] }](
     name = "input column",
     description = Some("The input column name."),
     sparkParamGetter = _.inputCol,
-    portIndex = 0)
+    portIndex = 0
+  )
 
-  def setInputColumn(value: String): this.type = {
+  def setInputColumn(value: String): this.type =
     set(inputColumn, NameSingleColumnSelection(value))
-  }
+
 }

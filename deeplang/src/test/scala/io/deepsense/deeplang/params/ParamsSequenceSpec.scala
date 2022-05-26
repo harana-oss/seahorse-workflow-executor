@@ -5,27 +5,32 @@ import io.deepsense.deeplang.params.exceptions.NoArgumentConstructorRequiredExce
 import io.deepsense.deeplang.params.validators.AcceptAllRegexValidator
 
 case class ClassWithParams() extends Params {
+
   val string = StringParam("string", None)
+
   val bool = BooleanParam("bool", None)
 
   val params: Array[io.deepsense.deeplang.params.Param[_]] = Array(string, bool)
 
   def setBool(b: Boolean): this.type = set(bool, b)
+
   def setString(s: String): this.type = set(string, s)
+
 }
 
 case class ParamsWithoutNoArgConstructor(x: String) extends Params {
+
   val params: Array[io.deepsense.deeplang.params.Param[_]] = Array()
+
 }
 
-class ParamsSequenceSpec
-  extends AbstractParamSpec[Seq[ClassWithParams], ParamsSequence[ClassWithParams]] {
+class ParamsSequenceSpec extends AbstractParamSpec[Seq[ClassWithParams], ParamsSequence[ClassWithParams]] {
 
   override def className: String = "ParamsSequence"
 
   className should {
     "throw an exception when params don't have no-arg constructor" in {
-      an [NoArgumentConstructorRequiredException] should be thrownBy
+      an[NoArgumentConstructorRequiredException] should be thrownBy
         ParamsSequence[ParamsWithoutNoArgConstructor](name = "paramsSequence", description = None)
     }
   }
@@ -37,17 +42,17 @@ class ParamsSequenceSpec
       description = Some(description)
     )
     val expectedJson = JsObject(
-      "type" -> JsString("multiplier"),
-      "name" -> JsString(paramsSequence.name),
+      "type"        -> JsString("multiplier"),
+      "name"        -> JsString(paramsSequence.name),
       "description" -> JsString(description),
-      "default" -> JsNull,
+      "default"     -> JsNull,
       "isGriddable" -> JsFalse,
       "values" -> JsArray(
         JsObject(
-          "type" -> JsString("string"),
-          "name" -> JsString("string"),
+          "type"        -> JsString("string"),
+          "name"        -> JsString("string"),
           "description" -> JsString(""),
-          "default" -> JsNull,
+          "default"     -> JsNull,
           "isGriddable" -> JsFalse,
           "validator" -> JsObject(
             "type" -> JsString("regex"),
@@ -57,11 +62,11 @@ class ParamsSequenceSpec
           )
         ),
         JsObject(
-          "type" -> JsString("boolean"),
-          "name" -> JsString("bool"),
+          "type"        -> JsString("boolean"),
+          "name"        -> JsString("bool"),
           "description" -> JsString(""),
           "isGriddable" -> JsFalse,
-          "default" -> JsNull
+          "default"     -> JsNull
         )
       )
     )
@@ -69,19 +74,19 @@ class ParamsSequenceSpec
   }
 
   override def valueFixture: (Seq[ClassWithParams], JsValue) = {
-    val customParams = Seq(
-      ClassWithParams().setBool(true).setString("aaa"),
-      ClassWithParams().setBool(false).setString("bbb"))
+    val customParams =
+      Seq(ClassWithParams().setBool(true).setString("aaa"), ClassWithParams().setBool(false).setString("bbb"))
     val expectedJson = JsArray(
       JsObject(
         "string" -> JsString("aaa"),
-        "bool" -> JsTrue
+        "bool"   -> JsTrue
       ),
       JsObject(
         "string" -> JsString("bbb"),
-        "bool" -> JsFalse
+        "bool"   -> JsFalse
       )
     )
     (customParams, expectedJson)
   }
+
 }

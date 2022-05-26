@@ -7,24 +7,26 @@ import org.apache.spark.ml.param.{Param => SparkParam}
 
 import io.deepsense.deeplang.params.choice.Choice
 import io.deepsense.deeplang.params.wrappers.spark.ChoiceParamWrapper
-import io.deepsense.deeplang.params.{Param, Params}
+import io.deepsense.deeplang.params.Param
+import io.deepsense.deeplang.params.Params
 
 trait HasSolverParam extends Params {
+
   val solver =
-    new ChoiceParamWrapper[
-        ml.param.Params { val solver: SparkParam[String]}, SolverChoice.SolverOption](
+    new ChoiceParamWrapper[ml.param.Params { val solver: SparkParam[String] }, SolverChoice.SolverOption](
       name = "solver",
       sparkParamGetter = _.solver,
-      description =
-        Some("""Sets the solver algorithm used for optimization.
-          |Can be set to "l-bfgs", "normal" or "auto".
-          |"l-bfgs" denotes Limited-memory BFGS which is a limited-memory quasi-Newton
-          |optimization method. "normal" denotes Normal Equation. It is an analytical
-          |solution to the linear regression problem.
-          |The default value is "auto" which means that the solver algorithm is
-          |selected automatically.""".stripMargin))
+      description = Some("""Sets the solver algorithm used for optimization.
+                           |Can be set to "l-bfgs", "normal" or "auto".
+                           |"l-bfgs" denotes Limited-memory BFGS which is a limited-memory quasi-Newton
+                           |optimization method. "normal" denotes Normal Equation. It is an analytical
+                           |solution to the linear regression problem.
+                           |The default value is "auto" which means that the solver algorithm is
+                           |selected automatically.""".stripMargin)
+    )
 
   setDefault(solver, SolverChoice.Auto())
+
 }
 
 object SolverChoice {
@@ -38,9 +40,13 @@ object SolverChoice {
       classOf[Normal],
       classOf[LBFGS]
     )
+
   }
 
   case class Auto() extends SolverOption("auto")
+
   case class Normal() extends SolverOption("normal")
+
   case class LBFGS() extends SolverOption("l-bfgs")
+
 }

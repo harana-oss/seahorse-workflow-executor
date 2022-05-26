@@ -6,13 +6,20 @@ import io.deepsense.commons.utils.Logging
 import io.deepsense.deeplang._
 import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.inout._
-import io.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
+import io.deepsense.deeplang.doperations.readwritedataframe.FilePath
+import io.deepsense.deeplang.doperations.readwritedataframe.FileScheme
 import io.deepsense.deeplang.utils.DataFrameMatchers
 import io.deepsense.deeplang.doperations.readwritedataframe.googlestorage._
 import io.deepsense.deeplang.google.GoogleServices
 
-class GoogleSheetSpec extends FreeSpec with BeforeAndAfter with BeforeAndAfterAll with LocalExecutionContext
-  with Matchers with TestFiles with Logging {
+class GoogleSheetSpec
+    extends FreeSpec
+    with BeforeAndAfter
+    with BeforeAndAfterAll
+    with LocalExecutionContext
+    with Matchers
+    with TestFiles
+    with Logging {
 
   "Seahorse is integrated with Google Sheets" in {
     info("It means that once given some Dataframe")
@@ -28,8 +35,8 @@ class GoogleSheetSpec extends FreeSpec with BeforeAndAfter with BeforeAndAfterAl
   }
 
   private def credentials: String = GoogleServices.serviceAccountJson match {
-    case Some(credentials) => credentials
-    case None if Jenkins.isRunningOnJenkins => throw GoogleServices.serviceAccountNotExistsException()
+    case Some(credentials)                   => credentials
+    case None if Jenkins.isRunningOnJenkins  => throw GoogleServices.serviceAccountNotExistsException()
     case None if !Jenkins.isRunningOnJenkins => cancel(GoogleServices.serviceAccountNotExistsException())
   }
 
@@ -59,8 +66,9 @@ class GoogleSheetSpec extends FreeSpec with BeforeAndAfter with BeforeAndAfterAl
       .setStorageType(
         new InputStorageTypeChoice.File()
           .setSourceFile(filePath.fullPath)
-          .setFileFormat(new InputFileFormatChoice.Csv()
-            .setNamesIncluded(true)
+          .setFileFormat(
+            new InputFileFormatChoice.Csv()
+              .setNamesIncluded(true)
           )
       )
     readDF.executeUntyped(Vector.empty[DOperable])(executionContext).head.asInstanceOf[DataFrame]

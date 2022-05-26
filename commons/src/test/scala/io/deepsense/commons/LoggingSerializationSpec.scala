@@ -5,10 +5,7 @@ import org.slf4j.Logger
 import io.deepsense.commons.serialization.Serialization
 import io.deepsense.commons.utils.Logging
 
-class LoggingSerializationSpec
-  extends StandardSpec
-  with UnitTestSupport
-  with Serialization {
+class LoggingSerializationSpec extends StandardSpec with UnitTestSupport with Serialization {
 
   "Object" when {
     "mixes-in SerializableLogging" should {
@@ -21,8 +18,11 @@ class LoggingSerializationSpec
       }
     }
   }
+
 }
 
 class SerializableTestObject extends Serializable with Logging {
+
   def getLogger: Logger = this.logger
+
 }

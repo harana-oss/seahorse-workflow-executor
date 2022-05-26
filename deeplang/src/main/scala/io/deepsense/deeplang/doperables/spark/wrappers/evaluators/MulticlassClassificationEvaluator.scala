@@ -3,27 +3,31 @@ package io.deepsense.deeplang.doperables.spark.wrappers.evaluators
 import org.apache.spark.ml.evaluation.{MulticlassClassificationEvaluator => SparkMulticlassClassificationEvaluator}
 
 import io.deepsense.deeplang.doperables.SparkEvaluatorWrapper
-import io.deepsense.deeplang.doperables.spark.wrappers.params.common.{HasLabelColumnParam, HasPredictionColumnSelectorParam}
+import io.deepsense.deeplang.doperables.spark.wrappers.params.common.HasLabelColumnParam
+import io.deepsense.deeplang.doperables.spark.wrappers.params.common.HasPredictionColumnSelectorParam
 import io.deepsense.deeplang.params.Param
 import io.deepsense.deeplang.params.choice.Choice
 import io.deepsense.deeplang.params.wrappers.spark.ChoiceParamWrapper
 
 class MulticlassClassificationEvaluator
-  extends SparkEvaluatorWrapper[SparkMulticlassClassificationEvaluator]
-  with HasPredictionColumnSelectorParam
-  with HasLabelColumnParam {
+    extends SparkEvaluatorWrapper[SparkMulticlassClassificationEvaluator]
+    with HasPredictionColumnSelectorParam
+    with HasLabelColumnParam {
 
   import MulticlassClassificationEvaluator._
 
   val metricName = new ChoiceParamWrapper[SparkMulticlassClassificationEvaluator, Metric](
     name = "multiclass metric",
     description = Some("The metric used in evaluation."),
-    sparkParamGetter = _.metricName)
+    sparkParamGetter = _.metricName
+  )
+
   setDefault(metricName, F1())
 
   override val params: Array[Param[_]] = Array(metricName, predictionColumn, labelColumn)
 
   override def getMetricName: String = $(metricName).name
+
 }
 
 object MulticlassClassificationEvaluator {
@@ -39,6 +43,7 @@ object MulticlassClassificationEvaluator {
       classOf[WeightedPrecision],
       classOf[WeightedRecall]
     )
+
   }
 
   case class F1() extends Metric("f1")
@@ -50,4 +55,5 @@ object MulticlassClassificationEvaluator {
   case class WeightedPrecision() extends Metric("weightedPrecision")
 
   case class WeightedRecall() extends Metric("weightedRecall")
+
 }

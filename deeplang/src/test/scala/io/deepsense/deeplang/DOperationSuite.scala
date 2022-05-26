@@ -2,35 +2,50 @@ package io.deepsense.deeplang
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.FunSuite
-
 import io.deepsense.commons.utils.Version
 import io.deepsense.deeplang.catalogs.doperable.DOperableCatalog
 import io.deepsense.deeplang.doperables.DOperableMock
-import io.deepsense.deeplang.inference.{InferContext, InferenceWarnings}
+import io.deepsense.deeplang.inference.InferContext
+import io.deepsense.deeplang.inference.InferenceWarnings
 import io.deepsense.deeplang.params.NumericParam
 import io.deepsense.deeplang.params.validators.RangeValidator
+import org.scalatest.funsuite.AnyFunSuite
 
 object DClassesForDOperations {
+
   trait A extends DOperableMock
+
   case class A1() extends A
+
   case class A2() extends A
+
 }
 
 object DOperationForPortTypes {
+
   import DClassesForDOperations._
+
   class SimpleOperation extends DOperation1To1[A1, A2] {
+
     override protected def execute(t0: A1)(context: ExecutionContext): A2 = ???
+
     override val id: DOperation.Id = DOperation.Id.randomId
+
     override val name: String = ""
+
     override val description: String = ""
+
     override val params: Array[io.deepsense.deeplang.params.Param[_]] = Array()
+
     override lazy val tTagTI_0: ru.TypeTag[A1] = ru.typeTag[A1]
+
     override lazy val tTagTO_0: ru.TypeTag[A2] = ru.typeTag[A2]
+
   }
+
 }
 
-class DOperationSuite extends FunSuite with DeeplangTestSupport {
+class DOperationSuite extends AnyFunSuite with DeeplangTestSupport {
 
   test("It is possible to implement simple operations") {
     import DClassesForDOperations._
@@ -38,19 +53,18 @@ class DOperationSuite extends FunSuite with DeeplangTestSupport {
     class PickOne extends DOperation2To1[A1, A2, A] {
       override val id: DOperation.Id = DOperation.Id.randomId
 
-      val param = NumericParam("param", None, RangeValidator.all)
+      val param                         = NumericParam("param", None, RangeValidator.all)
       def setParam(int: Int): this.type = set(param -> int)
 
       val params: Array[io.deepsense.deeplang.params.Param[_]] = Array(param)
 
-      override protected def execute(t1: A1, t2: A2)(context: ExecutionContext): A = {
+      override protected def execute(t1: A1, t2: A2)(context: ExecutionContext): A =
         if ($(param) % 2 == 1) t1 else t2
-      }
-      override val name: String = "Some name"
+      override val name: String        = "Some name"
       override val description: String = "Some description"
 
       override lazy val tTagTI_0: ru.TypeTag[A1] = ru.typeTag[A1]
-      override lazy val tTagTO_0: ru.TypeTag[A] = ru.typeTag[A]
+      override lazy val tTagTO_0: ru.TypeTag[A]  = ru.typeTag[A]
       override lazy val tTagTI_1: ru.TypeTag[A2] = ru.typeTag[A2]
     }
 
@@ -68,7 +82,7 @@ class DOperationSuite extends FunSuite with DeeplangTestSupport {
     h.registerDOperable[A2]()
     val context = createInferContext(h)
 
-    val knowledge = Vector[DKnowledge[DOperable]](DKnowledge(A1()), DKnowledge(A2()))
+    val knowledge          = Vector[DKnowledge[DOperable]](DKnowledge(A1()), DKnowledge(A2()))
     val (result, warnings) = firstPicker.inferKnowledgeUntyped(knowledge)(context)
     assert(result == Vector(DKnowledge(A1(), A2())))
     assert(warnings == InferenceWarnings.empty)
@@ -83,12 +97,10 @@ class DOperationSuite extends FunSuite with DeeplangTestSupport {
       override val id: DOperation.Id = DOperation.Id.randomId
 
       override protected def execute()(context: ExecutionContext): A = ???
-      override protected def inferKnowledge()(context: InferContext)
-          : (DKnowledge[A], InferenceWarnings) = {
+      override protected def inferKnowledge()(context: InferContext): (DKnowledge[A], InferenceWarnings) =
         (DKnowledge(A1(), A2()), mockedWarnings)
-      }
 
-      override val name: String = ""
+      override val name: String        = ""
       override val description: String = ""
 
       val params: Array[io.deepsense.deeplang.params.Param[_]] = Array()
@@ -119,4 +131,5 @@ class DOperationSuite extends FunSuite with DeeplangTestSupport {
     val op = new SimpleOperation
     assert(op.outPortTypes == Vector(ru.typeTag[DClassesForDOperations.A2]))
   }
+
 }

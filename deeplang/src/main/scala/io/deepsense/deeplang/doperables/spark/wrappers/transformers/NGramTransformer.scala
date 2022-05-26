@@ -13,12 +13,14 @@ class NGramTransformer extends SparkTransformerAsMultiColumnTransformer[NGram] {
     name = "n",
     description = Some("The minimum n-gram length."),
     sparkParamGetter = _.n,
-    validator = RangeValidator(begin = 1.0, end = Int.MaxValue, step = Some(1.0)))
+    validator = RangeValidator(begin = 1.0, end = Int.MaxValue, step = Some(1.0))
+  )
+
   setDefault(n, 2.0)
 
   override protected def getSpecificParams: Array[Param[_]] = Array(n)
 
-  def setN(value: Int): this.type = {
+  def setN(value: Int): this.type =
     set(n -> value)
-  }
+
 }

@@ -4,6 +4,7 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators.Word2Vec
 
 class Word2VecExample extends AbstractOperationExample[Word2Vec] {
+
   override def dOperation: Word2Vec = {
     val op = new Word2Vec()
     op.estimator
@@ -22,4 +23,5 @@ class Word2VecExample extends AbstractOperationExample[Word2Vec] {
     ).map(Tuple1(_))
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("words")))
   }
+
 }

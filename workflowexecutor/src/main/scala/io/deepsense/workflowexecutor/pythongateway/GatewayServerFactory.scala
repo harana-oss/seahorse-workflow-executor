@@ -1,28 +1,32 @@
 package io.deepsense.workflowexecutor.pythongateway
 
-import java.lang.reflect.{Field, Modifier}
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.net.InetAddress
 import java.util.concurrent.CopyOnWriteArrayList
 
-import py4j.{CallbackClient, Gateway, GatewayServer, GatewayServerListener}
+import py4j.CallbackClient
+import py4j.Gateway
+import py4j.GatewayServer
+import py4j.GatewayServerListener
 
 import io.deepsense.sparkutils
 
 object GatewayServerFactory {
 
-  /**
-   * GatewayServer is missing an appropriate constructor.
-   * We have to use reflection to set it's private final fields to correct values.
-   */
+  /** GatewayServer is missing an appropriate constructor. We have to use reflection to set it's private final fields to
+    * correct values.
+    */
   def create(
       entryPoint: Object,
       port: Int,
       connectTimeout: Int,
       readTimeout: Int,
       cbClient: CallbackClient,
-      hostAddress: InetAddress): GatewayServer = {
+      hostAddress: InetAddress
+  ): GatewayServer = {
     val gatewayServer = new GatewayServer(())
-    val clazz = gatewayServer.getClass
+    val clazz         = gatewayServer.getClass
 
     def setFieldValue(fieldName: String, value: Any): Unit = {
       val field = clazz.getDeclaredField(fieldName)
@@ -44,10 +48,9 @@ object GatewayServerFactory {
     // gatewayServer.readTimeout = readTimeout
     setFieldValue("readTimeout", readTimeout)
 
-    if (sparkutils.PythonGateway.gatewayServerHasCallBackClient) {
+    if (sparkutils.PythonGateway.gatewayServerHasCallBackClient)
       // gatewayServer.cbClient = cbClient
       setFieldValue("cbClient", cbClient)
-    }
 
     // gatewayServer.gateway = new Gateway(entryPoint, cbClient)
     setFieldValue("gateway", new Gateway(entryPoint, cbClient))
@@ -61,8 +64,11 @@ object GatewayServerFactory {
     // gatewayServer.gateway.getBindings.put(GatewayServer.GATEWAY_SERVER_ID, this)
     val gatewayField = clazz.getDeclaredField("gateway")
     gatewayField.setAccessible(true)
-    gatewayField.get(gatewayServer)
-      .asInstanceOf[Gateway].getBindings.put(GatewayServer.GATEWAY_SERVER_ID, gatewayServer)
+    gatewayField
+      .get(gatewayServer)
+      .asInstanceOf[Gateway]
+      .getBindings
+      .put(GatewayServer.GATEWAY_SERVER_ID, gatewayServer)
 
     // gatewayServer.customCommands = null
     setFieldValue("customCommands", null)
@@ -75,4 +81,5 @@ object GatewayServerFactory {
 
     gatewayServer
   }
+
 }

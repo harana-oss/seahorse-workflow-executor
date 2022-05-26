@@ -6,6 +6,7 @@ import io.deepsense.deeplang.doperables.dataframe.DataFrame
 import io.deepsense.deeplang.doperations.spark.wrappers.estimators.StandardScaler
 
 class StandardScalerExample extends AbstractOperationExample[StandardScaler] {
+
   override def dOperation: StandardScaler = {
     val op = new StandardScaler()
     op.estimator
@@ -22,4 +23,5 @@ class StandardScalerExample extends AbstractOperationExample[StandardScaler] {
     ).map(Tuple1(_))
     Seq(DataFrame.fromSparkDataFrame(sparkSQLSession.createDataFrame(data).toDF("features")))
   }
+
 }

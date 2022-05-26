@@ -16,6 +16,9 @@ trait HasMaxIterationsParam extends Params {
     name = "max iterations",
     description = Some("The maximum number of iterations."),
     sparkParamGetter = _.maxIter,
-    validator = RangeValidator.positiveIntegers)
+    validator = RangeValidator.positiveIntegers
+  )
+
   setDefault(maxIterations, maxIterationsDefault)
+
 }

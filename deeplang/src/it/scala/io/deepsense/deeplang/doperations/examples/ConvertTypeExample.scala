@@ -4,6 +4,7 @@ import io.deepsense.deeplang.doperables.TargetTypeChoices.IntegerTargetTypeChoic
 import io.deepsense.deeplang.doperations.ConvertType
 
 class ConvertTypeExample extends AbstractOperationExample[ConvertType] {
+
   override def dOperation: ConvertType = {
     val op = new ConvertType()
     op.transformer.setSingleColumn("beds", "beds_int")
@@ -12,4 +13,5 @@ class ConvertTypeExample extends AbstractOperationExample[ConvertType] {
   }
 
   override def fileNames: Seq[String] = Seq("example_city_beds_price")
+
 }

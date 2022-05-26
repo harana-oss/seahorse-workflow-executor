@@ -31,15 +31,18 @@ package org.apache.spark.api.r
 import java.util.concurrent.atomic.AtomicInteger
 
 import scala.collection.concurrent.TrieMap
-import org.slf4j.{Logger, LoggerFactory}
-/**
-  * Helper singleton that tracks JVM objects returned to R.
-  * This is useful for referencing these objects in RPC calls.
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+/** Helper singleton that tracks JVM objects returned to R. This is useful for referencing these objects in RPC calls.
   */
 private[r] object JVMObjectTracker {
+
   @transient
   protected lazy val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+
   private[this] val objMap = new TrieMap[String, Object]
+
   private[this] val objCounter = new AtomicInteger(0)
 
   def getObject(id: String): Object = {
@@ -53,7 +56,7 @@ private[r] object JVMObjectTracker {
   }
 
   def put(obj: Object): String = {
-    val objId = objCounter.getAndIncrement.toString
+    val objId   = objCounter.getAndIncrement.toString
     val objName = obj.getClass.getName
     logger.info(s"Puts $objName at $objId ")
     objMap.put(objId, obj)

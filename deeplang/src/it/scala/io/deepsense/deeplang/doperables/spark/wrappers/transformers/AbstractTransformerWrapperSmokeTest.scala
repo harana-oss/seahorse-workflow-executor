@@ -16,19 +16,22 @@ abstract class AbstractTransformerWrapperSmokeTest[+T <: Transformer]
   import TransformerSerialization._
 
   def transformerWithParams: T
+
   def deserializedTransformer: Transformer =
     transformerWithParams.loadSerializedTransformer(tempDir)
 
   final def className: String = transformerWithParams.getClass.getSimpleName
 
-  val inputDataFrameSchema = StructType(Seq(
-    StructField("as", ArrayType(StringType, containsNull = true)),
-    StructField("s", StringType),
-    StructField("i", IntegerType),
-    StructField("i2", IntegerType),
-    StructField("d", DoubleType),
-    StructField("v", new io.deepsense.sparkutils.Linalg.VectorUDT)
-  ))
+  val inputDataFrameSchema = StructType(
+    Seq(
+      StructField("as", ArrayType(StringType, containsNull = true)),
+      StructField("s", StringType),
+      StructField("i", IntegerType),
+      StructField("i2", IntegerType),
+      StructField("d", DoubleType),
+      StructField("v", new io.deepsense.sparkutils.Linalg.VectorUDT)
+    )
+  )
 
   lazy val inputDataFrame: DataFrame = {
     val rowSeq = Seq(
@@ -53,9 +56,10 @@ abstract class AbstractTransformerWrapperSmokeTest[+T <: Transformer]
       assertSchemaEqual(transformedSchema.get, transformedSchema2.get)
     }
     "succesfully run report" in {
-      val report = transformerWithParams.report
+      val report  = transformerWithParams.report
       val report2 = deserializedTransformer.report
       report shouldBe report2
     }
   }
+
 }

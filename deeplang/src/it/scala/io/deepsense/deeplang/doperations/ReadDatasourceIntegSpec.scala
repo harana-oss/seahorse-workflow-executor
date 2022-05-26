@@ -1,38 +1,25 @@
-/**
-  * Copyright 2015, deepsense.io
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
-
 package io.deepsense.deeplang.doperations
 
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FreeSpec}
+import org.scalatest.BeforeAndAfter
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.freespec.AnyFreeSpec
 
-import io.deepsense.deeplang.{LocalExecutionContext, TestDataSources, TestFiles}
+import io.deepsense.deeplang.LocalExecutionContext
+import io.deepsense.deeplang.TestDataSources
+import io.deepsense.deeplang.TestFiles
 
 class ReadDatasourceIntegSpec
-  extends FreeSpec
-  with BeforeAndAfter
-  with BeforeAndAfterAll
-  with LocalExecutionContext
-  with TestDataSources
-  with TestFiles {
+    extends AnyFreeSpec
+    with BeforeAndAfter
+    with BeforeAndAfterAll
+    with LocalExecutionContext
+    with TestDataSources
+    with TestFiles {
 
-  for (ds <- someDatasourcesForReading) {
+  for (ds <- someDatasourcesForReading)
     s"ReadDatasource should work with datasource ${ds.getParams.getName}" in {
       val rds = ReadDatasource().setDatasourceId(ds.getId)
       rds.execute()(LocalExecutionContext.createExecutionContext(datasourceClient))
     }
-  }
 
 }

@@ -1,18 +1,26 @@
 package io.deepsense.commons.mail
 
 import javax.mail.Message.RecipientType
-import javax.mail.internet.{InternetAddress, MimeBodyPart, MimeMessage, MimeMultipart}
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeBodyPart
+import javax.mail.internet.MimeMessage
+import javax.mail.internet.MimeMultipart
 import javax.mail._
 import java.io.InputStream
-import javax.activation.{DataHandler, DataSource, FileDataSource}
+import javax.activation.DataHandler
+import javax.activation.DataSource
+import javax.activation.FileDataSource
 import javax.mail.util.ByteArrayDataSource
 
-import scala.util.{Failure, Success, Try}
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Try
 
 import com.sun.mail.smtp.SMTPTransport
 import collection.JavaConversions._
 
-import io.deepsense.commons.mail.templates.{Template, TemplateInstanceToLoad}
+import io.deepsense.commons.mail.templates.Template
+import io.deepsense.commons.mail.templates.TemplateInstanceToLoad
 import io.deepsense.commons.utils.Logging
 
 class EmailSender private (emailSenderConfig: EmailSenderConfig) extends Logging {
@@ -36,10 +44,7 @@ class EmailSender private (emailSenderConfig: EmailSenderConfig) extends Logging
     msg
   }
 
-  def createTextMessage(subject: String,
-      text: String,
-      subtype: String,
-      to: Seq[String]): Message = {
+  def createTextMessage(subject: String, text: String, subtype: String, to: Seq[String]): Message = {
     val msg = createMessage(subject, to)
     msg.setText(
       text,
@@ -55,31 +60,30 @@ class EmailSender private (emailSenderConfig: EmailSenderConfig) extends Logging
       // to scan all the characters to determine what charset to
       // use."
       null,
-      subtype)
+      subtype
+    )
 
     msg
   }
 
-  def createPlainMessage(subject: String, text: String, to: Seq[String]): Message = {
+  def createPlainMessage(subject: String, text: String, to: Seq[String]): Message =
     createTextMessage(subject, text, "plain", to)
-  }
 
-  def createHtmlMessage(subject: String, html: String, to: Seq[String]): Message = {
+  def createHtmlMessage(subject: String, html: String, to: Seq[String]): Message =
     createTextMessage(subject, html, "html", to)
-  }
 
-  def createHtmlMessageFromTemplate[T : Template](subject: String,
+  def createHtmlMessageFromTemplate[T: Template](
+      subject: String,
       templateInstance: TemplateInstanceToLoad,
-      to: Seq[String]) : Try[Message] = {
+      to: Seq[String]
+  ): Try[Message] = {
 
     val TemplateInstanceToLoad(templateName, templateContext) = templateInstance
 
     for {
       template <- implicitly[Template[T]].loadTemplate(templateName)
-      html = implicitly[Template[T]].renderTemplate(template, templateContext)
-    } yield {
-      createHtmlMessage(subject, html, to)
-    }
+      html      = implicitly[Template[T]].renderTemplate(template, templateContext)
+    } yield createHtmlMessage(subject, html, to)
   }
 
   def sendEmail(message: Message): Option[Throwable] = {
@@ -109,28 +113,29 @@ class EmailSender private (emailSenderConfig: EmailSenderConfig) extends Logging
     newMsg
   }
 
-  private def copyMessageHeaders(from: MimeMessage, to: MimeMessage): Unit = {
-    for (line <- from.getAllHeaderLines) {
+  private def copyMessageHeaders(from: MimeMessage, to: MimeMessage): Unit =
+    for (line <- from.getAllHeaderLines)
       to.addHeaderLine(line.asInstanceOf[String])
-    }
-  }
 
   private def createAttachmentBodyPart(
       attachmentStream: InputStream,
       filename: String,
-      contentTypeOpt: Option[String]): BodyPart = {
+      contentTypeOpt: Option[String]
+  ): BodyPart = {
     val contentType = contentTypeOpt.getOrElse("application/octet-stream")
-    val bodyPart = new MimeBodyPart()
+    val bodyPart    = new MimeBodyPart()
     bodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(attachmentStream, contentType)))
     bodyPart.setFileName(filename)
 
     bodyPart
   }
 
-  def attachAttachment(msg: Message,
+  def attachAttachment(
+      msg: Message,
       attachment: InputStream,
       filename: String,
-      contentTypeOpt: Option[String]): Message = {
+      contentTypeOpt: Option[String]
+  ): Message = {
 
     val attachmentBodyPart = createAttachmentBodyPart(
       attachment,
@@ -142,7 +147,7 @@ class EmailSender private (emailSenderConfig: EmailSenderConfig) extends Logging
       msg.getContent.asInstanceOf[Multipart].addBodyPart(attachmentBodyPart)
       msg
     } else {
-      val newMsg = copyMessageWithoutContent(msg.asInstanceOf[MimeMessage])
+      val newMsg    = copyMessageWithoutContent(msg.asInstanceOf[MimeMessage])
       val multipart = new MimeMultipart()
       val firstPart = new MimeBodyPart()
       firstPart.setContent(msg.getContent, msg.getContentType)
@@ -152,13 +157,16 @@ class EmailSender private (emailSenderConfig: EmailSenderConfig) extends Logging
       newMsg
     }
   }
+
 }
 
 object EmailSender {
+
   def apply(emailSenderConfig: EmailSenderConfig): EmailSender = new EmailSender(emailSenderConfig)
+
   def apply(): EmailSender = new EmailSender(EmailSenderConfig())
 
-  private def recipientsForLogging(msg: Message): String = {
+  private def recipientsForLogging(msg: Message): String =
     msg.getAllRecipients.mkString("[", ", ", "]")
-  }
+
 }
