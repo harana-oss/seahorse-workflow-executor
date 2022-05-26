@@ -2,7 +2,7 @@ import sbt._
 
 object Version {
 
-  val spark = sys.props.getOrElse("SPARK_VERSION", "2.1.1")
+  val spark = sys.props.getOrElse("SPARK_VERSION", "2.2.0")
   val (scala, java, hadoop, akka, apacheCommons) = spark match {
     case "2.4.8" => ("2.11.12", "1.8", "2.7.3", "2.5.32", "3.5")
     case "2.2.0" => ("2.11.8", "1.8", "2.7.3", "2.4.9", "3.5")

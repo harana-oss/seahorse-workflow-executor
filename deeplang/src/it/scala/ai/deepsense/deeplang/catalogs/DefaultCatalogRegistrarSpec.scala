@@ -1,4 +1,3 @@
-/** Copyright (c) 2016, CodiLime Inc. */
 package ai.deepsense.deeplang.catalogs
 
 import ai.deepsense.deeplang.catalogs.spi.CatalogRegistrant

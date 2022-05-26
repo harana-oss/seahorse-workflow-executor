@@ -1,4 +1,3 @@
-/** Copyright (c) 2016, CodiLime Inc. */
 package ai.deepsense.deeplang.catalogs
 
 import scala.reflect.runtime.{universe => ru}
