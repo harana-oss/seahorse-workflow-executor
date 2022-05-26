@@ -1,0 +1,16 @@
+package ai.deepsense.deeplang.params.library
+
+import spray.json.DefaultJsonProtocol.StringJsonFormat
+
+import ai.deepsense.deeplang.params.ParamWithJsFormat
+import ai.deepsense.deeplang.params.ParameterType
+import ai.deepsense.deeplang.params.ParameterType.ParameterType
+
+case class LoadFromLibraryParam(name: String, override val description: Option[String])
+    extends ParamWithJsFormat[String] {
+
+  override def replicate(name: String): LoadFromLibraryParam = copy(name = name)
+
+  override val parameterType: ParameterType = ParameterType.LoadFromLibrary
+
+}

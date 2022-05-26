@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-  ~ Copyright 2015, deepsense.io
+  ~ Copyright 2015 deepsense.ai (CodiLime, Inc)
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -28,63 +28,63 @@
 
   <appender name="file" class="org.apache.log4j.rolling.RollingFileAppender">
     <rollingPolicy name="file" class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
-      <param name="FileNamePattern" value="${logFile}_seahorse.%d{yyyy-MM-dd}.log" />
+      <param name="FileNamePattern" value="${logFile}_seahorse.%d{yyyy-MM-dd}.log"/>
     </rollingPolicy>
 
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="[%-5p] [%d] [%t] %x %c - %m%n" />
+      <param name="ConversionPattern" value="[%-5p] [%d] [%t] %x %c - %m%n"/>
     </layout>
   </appender>
 
-  <logger name="akka" >
+  <logger name="akka">
     <level value="WARN"/>
   </logger>
 
-  <logger name="com.datastax" >
-    <level value ="WARN"/>
+  <logger name="com.datastax">
+    <level value="WARN"/>
   </logger>
 
-  <logger name="io.netty" >
-    <level value ="WARN"/>
+  <logger name="io.netty">
+    <level value="WARN"/>
   </logger>
 
-  <logger name="org.apache.cassandra" >
-    <level value ="WARN"/>
+  <logger name="org.apache.cassandra">
+    <level value="WARN"/>
   </logger>
 
-  <logger name="org.apache.hadoop" >
-    <level value ="WARN"/>
+  <logger name="org.apache.hadoop">
+    <level value="WARN"/>
   </logger>
 
-  <logger name="org.apache.spark" >
-    <level value ="WARN"/>
+  <logger name="org.apache.spark">
+    <level value="WARN"/>
   </logger>
 
-  <logger name="org.cassandraunit" >
-    <level value ="WARN"/>
+  <logger name="org.cassandraunit">
+    <level value="WARN"/>
   </logger>
 
-  <logger name="org.spark-project" >
-    <level value ="WARN"/>
+  <logger name="org.spark-project">
+    <level value="WARN"/>
   </logger>
 
-  <logger name="org.apache.spark.api.r" >
-    <level value ="INFO"/>
+  <logger name="org.apache.spark.api.r">
+    <level value="INFO"/>
   </logger>
 
   <logger name="org.reflections">
-    <level value="WARN" />
+    <level value="WARN"/>
   </logger>
 
-  <logger name="parquet.hadoop" >
-    <level value ="WARN"/>
+  <logger name="parquet.hadoop">
+    <level value="WARN"/>
   </logger>
 
   <logger name="slick">
     <level value="INFO"/>
   </logger>
 
-  <logger name="io.deepsense.workflowexecutor.rabbitmq.PublisherActor">
+  <logger name="ai.deepsense.workflowexecutor.rabbitmq.PublisherActor">
     <level value="WARN"/>
   </logger>
 
@@ -93,17 +93,17 @@
   </logger>
 
   <logger name="DataNucleus">
-    <level value="WARN" />
+    <level value="WARN"/>
   </logger>
 
   <logger name="com.jolbox">
-    <level value="WARN" />
+    <level value="WARN"/>
   </logger>
 
   <root>
-    <priority value ="warn" />
-    <appender-ref ref="console" />
-    <appender-ref ref="file" />
+    <priority value="warn"/>
+    <appender-ref ref="console"/>
+    <appender-ref ref="file"/>
   </root>
 
 </log4j:configuration>

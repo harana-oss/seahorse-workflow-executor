@@ -1,4 +1,4 @@
-name := "deepsense-seahorse-graph"
+name := "seahorse-executor-graph"
 
 libraryDependencies ++= Dependencies.graph
 

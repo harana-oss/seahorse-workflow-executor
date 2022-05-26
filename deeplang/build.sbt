@@ -1,15 +1,13 @@
-import sbt.Tests.SubProcess
-
-import sbt.Tests.Group
-
+import sbt.Tests.{SubProcess, Group}
 import CommonSettingsPlugin._
+
 
 // scalastyle:off
 
-name := "deepsense-seahorse-deeplang"
+name := "seahorse-executor-deeplang"
 
 // Integration tests using Spark Clusters need jar
-(OurIT / test) := OurIT / test.dependsOn(assembly).value
+(OurIT / test) := ((OurIT / test).dependsOn (assembly)).value
 
 // Only one spark context per JVM
 def assignTestsToJVMs(testDefs: Seq[TestDefinition]) = {
@@ -30,7 +28,7 @@ def assignTestsToJVMs(testDefs: Seq[TestDefinition]) = {
 }
 
 OurIT / testGrouping := {
-  val testDefinitions = (definedTests in OurIT).value
+  val testDefinitions = (OurIT / definedTests).value
   assignTestsToJVMs(testDefinitions)
 }
 

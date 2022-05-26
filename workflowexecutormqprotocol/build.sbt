@@ -1,3 +1,3 @@
-name := "deepsense-seahorse-workflowexecutor-mq-protocol"
+name := "seahorse-executor-workflowexecutor-mq-protocol"
 
 libraryDependencies ++= Dependencies.workflowexecutorMqProtocol

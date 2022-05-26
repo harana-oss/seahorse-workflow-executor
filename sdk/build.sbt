@@ -1,3 +1,3 @@
-name := "deepsense-seahorse-sdk"
+name := "seahorse-executor-sdk"
 
 libraryDependencies ++= Dependencies.sdk

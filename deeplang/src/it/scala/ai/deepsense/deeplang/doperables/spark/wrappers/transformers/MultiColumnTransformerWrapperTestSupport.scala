@@ -1,0 +1,13 @@
+package ai.deepsense.deeplang.doperables.spark.wrappers.transformers
+
+import ai.deepsense.deeplang.doperables.MultiColumnTransformer
+import ai.deepsense.deeplang.doperables.MultiColumnTransformerTestSupport
+
+trait MultiColumnTransformerWrapperTestSupport extends MultiColumnTransformerTestSupport {
+  self: AbstractTransformerWrapperSmokeTest[MultiColumnTransformer] =>
+
+  override def transformerName: String = className
+
+  override def transformer: MultiColumnTransformer = transformerWithParams
+
+}
