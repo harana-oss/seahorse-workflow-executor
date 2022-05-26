@@ -2,8 +2,8 @@ package ai.deepsense.models.json.workflow
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers._
 
 import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
 import ai.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
@@ -82,7 +82,7 @@ trait WorkflowTestSupport extends StandardSpec with UnitTestSupport {
     val knowledge    = mock[DKnowledge[DOperable]]
     when(knowledge.types).thenReturn(Seq[DOperable](operableMock))
     when(knowledge.filterTypes(any())).thenReturn(knowledge)
-    when(dOperation.inferKnowledgeUntyped(anyObject())(anyObject()))
+    when(dOperation.inferKnowledgeUntyped(any())(any()))
       .thenReturn((Vector.fill(outArity)(knowledge), InferenceWarnings.empty))
     when(dOperation.sameAs(isA(classOf[DOperation]))).thenReturn(true)
     dOperation

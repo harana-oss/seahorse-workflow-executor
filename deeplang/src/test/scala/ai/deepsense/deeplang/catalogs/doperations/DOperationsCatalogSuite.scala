@@ -3,9 +3,9 @@ package ai.deepsense.deeplang.catalogs.doperations
 import scala.reflect.runtime.universe.TypeTag
 import scala.reflect.runtime.universe.typeTag
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.catalogs.SortPriority
 import ai.deepsense.deeplang.catalogs.doperations.exceptions._
@@ -242,7 +242,7 @@ object ViewingTestResources extends MockitoSugar {
 
 }
 
-class DOperationsCatalogSuite extends FunSuite with Matchers with MockitoSugar {
+class DOperationsCatalogSuite extends AnyFunSuite with Matchers with MockitoSugar {
 
   test("It is possible to create instance of registered DOperation") {
     import DOperationCatalogTestResources._

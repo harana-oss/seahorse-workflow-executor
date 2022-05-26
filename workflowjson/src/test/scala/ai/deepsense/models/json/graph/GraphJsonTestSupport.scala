@@ -1,16 +1,17 @@
 package ai.deepsense.models.json.graph
 
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import spray.json.DefaultJsonProtocol
 import spray.json.JsObject
 
 import ai.deepsense.deeplang.DOperation
 import ai.deepsense.graph.Endpoint
 
-trait GraphJsonTestSupport extends WordSpec with MockitoSugar with DefaultJsonProtocol with Matchers {
+trait GraphJsonTestSupport extends AnyWordSpec with MockitoSugar with DefaultJsonProtocol with Matchers {
 
   def assertEndpointMatchesJsObject(edgeEnd: Endpoint, edgeEndJs: JsObject): Unit = {
     assert(edgeEndJs.fields("nodeId").convertTo[String] == edgeEnd.nodeId.value.toString)

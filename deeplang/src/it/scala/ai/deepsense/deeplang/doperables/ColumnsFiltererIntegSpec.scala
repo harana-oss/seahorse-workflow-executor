@@ -1,25 +1,21 @@
 package ai.deepsense.deeplang.doperables
 
-import java.sql.Timestamp
-
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.types._
-import org.joda.time.DateTime
-import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
 import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
 import ai.deepsense.deeplang.doperations.exceptions.ColumnsDoNotExistException
-import ai.deepsense.deeplang.params.selections.IndexColumnSelection
-import ai.deepsense.deeplang.params.selections.MultipleColumnSelection
-import ai.deepsense.deeplang.params.selections.NameColumnSelection
-import ai.deepsense.deeplang.params.selections.TypeColumnSelection
+import ai.deepsense.deeplang.params.selections.{IndexColumnSelection, MultipleColumnSelection, NameColumnSelection, TypeColumnSelection}
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types._
+import org.joda.time.DateTime
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+
+import java.sql.Timestamp
 
 class ColumnsFiltererIntegSpec
     extends DeeplangIntegTestSupport
-    with GeneratorDrivenPropertyChecks
+    with ScalaCheckDrivenPropertyChecks
     with Matchers
     with TransformerSerialization {
 

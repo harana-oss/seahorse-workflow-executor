@@ -1,14 +1,14 @@
 package ai.deepsense.reportlib.model
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import spray.json._
 
 import ai.deepsense.reportlib.model.factory.DistributionTestFactory
 
 class DistributionJsonSpec
-    extends WordSpec
+    extends AnyWordSpec
     with MockitoSugar
     with DistributionTestFactory
     with Matchers

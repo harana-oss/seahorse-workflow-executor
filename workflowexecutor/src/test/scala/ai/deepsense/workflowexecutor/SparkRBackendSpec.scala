@@ -2,14 +2,14 @@ package ai.deepsense.workflowexecutor
 
 import org.apache.spark.api.r._
 import org.scalatest.concurrent.TimeLimits
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.PrivateMethodTester
-import org.scalatest.WordSpec
+import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 
-class SparkRBackendSpec extends WordSpec with MockitoSugar with Matchers with TimeLimits with PrivateMethodTester {
+class SparkRBackendSpec extends AnyWordSpec with MockitoSugar with Matchers with TimeLimits with PrivateMethodTester {
 
   "Spark R Backend" should {
     "return 0 for Entry Point Id" in {

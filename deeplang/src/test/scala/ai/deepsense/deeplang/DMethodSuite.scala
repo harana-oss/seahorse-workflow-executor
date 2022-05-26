@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
 import ai.deepsense.deeplang.doperables.DOperableMock
@@ -17,7 +17,7 @@ object DClassesForDMethods {
 
 }
 
-class DMethodSuite extends FunSuite with DeeplangTestSupport {
+class DMethodSuite extends AnyFunSuite with DeeplangTestSupport {
 
   test("It is possible to implement class having DMethod") {
     import DClassesForDMethods._

@@ -2,8 +2,8 @@ package ai.deepsense.deeplang
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.deeplang.doperables.DOperableMock
 
@@ -23,7 +23,7 @@ object ClassesForDKnowledge {
 
 }
 
-class DKnowledgeSuite extends FunSuite with Matchers {
+class DKnowledgeSuite extends AnyFunSuite with Matchers {
 
   test("DKnowledge[DOperable] with same content are equal") {
     case class A(i: Int) extends DOperableMock

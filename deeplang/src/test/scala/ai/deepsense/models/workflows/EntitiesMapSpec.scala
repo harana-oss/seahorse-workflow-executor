@@ -1,14 +1,15 @@
 package ai.deepsense.models.workflows
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
 import ai.deepsense.reportlib.model.ReportContent
 
-class EntitiesMapSpec extends WordSpec with Matchers with MockitoSugar {
+class EntitiesMapSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   "EntitiesMap" should {
     "be correctly created from results and reports" in {

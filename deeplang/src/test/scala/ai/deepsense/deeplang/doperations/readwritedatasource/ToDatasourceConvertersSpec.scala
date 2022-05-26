@@ -1,7 +1,7 @@
 package ai.deepsense.deeplang.doperations.readwritedatasource
 
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
 
 import ai.deepsense.api.datasourcemanager.model._
 import ai.deepsense.deeplang.doperations.ReadDataFrame.ReadDataFrameParameters
@@ -11,7 +11,7 @@ import ai.deepsense.deeplang.doperations.inout._
 import ai.deepsense.deeplang.params.Param
 import ai.deepsense.deeplang.params.Params
 
-class ToDatasourceConvertersSpec extends FreeSpec with Matchers {
+class ToDatasourceConvertersSpec extends AnyFreeSpec with Matchers {
 
   case class SeparatorTest(setup: Setup, sepName: String, separator: ColumnSeparatorChoice, expected: CsvSeparatorType)
 

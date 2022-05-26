@@ -1,32 +1,27 @@
 package ai.deepsense.workflowexecutor.pythongateway
 
-import java.io.PrintStream
-import java.net.InetAddress
-import java.net.ServerSocket
-import java.net.Socket
-
-import scala.concurrent.duration
-import scala.concurrent.duration.FiniteDuration
-import scala.io.BufferedSource
-import scala.util.Success
-import scala.util.Try
-import org.apache.spark.SparkContext
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import org.scalatest.concurrent.Eventually._
-import org.scalatest.concurrent.TimeLimits
-import org.scalatest.concurrent.Timeouts
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.time.SpanSugar._
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
-
 import ai.deepsense.deeplang.DataFrameStorage
 import ai.deepsense.sparkutils.SparkSQLSession
 import ai.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 import ai.deepsense.workflowexecutor.pythongateway.PythonGateway.GatewayConfig
+import org.apache.spark.SparkContext
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatest.concurrent.Eventually._
+import org.scalatest.concurrent.TimeLimits
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.SpanSugar._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 
-class PythonGatewaySpec extends WordSpec with MockitoSugar with Matchers with TimeLimits {
+import java.io.PrintStream
+import java.net.{InetAddress, ServerSocket, Socket}
+import scala.concurrent.duration
+import scala.concurrent.duration.FiniteDuration
+import scala.io.BufferedSource
+import scala.util.{Success, Try}
+
+class PythonGatewaySpec extends AnyWordSpec with MockitoSugar with Matchers with TimeLimits {
 
   val gatewayConfig =
     GatewayConfig(FiniteDuration(500, duration.MILLISECONDS))

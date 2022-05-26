@@ -1,8 +1,8 @@
 package ai.deepsense.models.workflows
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.deeplang.exceptions.DeepLangException
@@ -12,7 +12,7 @@ import ai.deepsense.deeplang.DOperable
 import ai.deepsense.graph.NodeInferenceResult
 import ai.deepsense.reportlib.model.ReportContent
 
-class NodeStateWithResultsSpec extends WordSpec with Matchers with MockitoSugar {
+class NodeStateWithResultsSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   "NodeStateWithResults" should {
 

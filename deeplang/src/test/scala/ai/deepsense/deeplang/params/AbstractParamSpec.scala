@@ -1,14 +1,14 @@
 package ai.deepsense.deeplang.params
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import spray.json.JsObject
 import spray.json.JsValue
 
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 
-abstract class AbstractParamSpec[T, U <: Param[T]] extends WordSpec with Matchers with MockitoSugar {
+abstract class AbstractParamSpec[T, U <: Param[T]] extends AnyWordSpec with Matchers with MockitoSugar {
 
   def className: String
 

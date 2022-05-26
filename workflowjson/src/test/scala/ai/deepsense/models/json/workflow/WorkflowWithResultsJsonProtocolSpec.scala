@@ -2,6 +2,7 @@ package ai.deepsense.models.json.workflow
 
 import java.util.UUID
 
+import org.scalatest.matchers.should.Matchers
 import spray.json._
 import ai.deepsense.commons.datetime.DateTimeConverter.dateTime
 import ai.deepsense.commons.datetime.DateTimeConverter.{toString => dateToString}

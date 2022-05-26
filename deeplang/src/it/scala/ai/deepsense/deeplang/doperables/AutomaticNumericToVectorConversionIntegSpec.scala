@@ -1,26 +1,22 @@
 package ai.deepsense.deeplang.doperables
 
-import java.sql.Timestamp
-
+import ai.deepsense.deeplang._
+import ai.deepsense.deeplang.doperables.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice
+import ai.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
+import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.{DiscreteCosineTransformer, Normalizer, PolynomialExpander, TransformerSerialization}
+import ai.deepsense.deeplang.params.selections._
 import ai.deepsense.sparkutils.Linalg.Vectors
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 import org.joda.time.DateTime
-import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.doperables.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice
-import ai.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
-import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.DiscreteCosineTransformer
-import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.Normalizer
-import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.PolynomialExpander
-import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
-import ai.deepsense.deeplang.params.selections._
+import java.sql.Timestamp
 
 class AutomaticNumericToVectorConversionIntegSpec
     extends DeeplangIntegTestSupport
-    with GeneratorDrivenPropertyChecks
+    with ScalaCheckDrivenPropertyChecks
     with Matchers
     with TransformerSerialization {
 

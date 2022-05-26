@@ -35,7 +35,7 @@ object DeepsenseBuildInfoPlugin extends AutoPlugin {
 
     Seq(
       BuildInfoKey.action("gitCommitId") {
-        Process("git rev-parse HEAD").lines.head
+        Process("git rev-parse HEAD").lineStream.head
       },
 
       "apiVersionMajor" -> maj,

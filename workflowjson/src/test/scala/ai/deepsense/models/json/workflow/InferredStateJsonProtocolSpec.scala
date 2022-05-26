@@ -3,6 +3,7 @@ package ai.deepsense.models.json.workflow
 import org.apache.spark.sql.types._
 import org.joda.time.DateTime
 import org.mockito.Mockito._
+import org.scalatest.matchers.should.Matchers
 import spray.json._
 
 import ai.deepsense.commons.models.Entity

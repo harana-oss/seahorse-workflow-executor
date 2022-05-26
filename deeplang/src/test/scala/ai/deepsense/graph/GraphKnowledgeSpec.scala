@@ -1,13 +1,12 @@
 package ai.deepsense.graph
 
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
-
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
 import ai.deepsense.deeplang.exceptions.DeepLangException
+import org.scalatest.matchers.should.Matchers
 
-class GraphKnowledgeSpec extends WordSpec with MockitoSugar with Matchers {
+class GraphKnowledgeSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   "GraphKnowledge" should {
     "return proper errors map" in {

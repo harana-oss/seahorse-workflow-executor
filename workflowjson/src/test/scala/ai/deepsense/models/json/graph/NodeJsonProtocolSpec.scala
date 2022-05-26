@@ -1,5 +1,6 @@
 package ai.deepsense.models.json.graph
 
+import org.scalatest.matchers.should.Matchers
 import org.mockito.Mockito._
 import spray.json._
 

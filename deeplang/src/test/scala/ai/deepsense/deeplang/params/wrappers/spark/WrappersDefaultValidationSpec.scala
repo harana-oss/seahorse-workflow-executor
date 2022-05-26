@@ -2,11 +2,11 @@ package ai.deepsense.deeplang.params.wrappers.spark
 
 import org.apache.spark.ml
 import org.apache.spark.ml.param._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class WrappersDefaultValidationSpec extends WordSpec with Matchers with MockitoSugar {
+class WrappersDefaultValidationSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   class ExampleSparkParams extends ml.param.Params {
 

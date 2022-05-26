@@ -1,10 +1,8 @@
 package ai.deepsense.deeplang.catalogs.doperable
 
 import scala.reflect.runtime.{universe => ru}
-
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
-
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import ai.deepsense.deeplang.DOperable
 import ai.deepsense.deeplang.catalogs.doperable.exceptions._
 import ai.deepsense.deeplang.doperables.DOperableMock
@@ -87,7 +85,7 @@ object MixinInheritance {
 
 }
 
-class DOperableCatalogSuite extends FunSuite with Matchers {
+class DOperableCatalogSuite extends AnyFunSuite with Matchers {
 
   def testGettingSubclasses[T <: DOperable: ru.TypeTag](h: DOperableCatalog, expected: DOperable*): Unit =
     h.concreteSubclassesInstances[T] should contain theSameElementsAs expected

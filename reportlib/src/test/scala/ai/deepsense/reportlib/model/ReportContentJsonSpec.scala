@@ -1,11 +1,11 @@
 package ai.deepsense.reportlib.model
 
 import ai.deepsense.reportlib.model.factory.ReportContentTestFactory
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import spray.json._
 
-class ReportContentJsonSpec extends WordSpec with Matchers with ReportContentTestFactory with ReportJsonProtocol {
+class ReportContentJsonSpec extends AnyWordSpec with Matchers with ReportContentTestFactory with ReportJsonProtocol {
 
   import ReportContentTestFactory._
 

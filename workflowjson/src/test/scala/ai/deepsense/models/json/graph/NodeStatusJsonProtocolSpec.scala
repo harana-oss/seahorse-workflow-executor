@@ -2,6 +2,7 @@ package ai.deepsense.models.json.graph
 
 import spray.json._
 
+import org.scalatest.matchers.should.Matchers
 import ai.deepsense.commons.datetime.DateTimeConverter
 import ai.deepsense.commons.exception.DeepSenseFailure
 import ai.deepsense.commons.exception.FailureCode

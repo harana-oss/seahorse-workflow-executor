@@ -9,14 +9,14 @@ import scala.concurrent.Future
 import scala.language.postfixOps
 
 import akka.actor.ActorSystem
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
 import spray.http._
 
 import ai.deepsense.commons.models.Id
 import ai.deepsense.commons.utils.RetryActor.RetryLimitReachedException
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class NotebookRestClientSpec extends WordSpec with Matchers {
+class NotebookRestClientSpec extends AnyWordSpec with Matchers {
 
   implicit val as = ActorSystem()
 

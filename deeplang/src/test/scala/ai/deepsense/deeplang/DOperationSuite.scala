@@ -2,7 +2,7 @@ package ai.deepsense.deeplang
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import ai.deepsense.commons.utils.Version
 import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
@@ -46,7 +46,7 @@ object DOperationForPortTypes {
 
 }
 
-class DOperationSuite extends FunSuite with DeeplangTestSupport {
+class DOperationSuite extends AnyFunSuite with DeeplangTestSupport {
 
   test("It is possible to implement simple operations") {
     import DClassesForDOperations._

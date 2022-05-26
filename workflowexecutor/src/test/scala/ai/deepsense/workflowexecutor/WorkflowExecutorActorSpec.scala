@@ -1,56 +1,43 @@
 package ai.deepsense.workflowexecutor
 
-import scala.concurrent.duration._
-
-import akka.actor.Actor
-import akka.actor.ActorRef
-import akka.actor.ActorSystem
-import akka.testkit.TestActorRef
-import akka.testkit.TestKit
-import akka.testkit.TestProbe
-import org.mockito.Matchers._
-import org.mockito.Mockito._
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
-import org.scalatest._
-import org.scalatest.concurrent.Eventually
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.concurrent.ScaledTimeSpans
-import org.scalatest.mockito.MockitoSugar
-import spray.json.JsObject
 import ai.deepsense.commons.datetime.DateTimeConverter
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.doperations.{ReadDataFrame, WriteDataFrame}
 import ai.deepsense.deeplang.doperations.inout._
-import ai.deepsense.deeplang.doperations.readwritedataframe.FilePath
-import ai.deepsense.deeplang.doperations.readwritedataframe.FileScheme
-import ai.deepsense.deeplang.doperations.ReadDataFrame
-import ai.deepsense.deeplang.doperations.WriteDataFrame
+import ai.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.Node.Id
 import ai.deepsense.graph._
-import ai.deepsense.graph.nodestate.Aborted
-import ai.deepsense.graph.nodestate.NodeStatus
-import ai.deepsense.graph.nodestate.Queued
-import ai.deepsense.graph.nodestate.Running
-import ai.deepsense.models.workflows.EntitiesMap
-import ai.deepsense.models.workflows.Workflow
+import ai.deepsense.graph.nodestate.{Aborted, NodeStatus, Queued, Running}
 import ai.deepsense.models.workflows._
 import ai.deepsense.reportlib.model.ReportContent
 import ai.deepsense.reportlib.model.factory.ReportContentTestFactory
 import ai.deepsense.workflowexecutor.WorkflowExecutorActor.Messages._
-import ai.deepsense.workflowexecutor.WorkflowManagerClientActorProtocol.GetWorkflow
-import ai.deepsense.workflowexecutor.WorkflowManagerClientActorProtocol.SaveState
-import ai.deepsense.workflowexecutor.WorkflowManagerClientActorProtocol.SaveWorkflow
+import ai.deepsense.workflowexecutor.WorkflowManagerClientActorProtocol.{GetWorkflow, SaveState, SaveWorkflow}
 import ai.deepsense.workflowexecutor.WorkflowNodeExecutorActor.Messages.Delete
 import ai.deepsense.workflowexecutor.partialexecution._
+import akka.actor.{Actor, ActorRef, ActorSystem}
+import akka.testkit.{TestActorRef, TestKit, TestProbe}
 import org.apache.spark.SparkContext
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito._
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
+import org.scalatest._
+import org.scalatest.concurrent.{Eventually, ScalaFutures, ScaledTimeSpans}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatestplus.mockito.MockitoSugar
+import spray.json.JsObject
+
+import scala.concurrent.duration._
 
 class WorkflowExecutorActorSpec
     extends TestKit(ActorSystem("WorkflowExecutorActorSpec"))
-    with WordSpecLike
+    with AnyWordSpecLike
     with BeforeAndAfterAll
     with Matchers
     with MockitoSugar
@@ -369,7 +356,7 @@ class WorkflowExecutorActorSpec
         val inferredState                            = mock[InferredState]
         when(statefulWorkflow.workflowWithResults).thenReturn(workflowWithResults)
         when(statefulWorkflow.inferState).thenReturn(inferredState)
-        doReturn(removedNodes).when(statefulWorkflow).getNodesRemovedByWorkflow(workflow)
+        doReturn(removedNodes, Nil:_*).when(statefulWorkflow).getNodesRemovedByWorkflow(workflow)
 
         probe.send(wea, UpdateStruct(workflow))
 

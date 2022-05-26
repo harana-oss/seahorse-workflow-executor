@@ -1,7 +1,8 @@
 package ai.deepsense.reportlib.model
 
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import spray.json._
 
 import ai.deepsense.commons.types.ColumnType
@@ -9,7 +10,7 @@ import ai.deepsense.commons.types.ColumnType.ColumnType
 import ai.deepsense.commons.types.ColumnType.ColumnType
 import ai.deepsense.reportlib.model.factory.TableTestFactory
 
-class TableJsonSpec extends WordSpec with Matchers with TableTestFactory with ReportJsonProtocol {
+class TableJsonSpec extends AnyWordSpec with Matchers with TableTestFactory with ReportJsonProtocol {
 
   "Table" should {
     "serialize" when {

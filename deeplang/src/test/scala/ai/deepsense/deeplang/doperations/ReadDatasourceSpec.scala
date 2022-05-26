@@ -2,8 +2,8 @@ package ai.deepsense.deeplang.doperations
 
 import java.util.UUID
 
-import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.any
 
 import ai.deepsense.commons.datasource.DatasourceTestData
 import ai.deepsense.commons.rest.client.datasources.DatasourceClient

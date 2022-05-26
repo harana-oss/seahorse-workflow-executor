@@ -1,13 +1,13 @@
 package ai.deepsense.graph
 
-import org.mockito.Matchers.{eq => isEqualTo, _}
+import org.mockito.ArgumentMatchers.{ eq => isEqualTo, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-
 import ai.deepsense.deeplang.DOperation
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import org.mockito.ArgumentMatchers.any
 
 class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
 

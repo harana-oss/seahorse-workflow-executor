@@ -1,7 +1,6 @@
 package ai.deepsense.deeplang.doperations
 
 import org.scalatest._
-
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
@@ -11,9 +10,11 @@ import ai.deepsense.deeplang.doperations.readwritedataframe.FileScheme
 import ai.deepsense.deeplang.utils.DataFrameMatchers
 import ai.deepsense.deeplang.doperations.readwritedataframe.googlestorage._
 import ai.deepsense.deeplang.google.GoogleServices
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
 
 class GoogleSheetSpec
-    extends FreeSpec
+    extends AnyFreeSpec
     with BeforeAndAfter
     with BeforeAndAfterAll
     with LocalExecutionContext

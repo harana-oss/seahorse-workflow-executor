@@ -1,30 +1,24 @@
 package ai.deepsense.deeplang.doperables
 
-import java.sql.Timestamp
-
+import ai.deepsense.commons.types.ColumnType
+import ai.deepsense.deeplang.DeeplangIntegTestSupport
+import ai.deepsense.deeplang.doperables.MissingValuesHandler.{EmptyColumnsStrategy, MissingValueIndicatorChoice}
+import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
+import ai.deepsense.deeplang.doperations.exceptions.{MultipleTypesReplacementException, ValueConversionException}
+import ai.deepsense.deeplang.params.exceptions.EmptyColumnPrefixNameException
+import ai.deepsense.deeplang.params.selections.{IndexColumnSelection, IndexRangeColumnSelection, MultipleColumnSelection, TypeColumnSelection}
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 import org.joda.time.DateTime
-import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-import ai.deepsense.commons.types.ColumnType
-import ai.deepsense.deeplang.DeeplangIntegTestSupport
-import ai.deepsense.deeplang.doperables.MissingValuesHandler.EmptyColumnsStrategy
-import ai.deepsense.deeplang.doperables.MissingValuesHandler.MissingValueIndicatorChoice
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
-import ai.deepsense.deeplang.doperations.exceptions.MultipleTypesReplacementException
-import ai.deepsense.deeplang.doperations.exceptions.ValueConversionException
-import ai.deepsense.deeplang.params.exceptions.EmptyColumnPrefixNameException
-import ai.deepsense.deeplang.params.selections.IndexColumnSelection
-import ai.deepsense.deeplang.params.selections.IndexRangeColumnSelection
-import ai.deepsense.deeplang.params.selections.MultipleColumnSelection
-import ai.deepsense.deeplang.params.selections.TypeColumnSelection
+import java.sql.Timestamp
 
 class MissingValuesHandlerIntegSpec
     extends DeeplangIntegTestSupport
-    with GeneratorDrivenPropertyChecks
+    with ScalaCheckDrivenPropertyChecks
     with Matchers
     with TransformerSerialization {
 

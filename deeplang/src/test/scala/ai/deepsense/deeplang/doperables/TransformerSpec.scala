@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang.doperables
 
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame

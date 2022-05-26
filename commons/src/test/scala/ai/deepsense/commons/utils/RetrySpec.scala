@@ -7,13 +7,13 @@ import scala.language.postfixOps
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
 
 import ai.deepsense.commons.utils.RetryActor.RetriableException
 import ai.deepsense.commons.utils.RetryActor.RetryLimitReachedException
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class RetrySpec extends WordSpec with Matchers {
+class RetrySpec extends AnyWordSpec with Matchers {
 
   val uutName = classOf[Retry[_]].getSimpleName.filterNot(_ == '$')
 

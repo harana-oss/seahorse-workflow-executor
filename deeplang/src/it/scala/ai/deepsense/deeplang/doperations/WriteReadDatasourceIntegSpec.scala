@@ -2,7 +2,7 @@ package ai.deepsense.deeplang.doperations
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FreeSpec
+import org.scalatest.freespec.AnyFreeSpec
 
 import ai.deepsense.deeplang.utils.DataFrameMatchers
 import ai.deepsense.deeplang.InMemoryDataFrame
@@ -11,7 +11,7 @@ import ai.deepsense.deeplang.TestDataSources
 import ai.deepsense.deeplang.TestFiles
 
 class WriteReadDatasourceIntegSpec
-    extends FreeSpec
+    extends AnyFreeSpec
     with BeforeAndAfter
     with BeforeAndAfterAll
     with LocalExecutionContext

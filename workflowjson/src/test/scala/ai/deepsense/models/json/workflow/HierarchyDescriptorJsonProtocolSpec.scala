@@ -1,7 +1,9 @@
 package ai.deepsense.models.json.workflow
 
 import org.scalatest._
-import org.scalatest.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.flatspec.AnyFlatSpec
 import spray.json._
 
 import ai.deepsense.deeplang.catalogs.doperable.ClassDescriptor
@@ -9,7 +11,7 @@ import ai.deepsense.deeplang.catalogs.doperable.HierarchyDescriptor
 import ai.deepsense.deeplang.catalogs.doperable.TraitDescriptor
 
 class HierarchyDescriptorJsonProtocolSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with Matchers
     with MockitoSugar
     with HierarchyDescriptorJsonProtocol {

@@ -1,10 +1,10 @@
 package ai.deepsense.commons.json.envelope
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
 import spray.json._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class EnvelopeSpec extends FlatSpec with Matchers with DefaultJsonProtocol {
+class EnvelopeSpec extends AnyFlatSpec with Matchers with DefaultJsonProtocol {
 
   val StringLabel = "ExampleOfStringLabel"
 

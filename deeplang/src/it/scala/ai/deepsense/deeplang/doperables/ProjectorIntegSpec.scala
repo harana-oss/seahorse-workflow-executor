@@ -1,13 +1,10 @@
 package ai.deepsense.deeplang.doperables
 
 import java.sql.Timestamp
-
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 import org.joda.time.DateTime
-import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.Projector.ColumnProjection
 import ai.deepsense.deeplang.doperables.Projector.RenameColumnChoice.Yes
@@ -16,10 +13,11 @@ import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerS
 import ai.deepsense.deeplang.doperations.exceptions.ColumnDoesNotExistException
 import ai.deepsense.deeplang.doperations.exceptions.DuplicatedColumnsException
 import ai.deepsense.deeplang.params.selections._
+import org.scalatest.matchers.should.Matchers
 
 class ProjectorIntegSpec
     extends DeeplangIntegTestSupport
-    with GeneratorDrivenPropertyChecks
+    with ScalaCheckDrivenPropertyChecks
     with Matchers
     with TransformerSerialization {
 

@@ -2,11 +2,11 @@ package ai.deepsense.deeplang.doperables
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
-import org.scalatest.Matchers
-
+import org.scalatest.matchers.should.Matchers
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
 import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
+import org.scalatest.matchers.should.Matchers
 
 class RowsFiltererIntegSpec extends DeeplangIntegTestSupport with Matchers with TransformerSerialization {
 

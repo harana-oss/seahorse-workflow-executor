@@ -39,6 +39,6 @@ object PublishSettings {
       </developers>))
 
   def disablePublishing = Seq(
-    PgpKeys.publishSigned := ()
+    PgpKeys.publishSigned := ((): Unit)
   )
 }

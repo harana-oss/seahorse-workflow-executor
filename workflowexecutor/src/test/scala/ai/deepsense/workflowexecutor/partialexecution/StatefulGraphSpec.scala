@@ -1,8 +1,8 @@
 package ai.deepsense.workflowexecutor.partialexecution
 
-import org.mockito.Matchers._
 import org.mockito.Mockito
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.any
 import org.scalatest.GivenWhenThen
 import org.scalatest.Inspectors
 
@@ -305,7 +305,7 @@ class StatefulGraphSpec
         )
 
         val graphSpy = Mockito.spy(graph)
-        doReturn(graphKnowledge).when(graphSpy).inferKnowledge(any(), any())
+        doReturn(graphKnowledge, Nil:_*).when(graphSpy).inferKnowledge(any(), any())
         val updatedGraph = graphSpy.inferAndApplyKnowledge(mock[InferContext])
 
         updatedGraph.states(idA) shouldBe 'Completed

@@ -2,7 +2,7 @@ package ai.deepsense.workflowexecutor.communication.mq.json
 
 import java.nio.charset.StandardCharsets
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import spray.json.JsArray
 import spray.json.JsNull
 import spray.json.JsObject

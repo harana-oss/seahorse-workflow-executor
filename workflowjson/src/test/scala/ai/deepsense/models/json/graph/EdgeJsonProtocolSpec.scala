@@ -2,6 +2,7 @@ package ai.deepsense.models.json.graph
 
 import spray.json._
 
+import org.scalatest.matchers.should.Matchers
 import ai.deepsense.graph.Edge
 import ai.deepsense.graph.Endpoint
 import ai.deepsense.graph.Node

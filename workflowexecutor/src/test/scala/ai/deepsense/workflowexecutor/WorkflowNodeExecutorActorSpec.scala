@@ -6,15 +6,14 @@ import akka.actor.Props
 import akka.testkit.TestActorRef
 import akka.testkit.TestKit
 import akka.testkit.TestProbe
-import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.{any, same}
 import org.scalatest.concurrent.Eventually
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfter
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.Matchers
-import org.scalatest.WordSpecLike
-
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.report.Report
 import ai.deepsense.deeplang.inference.InferenceWarnings
@@ -30,7 +29,7 @@ import ai.deepsense.workflowexecutor.WorkflowNodeExecutorActor.Messages.Start
 
 class WorkflowNodeExecutorActorSpec
     extends TestKit(ActorSystem("WorkflowNodeExecutorActorSpec"))
-    with WordSpecLike
+    with AnyWordSpecLike
     with Matchers
     with MockitoSugar
     with BeforeAndAfter

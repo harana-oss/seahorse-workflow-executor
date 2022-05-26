@@ -1,9 +1,7 @@
 package ai.deepsense.deeplang.doperations
 
 import java.util.UUID
-
 import org.scalatest._
-
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
@@ -11,12 +9,13 @@ import ai.deepsense.deeplang.doperations.inout.CsvParameters.ColumnSeparatorChoi
 import ai.deepsense.deeplang.doperations.inout._
 import ai.deepsense.deeplang.doperations.readwritedataframe.FileScheme
 import ai.deepsense.deeplang.utils.DataFrameMatchers
+import org.scalatest.freespec.AnyFreeSpec
 
 /** This suite shouldn't be executed on its own. It depends on an external standalone spark cluster. It should be
   * executed as a part of [[ClusterDependentSpecsSuite]].
   */
 @DoNotDiscover
-class InputOutputSpec extends FreeSpec with BeforeAndAfter with BeforeAndAfterAll with TestFiles with Logging {
+class InputOutputSpec extends AnyFreeSpec with BeforeAndAfter with BeforeAndAfterAll with TestFiles with Logging {
 
   import DataFrameMatchers._
 

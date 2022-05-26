@@ -2,8 +2,8 @@ package ai.deepsense.graph
 
 import scala.reflect.runtime.{universe => ru}
 
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
@@ -17,7 +17,7 @@ import ai.deepsense.graph.DClassesForDOperations._
 import ai.deepsense.graph.DOperationTestClasses._
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 
-class AbstractInferenceSpec extends WordSpec with DeeplangTestSupport with Matchers {
+class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Matchers {
 
   val hierarchy = new DOperableCatalog
 

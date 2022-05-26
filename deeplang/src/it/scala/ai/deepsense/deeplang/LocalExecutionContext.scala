@@ -5,7 +5,7 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import org.scalatest.mockito.MockitoSugar._
+import org.scalatestplus.mockito.MockitoSugar._
 
 import ai.deepsense.commons.rest.client.datasources.DatasourceClient
 import ai.deepsense.commons.rest.client.datasources.DatasourceInMemoryClientFactory

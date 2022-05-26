@@ -2,6 +2,8 @@ package ai.deepsense.models.json.workflow
 
 import spray.json._
 
+import org.scalatest.matchers.should.Matchers
+
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphWriter
 import ai.deepsense.models.workflows.Workflow
 import ai.deepsense.models.workflows.WorkflowMetadata

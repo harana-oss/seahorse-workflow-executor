@@ -1,16 +1,15 @@
 package ai.deepsense.graph
 
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
-
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import ai.deepsense.commons.serialization.Serialization
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.RandomNodeFactory._
 
 class DeeplangGraphSpec
-    extends FunSuite
+    extends AnyFunSuite
     with Matchers
     with Serialization
     with Logging

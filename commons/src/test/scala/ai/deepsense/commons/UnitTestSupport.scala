@@ -1,6 +1,6 @@
 package ai.deepsense.commons
 
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 /** Extends StandardSpec with features to aid unit testing including:
   *   - Support for mockito mocking

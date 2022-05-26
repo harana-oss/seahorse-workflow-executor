@@ -1,19 +1,16 @@
 package ai.deepsense.deeplang.doperations
 
-import scala.collection.JavaConverters._
-
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.IntegerType
-import org.apache.spark.sql.types.StructField
-import org.apache.spark.sql.types.StructType
-import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-class DataFrameSplitterIntegSpec extends DeeplangIntegTestSupport with GeneratorDrivenPropertyChecks with Matchers {
+import scala.collection.JavaConverters._
+
+class DataFrameSplitterIntegSpec extends DeeplangIntegTestSupport with ScalaCheckDrivenPropertyChecks with Matchers {
 
   "SplitDataFrame" should {
     "split randomly one df into two df in given range" in {

@@ -1,11 +1,11 @@
 package ai.deepsense.reportlib.model
 
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.commons.types.ColumnType
 
-class TableSpec extends WordSpec with Matchers {
+class TableSpec extends AnyWordSpec with Matchers {
 
   "Table" should {
     "throw IllegalArgumentException" when {

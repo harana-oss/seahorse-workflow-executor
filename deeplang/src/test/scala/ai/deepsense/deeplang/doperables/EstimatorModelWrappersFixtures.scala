@@ -9,7 +9,7 @@ import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame => SparkDataFrame}
 import org.apache.spark.sql.Dataset
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 
 import ai.deepsense.deeplang.doperables.report.Report
 import ai.deepsense.deeplang.doperables.serialization.SerializableSparkModel

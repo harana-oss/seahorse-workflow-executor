@@ -6,10 +6,10 @@ import java.io.IOException
 
 import scala.util.Success
 
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class DirectoryListFileFinderSpec extends WordSpec with Matchers {
+class DirectoryListFileFinderSpec extends AnyWordSpec with Matchers {
 
   val uutName: String = DirectoryListFileFinder.getClass.getSimpleName.filterNot(_ == '$')
 

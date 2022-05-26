@@ -1,8 +1,9 @@
 package ai.deepsense.deeplang.doperations
 
 import org.apache.spark.sql.types.StructType
-import org.mockito.Matchers._
+import org.scalatest.matchers.should.Matchers
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.any
 
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables._

@@ -2,12 +2,11 @@ package ai.deepsense.deeplang.doperables
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.types._
-import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
+import org.mockito.ArgumentMatchers.{any, same}
 import spray.json.JsObject
-
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.doperables.InnerWorkflowTestFactory._
 import ai.deepsense.deeplang.doperables.dataframe.DataFrame

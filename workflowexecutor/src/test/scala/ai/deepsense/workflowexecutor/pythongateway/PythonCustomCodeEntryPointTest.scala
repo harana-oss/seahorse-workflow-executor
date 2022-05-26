@@ -5,9 +5,9 @@ import java.util.concurrent.TimeoutException
 import scala.concurrent.duration._
 
 import org.apache.spark.SparkContext
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.deeplang.CustomCodeExecutor
 import ai.deepsense.deeplang.DataFrameStorage
@@ -15,7 +15,7 @@ import ai.deepsense.deeplang.OperationExecutionDispatcher
 import ai.deepsense.sparkutils.SparkSQLSession
 import ai.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 
-class PythonCustomCodeEntryPointTest extends WordSpec with MockitoSugar with Matchers {
+class PythonCustomCodeEntryPointTest extends AnyWordSpec with MockitoSugar with Matchers {
 
   "PythonEntryPoint" should {
     "throw on uninitialized code executor" in {

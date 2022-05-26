@@ -2,8 +2,10 @@ package ai.deepsense.models.json.workflow
 
 import scala.util.Success
 
-import org.mockito.Matchers._
+import org.scalatest.matchers.should.Matchers
+
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.any
 import spray.json._
 
 import ai.deepsense.commons.utils.Logging

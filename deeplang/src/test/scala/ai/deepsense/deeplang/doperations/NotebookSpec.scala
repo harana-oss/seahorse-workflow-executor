@@ -7,14 +7,14 @@ import scala.concurrent.Future
 import scala.util.Try
 
 import akka.actor.ActorSystem
-import org.mockito.Matchers.{eq => eqMatcher, _}
+import org.mockito.ArgumentMatchers.{eq => eqMatcher, _}
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentCaptor
-import org.mockito.Mockito
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.Eventually
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.Matchers
-import org.scalatest.WordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.commons.mail.EmailSender
 import ai.deepsense.commons.rest.client.NotebookRestClient
@@ -24,7 +24,7 @@ import ai.deepsense.deeplang.doperations.Notebook.SendEmailChoice
 import ai.deepsense.deeplang.ContextualDataFrameStorage
 import ai.deepsense.deeplang.ExecutionContext
 
-class NotebookSpec extends WordSpec with Matchers with MockitoSugar with Eventually {
+class NotebookSpec extends AnyWordSpec with Matchers with MockitoSugar with Eventually {
 
   def uutName(uut: Notebook): String = uut.getClass.getSimpleName.filterNot(_ == '$')
 

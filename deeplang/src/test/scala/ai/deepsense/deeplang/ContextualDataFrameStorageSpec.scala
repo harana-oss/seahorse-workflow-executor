@@ -1,8 +1,8 @@
 package ai.deepsense.deeplang
 
 import org.apache.spark.sql.{DataFrame => SparkDataFrame}
-import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfter
 
 import ai.deepsense.commons.models.Id
