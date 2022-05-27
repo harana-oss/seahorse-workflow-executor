@@ -7,7 +7,7 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.types._
 import org.scalatest.BeforeAndAfter
 import ai.deepsense.commons.datetime.DateTimeConverter
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseIOException
+import ai.deepsense.deeplang.actions.exceptions.HaranaIOException
 import ai.deepsense.deeplang.actions.exceptions.UnsupportedColumnTypeException
 import ai.deepsense.deeplang.actions.inout._
 import ai.deepsense.deeplang.actions.readwritedataframe.filestorage.ParquetNotSupported
@@ -293,7 +293,7 @@ class WriteDataFrameWithDriverFilesIntegSpec extends DeeplangIntegTestSupport wi
                   .setNamesIncluded(true)
               )
           )
-      a[DeepSenseIOException] shouldBe thrownBy {
+      a[HaranaIOException] shouldBe thrownBy {
         wdf1.executeUntyped(Vector(dataframe))(executionContext)
       }
     }

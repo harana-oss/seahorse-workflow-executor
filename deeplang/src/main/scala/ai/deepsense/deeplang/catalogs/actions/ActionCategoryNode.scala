@@ -4,9 +4,9 @@ import scala.collection.immutable.SortedMap
 
 import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.catalogs.SortPriority
-import ai.deepsense.deeplang.catalogs.actions.DOperationCategoryNode.InnerNodes
+import ai.deepsense.deeplang.catalogs.actions.ActionCategoryNode.InnerNodes
 
-/** Node in DOperationCategoryTree. Represents certain category, holds its subcategories and assigned operations.
+/** Node in ActionCategoryTree. Represents certain category, holds its subcategories and assigned operations.
   * Objects of this class are immutable.
   * @param category
   *   category represented by this node or None if it is root
@@ -15,9 +15,9 @@ import ai.deepsense.deeplang.catalogs.actions.DOperationCategoryNode.InnerNodes
   * @param operations
   *   operations directly in category represented by this node
   */
-case class DOperationCategoryNode(
+case class ActionCategoryNode(
                                    category: Option[ActionCategory] = None,
-                                   successors: InnerNodes = DOperationCategoryNode.emptyInnerNodes,
+                                   successors: InnerNodes = ActionCategoryNode.emptyInnerNodes,
                                    operations: List[ActionDescriptor] = List.empty
 ) {
 
@@ -32,17 +32,17 @@ case class DOperationCategoryNode(
   private def addOperationAtPath(
                                   operation: ActionDescriptor,
                                   path: List[ActionCategory]
-  ): DOperationCategoryNode = {
+  ): ActionCategoryNode = {
     path match {
       case Nil              => copy(operations = (operations :+ operation).sortWith(_.priority < _.priority))
       case category :: tail =>
-        val successor        = successors.getOrElse(category, DOperationCategoryNode(Some(category)))
+        val successor        = successors.getOrElse(category, ActionCategoryNode(Some(category)))
         val updatedSuccessor = successor.addOperationAtPath(operation, tail)
         copy(successors = successors + (category -> updatedSuccessor))
     }
   }
 
-  /** Adds a new DOperation to the tree represented by this node under a specified category.
+  /** Adds a new Action to the tree represented by this node under a specified category.
     * @param operation
     *   operation descriptor to be added
     * @param category
@@ -50,7 +50,7 @@ case class DOperationCategoryNode(
     * @return
     *   category tree identical to this but with operation added
     */
-  def addOperation(operation: ActionDescriptor, category: ActionCategory): DOperationCategoryNode =
+  def addOperation(operation: ActionDescriptor, category: ActionCategory): ActionCategoryNode =
     addOperationAtPath(operation, category.pathFromRoot)
 
   /** Gets all operations inside a tree
@@ -74,10 +74,10 @@ case class DOperationCategoryNode(
 
 }
 
-object DOperationCategoryNode {
+object ActionCategoryNode {
 
-  type InnerNodes = SortedMap[ActionCategory, DOperationCategoryNode]
+  type InnerNodes = SortedMap[ActionCategory, ActionCategoryNode]
 
-  def emptyInnerNodes = SortedMap[ActionCategory, DOperationCategoryNode]()
+  def emptyInnerNodes = SortedMap[ActionCategory, ActionCategoryNode]()
 
 }

@@ -35,8 +35,7 @@ case class Join()
 
   override val name = "Join"
 
-  override val description: String =
-    "Joins two DataFrames to a DataFrame"
+  override val description: String = "Joins two DataFrames to a DataFrame"
 
   override val since: Version = Version(0, 4, 0)
 

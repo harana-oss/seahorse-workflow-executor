@@ -10,7 +10,7 @@ import ai.deepsense.commons.models.Entity
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actionobjects.descriptions.ParamsInferenceResult
 import ai.deepsense.deeplang.actionobjects.descriptions.DataFrameInferenceResult
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.inference.InferenceWarning
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.Params
@@ -76,8 +76,8 @@ class InferredStateJsonProtocolSpec extends WorkflowJsonTestSupport with Inferre
         ),
         InferenceWarnings(new InferenceWarning("warning1") {}, new InferenceWarning("warning2") {}),
         Vector(
-          new DeepLangException("error1") {},
-          new DeepLangException("error2") {}
+          new FlowException("error1") {},
+          new FlowException("error2") {}
         )
       )
     )

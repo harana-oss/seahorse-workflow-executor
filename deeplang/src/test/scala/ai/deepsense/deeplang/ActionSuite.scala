@@ -22,7 +22,7 @@ object DClassesForActions {
 
 }
 
-object DOperationForPortTypes {
+object ActionForPortTypes {
 
   import DClassesForActions._
 
@@ -89,7 +89,7 @@ class ActionSuite extends AnyFunSuite with DeeplangTestSupport {
     assert(warnings == InferenceWarnings.empty)
   }
 
-  test("It is possible to override knowledge inferring in DOperation") {
+  test("It is possible to override knowledge inferring in Action") {
     import DClassesForActions._
 
     val mockedWarnings = mock[InferenceWarnings]
@@ -122,13 +122,13 @@ class ActionSuite extends AnyFunSuite with DeeplangTestSupport {
   }
 
   test("Getting types required in input port") {
-    import DOperationForPortTypes._
+    import ActionForPortTypes._
     val op = new SimpleOperation
     assert(op.inPortTypes == Vector(ru.typeTag[DClassesForActions.A1]))
   }
 
   test("Getting types required in output port") {
-    import DOperationForPortTypes._
+    import ActionForPortTypes._
     val op = new SimpleOperation
     assert(op.outPortTypes == Vector(ru.typeTag[DClassesForActions.A2]))
   }

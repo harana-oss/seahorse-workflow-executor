@@ -8,7 +8,7 @@ import ai.deepsense.commons.datetime.DateTimeConverter
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.deeplang._
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 
 trait GraphTestSupport {
   self: MockitoSugar =>
@@ -71,7 +71,7 @@ trait GraphTestSupport {
     )
   }
 
-  protected def generateNodes(ops: Action*): Seq[(Node.Id, DeeplangNode)] = {
+  protected def generateNodes(ops: Action*): Seq[(Node.Id, FlowNode)] = {
     val nodes = ops.map(o => Node(Node.Id.randomId, o))
     nodes.map(n => n.id -> n)
   }

@@ -3,7 +3,7 @@ package ai.deepsense.deeplang.actions.exceptions
 import ai.deepsense.commons.types.ColumnType
 import ColumnType.ColumnType
 
-case class WrongColumnTypeException(override val message: String) extends DOperationExecutionException(message, None)
+case class WrongColumnTypeException(override val message: String) extends ActionExecutionException(message, None)
 
 object WrongColumnTypeException {
 

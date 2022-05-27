@@ -12,9 +12,9 @@ import ai.deepsense.commons.serialization.Serialization
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.UnitTestSupport
 import ai.deepsense.deeplang.ActionObject
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.inference.InferContext
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph.Node.Id
 import ai.deepsense.graph.RandomNodeFactory._
 import ai.deepsense.graph._
@@ -215,7 +215,7 @@ class StatefulGraphSpec
         .nodeStarted(idS)
         .nodeFinished(idS, Seq(mock[Entity.Id]), Map(), Map())
         .nodeStarted(idV)
-        .nodeFailed(idV, new DeepLangException("node execution error for test") {})
+        .nodeFailed(idV, new FlowException("node execution error for test") {})
 
       graph.states(idS) shouldBe 'Completed
       graph.states(idU) shouldBe 'Queued
@@ -223,7 +223,7 @@ class StatefulGraphSpec
       graph.states(idT) shouldBe 'Aborted
     }
     "be serializable" in {
-      import ai.deepsense.graph.DOperationTestClasses._
+      import ai.deepsense.graph.ActionTestClasses._
       val operationWithInitializedLogger = new ActionAToALogging
       val id                             = Node.Id.randomId
       val id2                            = Node.Id.randomId
@@ -254,11 +254,11 @@ class StatefulGraphSpec
         idD -> mock[NodeStateWithResults],
         idE -> mock[NodeStateWithResults]
       )
-      val g1 = StatefulGraph(DeeplangGraph(nodeSet, edgeSet), states, None)
+      val g1 = StatefulGraph(FlowGraph(nodeSet, edgeSet), states, None)
       val nodeFailedStatus =
         NodeStateWithResults(NodeState(nodeFailed, Some(EntitiesMap())), Map(), None)
       val description: Some[FailureDescription] = Some(mock[FailureDescription])
-      val g2                                    = StatefulGraph(DeeplangGraph(Set(nodeB), Set()), Map(idB -> nodeFailedStatus), description)
+      val g2                                    = StatefulGraph(FlowGraph(Set(nodeB), Set()), Map(idB -> nodeFailedStatus), description)
       val updated                               = g1.updateStates(g2)
       updated.states should contain theSameElementsAs g1.states.updated(idB, nodeFailedStatus)
       updated.executionFailure shouldBe description
@@ -266,7 +266,7 @@ class StatefulGraphSpec
     "recursively mark nodes as draft" in {
       val statusCompleted = nodeCompleted
       val drafted = StatefulGraph(
-        DeeplangGraph(nodeSet, edgeSet),
+        FlowGraph(nodeSet, edgeSet),
         Map(
           idA -> nodeState(statusCompleted),
           idB -> nodeState(nodeFailed),
@@ -289,7 +289,7 @@ class StatefulGraphSpec
       "inferrenced knowledge contains errors" in {
         val statusCompleted = nodeCompleted
         val graph = StatefulGraph(
-          DeeplangGraph(nodeSet, edgeSet),
+          FlowGraph(nodeSet, edgeSet),
           Map(
             idA -> nodeState(statusCompleted),
             idB -> nodeState(nodeFailed),
@@ -324,12 +324,12 @@ class StatefulGraphSpec
   }
 
   private def graph(
-      nodes: Set[DeeplangNode],
-      edges: Set[Edge],
-      states: Map[Node.Id, NodeStateWithResults],
-      state: GraphState
+                     nodes: Set[FlowNode],
+                     edges: Set[Edge],
+                     states: Map[Node.Id, NodeStateWithResults],
+                     state: GraphState
   ): StatefulGraph = {
-    val directedGraph = DeeplangGraph(nodes, edges)
+    val directedGraph = FlowGraph(nodes, edges)
     StatefulGraph(directedGraph, states, None)
   }
 
@@ -364,7 +364,7 @@ class StatefulGraphSpec
 object StatefulGraphSpec {
 
   case class TestException()
-      extends DeepLangException(
+      extends FlowException(
         "This is a test exception thrown on purpose."
       )
 

@@ -7,7 +7,7 @@ import spray.json._
 
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.deeplang.CatalogRecorder
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.workflows.Workflow
 import ai.deepsense.models.workflows.WorkflowMetadata
@@ -59,7 +59,7 @@ class ProtocolJsonDeserializerSpec extends StandardSpec with MockitoSugar {
       val readMessage: Any = serializeAndRead(rawMessage, protocolDeserializer)
       readMessage shouldBe UpdateWorkflow(
         workflowId,
-        Workflow(WorkflowMetadata(WorkflowType.Batch, "1.0.0"), DeeplangGraph(), JsObject())
+        Workflow(WorkflowMetadata(WorkflowType.Batch, "1.0.0"), FlowGraph(), JsObject())
       )
     }
 

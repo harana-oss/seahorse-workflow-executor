@@ -13,8 +13,8 @@ import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.WriteDatasource.WriteDatasourceParameters
 import ai.deepsense.deeplang.actions.inout.OutputStorageTypeChoice
 import ai.deepsense.deeplang.actions.readwritedatasource.FromDatasourceConverters
-import ai.deepsense.deeplang.exceptions.DeepLangException
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.datasource.DatasourceIdForWriteParameter
@@ -59,7 +59,7 @@ class WriteDatasource() extends Action1To0[DataFrame] with WriteDatasourceParame
 
     val parametersValidationErrors = writeDataFrame.validateParams
     if (parametersValidationErrors.nonEmpty)
-      throw new DeepLangMultiException(parametersValidationErrors)
+      throw new FlowMultiException(parametersValidationErrors)
     writeDataFrame.inferKnowledge(k0)(context)
   }
 
@@ -86,7 +86,7 @@ class WriteDatasource() extends Action1To0[DataFrame] with WriteDatasourceParame
         FromDatasourceConverters.OutputFileStorageType
           .get(datasource.getParams.getHdfsParams)
           .setShouldOverwrite(getShouldOverwrite())
-      case DatasourceType.EXTERNALFILE      => throw new DeepLangException("Cannot write to external file")
+      case DatasourceType.EXTERNALFILE      => throw new FlowException("Cannot write to external file")
       case DatasourceType.LIBRARYFILE       =>
         FromDatasourceConverters.OutputFileStorageType
           .get(datasource.getParams.getLibraryFileParams)
@@ -98,7 +98,7 @@ class WriteDatasource() extends Action1To0[DataFrame] with WriteDatasourceParame
 
   private def checkDatasourceExists(datasourceOpt: Option[Datasource]) = datasourceOpt match {
     case Some(datasource) => datasource
-    case None             => throw new DeepLangException(s"Datasource with id = ${getDatasourceId()} not found")
+    case None             => throw new FlowException(s"Datasource with id = ${getDatasourceId()} not found")
   }
 
 }

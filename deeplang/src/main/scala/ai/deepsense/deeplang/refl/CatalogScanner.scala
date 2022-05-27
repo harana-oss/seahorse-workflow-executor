@@ -38,8 +38,8 @@ class CatalogScanner(jarsUrls: Seq[URL]) extends CatalogRegistrant with Logging 
     } {
       logger.debug(s"Trying to register class $registrable")
       registrable match {
-        case DOperationMatcher(doperation) => registerDOperation(registrar, doperation, priority)
-        case other                         => logger.warn(s"Only DOperation can be `@Register`ed. '$other' not supported.")
+        case ActionMatcher(doperation) => registerAction(registrar, doperation, priority)
+        case other                         => logger.warn(s"Only Action can be `@Register`ed. '$other' not supported.")
       }
     }
   }
@@ -76,7 +76,7 @@ class CatalogScanner(jarsUrls: Seq[URL]) extends CatalogRegistrant with Logging 
     }
   }
 
-  private def registerDOperation(
+  private def registerAction(
                                   registrar: CatalogRegistrar,
                                   operation: Class[Action],
                                   priority: SortPriority
@@ -105,6 +105,6 @@ class CatalogScanner(jarsUrls: Seq[URL]) extends CatalogRegistrant with Logging 
 
   }
 
-  object DOperationMatcher extends AssignableFromExtractor(classOf[Action])
+  object ActionMatcher extends AssignableFromExtractor(classOf[Action])
 
 }

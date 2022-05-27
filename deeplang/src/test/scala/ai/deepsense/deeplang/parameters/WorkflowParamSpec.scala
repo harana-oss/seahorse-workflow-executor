@@ -16,8 +16,8 @@ class WorkflowParamSpec extends AbstractParameterSpec[InnerWorkflow, WorkflowPar
 
   override def graphReader: GraphReader = {
     val catalog = ActionCatalog()
-    catalog.registerDOperation(ActionCategories.IO, () => Source(), SortPriority.coreDefault)
-    catalog.registerDOperation(ActionCategories.IO, () => Sink(), SortPriority.coreDefault)
+    catalog.registerAction(ActionCategories.IO, () => Source(), SortPriority.coreDefault)
+    catalog.registerAction(ActionCategories.IO, () => Sink(), SortPriority.coreDefault)
     new GraphReader(catalog)
   }
 

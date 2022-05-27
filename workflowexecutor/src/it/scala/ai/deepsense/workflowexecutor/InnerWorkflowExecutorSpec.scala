@@ -6,7 +6,7 @@ import org.apache.spark.sql.types.StructField
 import org.apache.spark.sql.types.StructType
 import spray.json._
 
-import ai.deepsense.commons.exception.DeepSenseException
+import ai.deepsense.commons.exception.HaranaException
 import ai.deepsense.deeplang.actionobjects.SqlColumnTransformer
 import ai.deepsense.deeplang.actionobjects.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice
 import ai.deepsense.deeplang.actionobjects.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
@@ -20,7 +20,7 @@ import ai.deepsense.deeplang.CatalogRecorder
 import ai.deepsense.deeplang.DeeplangIntegTestSupport
 import ai.deepsense.deeplang.InnerWorkflowExecutor
 import ai.deepsense.deeplang._
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.graph.Edge
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -74,24 +74,24 @@ class InnerWorkflowExecutorSpec extends DeeplangIntegTestSupport with InnerWorkf
 
   val otherNode   = Node(Node.Id.randomId, new CreateRegressionEvaluator())
 
-  val simpleGraph = DeeplangGraph(
+  val simpleGraph = FlowGraph(
     Set(sourceNode, sinkNode, innerNode),
     Set(Edge(sourceNode, 0, innerNode, 0), Edge(innerNode, 0, sinkNode, 0))
   )
 
-  val disconnectedGraph = DeeplangGraph(Set(sourceNode, sinkNode, innerNode), Set(Edge(sourceNode, 0, innerNode, 0)))
+  val disconnectedGraph = FlowGraph(Set(sourceNode, sinkNode, innerNode), Set(Edge(sourceNode, 0, innerNode, 0)))
 
-  val cyclicGraph = DeeplangGraph(
+  val cyclicGraph = FlowGraph(
     Set(sourceNode, sinkNode, innerNode),
     Set(Edge(sourceNode, 0, sinkNode, 0), Edge(innerNode, 0, innerNode, 0))
   )
 
-  val failingGraph = DeeplangGraph(
+  val failingGraph = FlowGraph(
     Set(sourceNode, sinkNode, failingNode),
     Set(Edge(sourceNode, 0, failingNode, 0), Edge(failingNode, 0, sinkNode, 0))
   )
 
-  val otherGraph = DeeplangGraph(Set(sourceNode, sinkNode, otherNode), Set(Edge(sourceNode, 0, sinkNode, 0)))
+  val otherGraph = FlowGraph(Set(sourceNode, sinkNode, otherNode), Set(Edge(sourceNode, 0, sinkNode, 0)))
 
   val dOperationsCatalog              = CatalogRecorder.resourcesCatalogRecorder.catalogs.operations
 
@@ -146,21 +146,21 @@ class InnerWorkflowExecutorSpec extends DeeplangIntegTestSupport with InnerWorkf
 
       "workflow contains cycle" in {
         val innerWorkflow = InnerWorkflow(cyclicGraph, JsObject())
-        a[DeepSenseException] should be thrownBy {
+        a[HaranaException] should be thrownBy {
           executor.execute(commonExecutionContext, innerWorkflow, df)
         }
       }
 
       "workflow is not connected" in {
         val innerWorkflow = InnerWorkflow(disconnectedGraph, JsObject())
-        a[DeepSenseException] should be thrownBy {
+        a[HaranaException] should be thrownBy {
           executor.execute(commonExecutionContext, innerWorkflow, df)
         }
       }
 
       "workflow execution fails" in {
         val innerWorkflow = InnerWorkflow(failingGraph, JsObject())
-        a[DeepSenseException] should be thrownBy {
+        a[HaranaException] should be thrownBy {
           executor.execute(commonExecutionContext, innerWorkflow, df)
         }
       }

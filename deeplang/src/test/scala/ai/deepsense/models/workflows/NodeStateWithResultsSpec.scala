@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.commons.models.Entity
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.Knowledge
 import ai.deepsense.deeplang.ActionObject
@@ -38,7 +38,7 @@ class NodeStateWithResultsSpec extends AnyWordSpec with Matchers with MockitoSug
 
   private def draftNodeState = {
     NodeStateWithResults.draft.withKnowledge(
-      NodeInferenceResult(Vector(Knowledge(mock[ActionObject])), mock[InferenceWarnings], Vector(mock[DeepLangException]))
+      NodeInferenceResult(Vector(Knowledge(mock[ActionObject])), mock[InferenceWarnings], Vector(mock[FlowException]))
     )
   }
 

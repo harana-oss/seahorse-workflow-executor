@@ -22,9 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks the class to be registered in {@link ai.deepsense.deeplang.Action DOperation} catalog.
+ * Marks the class to be registered in {@link ai.deepsense.deeplang.Action Action} catalog.
  *
- * @see ai.deepsense.deeplang.Action DOperation
+ * @see ai.deepsense.deeplang.Action Action
  */
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.TYPE})

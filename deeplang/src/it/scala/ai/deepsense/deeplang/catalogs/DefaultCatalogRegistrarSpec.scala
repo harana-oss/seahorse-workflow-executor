@@ -18,7 +18,7 @@ class DefaultCatalogRegistrarSpec extends UnitSpec with BeforeAndAfter {
       operationCatalog.operations.keys should contain(SpiLoadedOperation.spiLoadedOperationId)
     }
     "create operation loaded using test registator" in {
-      val operation = operationCatalog.createDOperation(SpiLoadedOperation.spiLoadedOperationUuid)
+      val operation = operationCatalog.createAction(SpiLoadedOperation.spiLoadedOperationUuid)
       operation.id shouldBe SpiLoadedOperation.spiLoadedOperationId
     }
   }

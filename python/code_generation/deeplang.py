@@ -91,7 +91,7 @@ def default_infer_implementation(out_arity, pass_type_tag):
       default_inference_warnings)
 
 def print_operation(in_arity, out_arity):
-  operation_class = "DOperation"
+  operation_class = "Action"
   parameters_class = "DParameters"
   inner_exec = "execute"
   inner_infer = "inferKnowledge"
@@ -133,7 +133,7 @@ def print_operation(in_arity, out_arity):
 
   print textwrap.dedent("""\
     abstract class {operation_class}{in_arity}To{out_arity}[{generics_list}]
-      extends DOperation {{
+      extends Action {{
       override final val inArity = {in_arity}
       override final val outArity = {out_arity}
 

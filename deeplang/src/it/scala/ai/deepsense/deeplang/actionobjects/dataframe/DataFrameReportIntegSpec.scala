@@ -21,7 +21,7 @@ class DataFrameReportIntegSpec extends DeeplangIntegTestSupport with DataFrameTe
 
   "DataFrame" should {
     "generate report with data sample table" when {
-      val exampleString  = "DeepSense.io"
+      val exampleString  = "Harana.com"
       val columnNameBase = "stringColumn"
       "number of columns and rows is minimal" in {
         val columnsNumber = 1

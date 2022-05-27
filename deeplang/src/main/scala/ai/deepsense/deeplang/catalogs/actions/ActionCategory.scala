@@ -3,7 +3,7 @@ package ai.deepsense.deeplang.catalogs.actions
 import ai.deepsense.commons.models
 import ai.deepsense.deeplang.catalogs.SortPriority
 
-/** Category of Actions. It can be subcategory of different DOperationCategory.
+/** Category of Actions. It can be subcategory of different ActionCategory.
   * @param id
   *   id of this category
   * @param name

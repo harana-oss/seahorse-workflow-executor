@@ -9,7 +9,7 @@ import ai.deepsense.deeplang.Action.Id
 import ai.deepsense.deeplang.documentation.OperationDocumentation
 import ai.deepsense.deeplang.actionobjects.Transformer
 import ai.deepsense.deeplang.actions.ReadTransformer.ReadTransformerParameters
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseIOException
+import ai.deepsense.deeplang.actions.exceptions.HaranaIOException
 import ai.deepsense.deeplang.parameters.Params
 import ai.deepsense.deeplang.parameters.StringParameter
 import ai.deepsense.deeplang.Action0To1
@@ -36,7 +36,7 @@ case class ReadTransformer()
     try
       Transformer.load(context, path)
     catch {
-      case e: IOException => throw DeepSenseIOException(e)
+      case e: IOException => throw HaranaIOException(e)
     }
   }
 

@@ -5,7 +5,7 @@ import org.apache.spark.sql.types.StructType
 import ai.deepsense.deeplang.ExecutionContext
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.exceptions._
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.selections.NameColumnSelection
 import ai.deepsense.deeplang.parameters.Parameter
 import ai.deepsense.deeplang.parameters.StringParameter
@@ -99,7 +99,7 @@ case class SqlColumnTransformer() extends MultiColumnTransformer {
         throw ColumnsDoNotExistException(NameColumnSelection(nonExistingColumns), schema)
       }
     } catch {
-      case de: DeepLangException =>
+      case de: FlowException =>
         throw de
       case e: Exception =>
         throw SqlColumnExpressionSyntaxException(formula)

@@ -6,7 +6,7 @@ import spray.json._
 
 import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph._
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 
@@ -22,9 +22,9 @@ class GraphReaderSpec extends GraphJsonTestSupport {
 
   val operation3 = mockOperation(1, 0, Action.Id.randomId, "SaveDataSet")
 
-  when(catalog.createDOperation(operation1.id)).thenReturn(operation1)
-  when(catalog.createDOperation(operation2.id)).thenReturn(operation2)
-  when(catalog.createDOperation(operation3.id)).thenReturn(operation3)
+  when(catalog.createAction(operation1.id)).thenReturn(operation1)
+  when(catalog.createAction(operation2.id)).thenReturn(operation2)
+  when(catalog.createAction(operation3.id)).thenReturn(operation3)
 
   val node1Id = Node.Id.randomId
 
@@ -95,7 +95,7 @@ class GraphReaderSpec extends GraphJsonTestSupport {
     "connections" -> edgesArray
   )
 
-  val expectedGraph = DeeplangGraph(
+  val expectedGraph = FlowGraph(
     Set(Node(node1Id, operation1), Node(node2Id, operation2), Node(node3Id, operation3)),
     Set(
       Edge(Endpoint(node1Id, edge1from), Endpoint(node2Id, edge1to)),
@@ -105,20 +105,20 @@ class GraphReaderSpec extends GraphJsonTestSupport {
 
   "GraphReader" should {
     "create Graph from JSON and fill parameters with values from Json" in {
-      graphsSimilar(exampleJson.convertTo[DeeplangGraph], expectedGraph) shouldBe true
+      graphsSimilar(exampleJson.convertTo[FlowGraph], expectedGraph) shouldBe true
       verify(operation1).setParamsFromJson(parameters1, graphReader)
       verify(operation2).setParamsFromJson(parameters2, graphReader)
       verify(operation3).setParamsFromJson(parameters3, graphReader)
     }
   }
 
-  def graphsSimilar(g1: DeeplangGraph, g2: DeeplangGraph): Boolean = {
+  def graphsSimilar(g1: FlowGraph, g2: FlowGraph): Boolean = {
     g1.edges == g2.edges &&
     g1.nodes.size == g2.nodes.size &&
     nodesSimilar(g1.nodes, g2.nodes)
   }
 
-  def nodesSimilar(nodes1: Set[DeeplangNode], nodes2: Set[DeeplangNode]): Boolean = {
+  def nodesSimilar(nodes1: Set[FlowNode], nodes2: Set[FlowNode]): Boolean = {
     val testNodes1 = nodes1.map(node => TestNode(node.id, node.value))
     val testNodes2 = nodes2.map(node => TestNode(node.id, node.value))
     testNodes1 == testNodes2

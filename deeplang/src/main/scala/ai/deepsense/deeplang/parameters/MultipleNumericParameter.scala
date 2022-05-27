@@ -3,7 +3,7 @@ package ai.deepsense.deeplang.parameters
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.validators.ComplexArrayValidator
 import ai.deepsense.deeplang.parameters.validators.Validator
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -51,7 +51,7 @@ case class MultipleNumericParameter(
   override protected def extraJsFields: Map[String, JsValue] =
     super.extraJsFields ++ Map("validator" -> validator.toJson)
 
-  override def validate(values: Array[Double]): Vector[DeepLangException] =
+  override def validate(values: Array[Double]): Vector[FlowException] =
     validator.validate(name, values)
 
 }

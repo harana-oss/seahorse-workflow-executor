@@ -7,7 +7,7 @@ import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.MockActionObjectsFactory._
 import ai.deepsense.deeplang.actions.MockTransformers._
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.ParamsMatchers._
@@ -94,7 +94,7 @@ class TransformSpec extends UnitSpec with DeeplangTestSupport {
         val transformer = new MockTransformer
         val transform   = Transform().setTransformerParams(JsObject(transformer.paramA.name -> JsNumber(-2)))
 
-        a[DeepLangMultiException] shouldBe thrownBy {
+        a[FlowMultiException] shouldBe thrownBy {
           transform.inferKnowledgeUntyped(Vector(Knowledge(transformer), Knowledge(inputDF)))(mock[InferContext])
         }
       }

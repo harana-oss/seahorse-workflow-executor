@@ -13,8 +13,7 @@ class RColumnTransformation extends TransformerAsOperation[RColumnTransformer] w
 
   override val name: String = "R Column Transformation"
 
-  override val description: String =
-    "Executes a custom R transformation on a column of a DataFrame"
+  override val description: String = "Executes a custom R transformation on a column of a DataFrame"
 
   override lazy val tTagTO_1: TypeTag[RColumnTransformer] = typeTag
 

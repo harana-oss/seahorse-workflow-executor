@@ -29,7 +29,7 @@ class StatefulWorkflowSpec extends WorkflowTestSupport with MockitoSugar {
 
     val graph2                       = createGraph(node1Id, node3Id)
 
-    val originalGraph: DeeplangGraph = DeeplangGraph()
+    val originalGraph: FlowGraph = FlowGraph()
 
     val state1: NodeState =
       NodeState(Completed(DateTimeConverter.now, DateTimeConverter.now, Seq()), Some(EntitiesMap()))
@@ -49,7 +49,7 @@ class StatefulWorkflowSpec extends WorkflowTestSupport with MockitoSugar {
     val workflowWithResults =
       WorkflowWithResults(workflowId, metadata, originalGraph, JsObject(), ExecutionReport(Map()), WorkflowInfo.empty())
 
-    val workflow = Workflow(WorkflowMetadata(WorkflowType.Batch, "1.0.0"), mock[DeeplangGraph], mock[JsObject])
+    val workflow = Workflow(WorkflowMetadata(WorkflowType.Batch, "1.0.0"), mock[FlowGraph], mock[JsObject])
 
     val successfulExecution = IdleExecution(statefulGraph)
 
@@ -63,10 +63,10 @@ class StatefulWorkflowSpec extends WorkflowTestSupport with MockitoSugar {
       new MockStateInferrer()
     )
 
-    def createGraph(node1Id: Node.Id, node2Id: Node.Id): DeeplangGraph = {
+    def createGraph(node1Id: Node.Id, node2Id: Node.Id): FlowGraph = {
       val node1 = Node(node1Id, mockOperation(0, 1, Action.Id.randomId, "a", "b"))
       val node2 = Node(node2Id, mockOperation(1, 0, Action.Id.randomId, "c", "d"))
-      DeeplangGraph(Set(node1, node2), Set(Edge(Endpoint(node1.id, 0), Endpoint(node2.id, 0))))
+      FlowGraph(Set(node1, node2), Set(Edge(Endpoint(node1.id, 0), Endpoint(node2.id, 0))))
     }
 
   }
@@ -82,7 +82,7 @@ class StatefulWorkflowSpec extends WorkflowTestSupport with MockitoSugar {
 
   "StatefulWorkflow" should {
 
-    val workflow        = Workflow(WorkflowMetadata(WorkflowType.Batch, "1.0.0"), mock[DeeplangGraph], mock[JsObject])
+    val workflow        = Workflow(WorkflowMetadata(WorkflowType.Batch, "1.0.0"), mock[FlowGraph], mock[JsObject])
     val executionReport = ExecutionReportData()
 
     "actually updateStruct only" when {

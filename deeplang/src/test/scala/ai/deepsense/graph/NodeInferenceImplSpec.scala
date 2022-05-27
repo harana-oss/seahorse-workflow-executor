@@ -7,7 +7,7 @@ import ai.deepsense.deeplang.inference.warnings.SomeTypesNotCompilableWarning
 import ai.deepsense.deeplang.Knowledge
 import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.graph.DClassesForActions.A1
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 
 class NodeInferenceImplSpec extends AbstractInferenceSpec {
 
@@ -136,9 +136,9 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
   }
 
   def testInputInferenceForNode(
-      predecessorPortIndex: Int,
-      node: DeeplangNode,
-      predecessorKnowledge: Vector[Knowledge[ActionObject]]
+                                 predecessorPortIndex: Int,
+                                 node: FlowNode,
+                                 predecessorKnowledge: Vector[Knowledge[ActionObject]]
   ): NodeInferenceResult = {
     val predecessorId             = Node.Id.randomId
     val nodePredecessorsEndpoints = IndexedSeq(

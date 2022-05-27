@@ -5,7 +5,7 @@ import org.apache.spark.sql.types.DataType
 import org.apache.spark.sql.types.StructField
 import org.apache.spark.sql.types.StructType
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.DeeplangIntegTestSupport
 import ai.deepsense.deeplang.ExecutionContext
 
@@ -55,7 +55,7 @@ trait MultiColumnTransformerTestSupport {
       "throw an exception" when {
         "output column already exists" in {
           val t = transformer
-          a[DeepLangException] shouldBe thrownBy {
+          a[FlowException] shouldBe thrownBy {
             t.transformSingleColumnSchema(
               inputColumnName,
               outputColumnName,
@@ -65,7 +65,7 @@ trait MultiColumnTransformerTestSupport {
         }
         "selected columns do not exist" in {
           val t = transformer
-          an[DeepLangException] shouldBe thrownBy {
+          an[FlowException] shouldBe thrownBy {
             t.transformSingleColumnSchema("columnThatDoesNotExist", outputColumnName, supportInputDataFrame.schema.get)
           }
         }

@@ -5,8 +5,8 @@ import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-import ai.deepsense.commons.exception.DeepSenseException
-import ai.deepsense.commons.exception.DeepSenseFailure
+import ai.deepsense.commons.exception.HaranaException
+import ai.deepsense.commons.exception.HaranaFile
 import ai.deepsense.commons.exception.FailureCode
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
@@ -14,7 +14,7 @@ import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.deeplang.Action
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph.GraphKnowledge._
 import ai.deepsense.graph.Node.Id
 import ai.deepsense.graph._
@@ -26,9 +26,9 @@ import ai.deepsense.models.workflows.NodeStateWithResults
 import ai.deepsense.reportlib.model.ReportContent
 
 case class StatefulGraph(
-    directedGraph: DeeplangGraph,
-    states: Map[Node.Id, NodeStateWithResults],
-    executionFailure: Option[FailureDescription]
+                          directedGraph: FlowGraph,
+                          states: Map[Node.Id, NodeStateWithResults],
+                          executionFailure: Option[FailureDescription]
 ) extends TopologicallySortable[Action]
     with KnowledgeInference
     with NodeInferenceImpl
@@ -43,7 +43,7 @@ case class StatefulGraph(
   /** Tells the graph that an exception has occurred during the execution of a node. */
   def nodeFailed(id: Node.Id, cause: Exception): StatefulGraph = {
     val description = cause match {
-      case e: DeepSenseException => e.failureDescription
+      case e: HaranaException => e.failureDescription
       case e                     => genericNodeFailureDescription(e)
     }
     changeState(id)(_.fail(description))
@@ -73,7 +73,7 @@ case class StatefulGraph(
     inputs.map { case (id, input) => ReadyNode(directedGraph.node(id), input) }.toSeq
   }
 
-  def runningNodes: Seq[DeeplangNode] = {
+  def runningNodes: Seq[FlowNode] = {
     val queuedIds = states.collect { case (id, nodeState) if nodeState.isRunning => id }
     queuedIds.map(id => node(id))
   }.toSeq
@@ -94,16 +94,16 @@ case class StatefulGraph(
 
   def size: Int = directedGraph.size
 
-  def node(id: Node.Id): DeeplangNode = directedGraph.node(id)
+  def node(id: Node.Id): FlowNode = directedGraph.node(id)
 
-  def nodes: Set[DeeplangNode] = directedGraph.nodes
+  def nodes: Set[FlowNode] = directedGraph.nodes
 
   // Delegated methods (TopologicallySortable)
 
-  override def topologicallySorted: Option[List[DeeplangNode]] =
+  override def topologicallySorted: Option[List[FlowNode]] =
     directedGraph.topologicallySorted
 
-  override def allPredecessorsOf(id: Id): Set[DeeplangNode] =
+  override def allPredecessorsOf(id: Id): Set[FlowNode] =
     directedGraph.allPredecessorsOf(id)
 
   override def predecessors(id: Id): IndexedSeq[Option[Endpoint]] =
@@ -199,7 +199,7 @@ case class StatefulGraph(
   protected def handleInferredKnowledge(knowledge: GraphKnowledge): StatefulGraph = {
     if (knowledge.errors.nonEmpty) {
       val description = FailureDescription(
-        DeepSenseFailure.Id.randomId,
+        HaranaFile.Id.randomId,
         FailureCode.IncorrectWorkflow,
         "Incorrect workflow",
         Some("Provided workflow cannot be launched, because it contains errors")
@@ -226,7 +226,7 @@ case class StatefulGraph(
 
   protected def nodeErrorsFailureDescription(nodeId: Node.Id, nodeErrors: InferenceErrors): FailureDescription = {
     FailureDescription(
-      DeepSenseFailure.Id.randomId,
+      HaranaFile.Id.randomId,
       FailureCode.IncorrectNode,
       title = "Incorrect node",
       message = Some(
@@ -277,7 +277,7 @@ case class StatefulGraph(
 
   protected def genericNodeFailureDescription(exception: Exception): FailureDescription = {
     FailureDescription(
-      DeepSenseFailure.Id.randomId,
+      HaranaFile.Id.randomId,
       FailureCode.UnexpectedError,
       "Execution of a node failed",
       Some(s"Error while executing a node: ${exception.getMessage}"),
@@ -308,7 +308,7 @@ case class StatefulGraph(
   }
 
   private def abortSuccessors(allNodes: Map[Id, NodeStateWithResults], id: Node.Id): Map[Id, NodeStateWithResults] = {
-    val unsuccessfulAtBeginning: Set[DeeplangNode] = Set(node(id))
+    val unsuccessfulAtBeginning: Set[FlowNode] = Set(node(id))
     val sorted = {
       val sortedOpt = topologicallySorted
       assert(sortedOpt.nonEmpty)
@@ -316,7 +316,7 @@ case class StatefulGraph(
     }
     // if A is a predecessor of B, we will visit A first, so if A is failed/aborted, B will also be aborted.
     val (_, updatedStates) = sorted
-      .foldLeft[(Set[DeeplangNode], Map[Id, NodeStateWithResults])](unsuccessfulAtBeginning, allNodes) {
+      .foldLeft[(Set[FlowNode], Map[Id, NodeStateWithResults])](unsuccessfulAtBeginning, allNodes) {
         case ((unsuccessfulNodes, statesMap), node) =>
           if (allPredecessorsOf(node.id).intersect(unsuccessfulNodes).nonEmpty)
             (unsuccessfulNodes + node, statesMap.updated(node.id, abortIfAbortable(statesMap(node.id))))
@@ -330,17 +330,17 @@ case class StatefulGraph(
 
 object StatefulGraph {
 
-  def apply(nodes: Set[DeeplangNode] = Set(), edges: Set[Edge] = Set()): StatefulGraph = {
+  def apply(nodes: Set[FlowNode] = Set(), edges: Set[Edge] = Set()): StatefulGraph = {
     val states = nodes
       .map(node => node.id -> NodeStateWithResults(NodeState(nodestate.Draft(), Some(EntitiesMap())), Map(), None))
       .toMap
-    StatefulGraph(DeeplangGraph(nodes, edges), states, None)
+    StatefulGraph(FlowGraph(nodes, edges), states, None)
   }
 
   protected def predecessorsReady(
-      id: Node.Id,
-      directedGraph: DeeplangGraph,
-      states: Map[Node.Id, NodeStateWithResults]
+                                   id: Node.Id,
+                                   directedGraph: FlowGraph,
+                                   states: Map[Node.Id, NodeStateWithResults]
   ): Boolean = {
     directedGraph.predecessors(id).forall {
       case Some(Endpoint(nodeId, _)) =>
@@ -352,7 +352,7 @@ object StatefulGraph {
 
   def cyclicGraphFailureDescription: FailureDescription = {
     FailureDescription(
-      DeepSenseFailure.Id.randomId,
+      HaranaFile.Id.randomId,
       FailureCode.IncorrectWorkflow,
       "Cyclic workflow",
       Some("Provided workflow cannot be launched, because it contains a cycle")
@@ -361,7 +361,7 @@ object StatefulGraph {
 
   def genericFailureDescription(e: Throwable): FailureDescription = {
     FailureDescription(
-      DeepSenseFailure.Id.randomId,
+      HaranaFile.Id.randomId,
       FailureCode.LaunchingFailure,
       "Launching failure",
       Some(s"Error while launching workflow: ${e.getMessage}"),
@@ -371,4 +371,4 @@ object StatefulGraph {
 
 }
 
-case class ReadyNode(node: DeeplangNode, input: Seq[ActionObject])
+case class ReadyNode(node: FlowNode, input: Seq[ActionObject])

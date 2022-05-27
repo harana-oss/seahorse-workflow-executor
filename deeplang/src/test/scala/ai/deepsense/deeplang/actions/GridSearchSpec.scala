@@ -7,7 +7,7 @@ import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actionobjects.report.Report
 import ai.deepsense.deeplang.actions.MockActionObjectsFactory.MockEstimator
 import ai.deepsense.deeplang.actions.MockActionObjectsFactory.MockEvaluator
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.Knowledge
@@ -51,7 +51,7 @@ class GridSearchSpec extends UnitSpec with DeeplangTestSupport {
       .setEstimatorParams(prepareParamDictionary(estimator.paramA.name, estimatorParamValue))
       .setEvaluatorParams(prepareParamDictionary(evaluator.paramA.name, evaluatorParamValue))
 
-    val multiException = the[DeepLangMultiException] thrownBy {
+    val multiException = the[FlowMultiException] thrownBy {
       gridSearch.inferKnowledgeUntyped(Vector(Knowledge(estimator), Knowledge(inputDF), Knowledge(evaluator)))(
         mock[InferContext]
       )

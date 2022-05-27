@@ -3,30 +3,30 @@ package ai.deepsense.graph
 import scala.reflect.runtime.{universe => ru}
 
 import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.Knowledge
 import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.deeplang.Action
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
-import ai.deepsense.graph.DefaultKnowledgeService._
+import ai.deepsense.graph.FlowGraph.FlowNode
+import ai.deepsense.graph.KnowledgeService._
 import ai.deepsense.graph.TypesAccordance.TypesAccordance
 
 trait NodeInferenceImpl extends NodeInference {
 
   /** @return inferred result for the given node. */
   override def inferKnowledge(
-      node: DeeplangNode,
-      context: InferContext,
-      inputInferenceForNode: NodeInferenceResult
+                               node: FlowNode,
+                               context: InferContext,
+                               inputInferenceForNode: NodeInferenceResult
   ): NodeInferenceResult = {
 
     val NodeInferenceResult(inKnowledge, warnings, errors) = inputInferenceForNode
 
     val parametersValidationErrors                         = node.value.validateParams
 
-    def defaultInferenceResult(additionalErrors: Vector[DeepLangException] = Vector.empty) =
+    def defaultInferenceResult(additionalErrors: Vector[FlowException] = Vector.empty) =
       createDefaultKnowledge(
         context.dOperableCatalog,
         node.value,
@@ -42,7 +42,7 @@ trait NodeInferenceImpl extends NodeInference {
           node.value.inferKnowledgeUntyped(inKnowledge)(context)
         NodeInferenceResult(outKnowledge, warnings ++ inferWarnings, errors)
       } catch {
-        case exception: DeepLangException =>
+        case exception: FlowException =>
           defaultInferenceResult(exception.toVector)
         case exception: Exception         =>
           defaultInferenceResult()
@@ -51,10 +51,10 @@ trait NodeInferenceImpl extends NodeInference {
   }
 
   override def inputInferenceForNode(
-      node: DeeplangNode,
-      context: InferContext,
-      graphKnowledge: GraphKnowledge,
-      nodePredecessorsEndpoints: IndexedSeq[Option[Endpoint]]
+                                      node: FlowNode,
+                                      context: InferContext,
+                                      graphKnowledge: GraphKnowledge,
+                                      nodePredecessorsEndpoints: IndexedSeq[Option[Endpoint]]
   ): NodeInferenceResult = {
 
     (0 until node.value.inArity).foldLeft(NodeInferenceResult.empty) {
@@ -86,7 +86,7 @@ trait NodeInferenceImpl extends NodeInference {
     *   Contains inference results computed so far. This method assumes that graphKnowledge contains all required data.
     */
   private def inputKnowledgeAndAccordanceForInputPort(
-                                                       node: DeeplangNode,
+                                                       node: FlowNode,
                                                        catalog: ActionObjectCatalog,
                                                        graphKnowledge: GraphKnowledge,
                                                        portIndex: Int,
@@ -135,7 +135,7 @@ trait NodeInferenceImpl extends NodeInference {
                                       catalog: ActionObjectCatalog,
                                       operation: Action,
                                       warnings: InferenceWarnings,
-                                      errors: Vector[DeepLangException]
+                                      errors: Vector[FlowException]
   ): NodeInferenceResult = {
     val outKnowledge = defaultOutputKnowledge(catalog, operation)
     NodeInferenceResult(outKnowledge, warnings, errors)

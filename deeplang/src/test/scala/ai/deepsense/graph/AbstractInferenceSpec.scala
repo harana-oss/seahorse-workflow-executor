@@ -7,15 +7,15 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
-import ai.deepsense.deeplang.exceptions.DeepLangException
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarning
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.exceptions.ValidationException
 import ai.deepsense.graph.DClassesForActions._
-import ai.deepsense.graph.DOperationTestClasses._
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.ActionTestClasses._
+import ai.deepsense.graph.FlowGraph.FlowNode
 
 class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Matchers {
 
@@ -42,7 +42,7 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
 
     override protected def execute(t1: A1, t2: A2)(context: ExecutionContext): A = ???
 
-    override def validateParams: Vector[DeepLangException] =
+    override def validateParams: Vector[FlowException] =
       if (paramsValid) Vector.empty else Vector(parameterInvalidError)
 
     private var paramsValid: Boolean = _
@@ -86,9 +86,9 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
 
     val parameterInvalidError = new ValidationException("") {}
 
-    val inferenceError = new DeepLangException("") {}
+    val inferenceError = new FlowException("") {}
 
-    val multiInferenceError = DeepLangMultiException(Vector(mock[DeepLangException], mock[DeepLangException]))
+    val multiInferenceError = FlowMultiException(Vector(mock[FlowException], mock[FlowException]))
 
     val warning = mock[InferenceWarning]
 
@@ -110,7 +110,7 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
 
   protected def nodeA1A2ToFirst = Node(idA1A2ToFirst, ActionA1A2ToFirst())
 
-  def validGraph: DeeplangGraph = DeeplangGraph(
+  def validGraph: FlowGraph = FlowGraph(
     nodes = Set(nodeCreateA1, nodeAToA1A2, nodeA1A2ToFirst),
     edges = Set(
       Edge(nodeCreateA1, 0, nodeAToA1A2, 0),
@@ -119,21 +119,21 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
     )
   )
 
-  def setParametersValid(node: DeeplangNode): Unit =
+  def setParametersValid(node: FlowNode): Unit =
     node.value.asInstanceOf[ActionA1A2ToFirst].setParamsValid()
 
-  def setInferenceErrorThrowing(node: DeeplangNode): Unit =
+  def setInferenceErrorThrowing(node: FlowNode): Unit =
     node.value.asInstanceOf[ActionA1A2ToFirst].setInferenceErrorThrowing()
 
-  def setInferenceErrorMultiThrowing(node: DeeplangNode): Unit =
+  def setInferenceErrorMultiThrowing(node: FlowNode): Unit =
     node.value.asInstanceOf[ActionA1A2ToFirst].setInferenceErrorThrowingMultiException()
 
-  def setParametersInvalid(node: DeeplangNode): Unit =
+  def setParametersInvalid(node: FlowNode): Unit =
     node.value.asInstanceOf[ActionA1A2ToFirst].setParamsInvalid()
 
-  def setParametersValid(graph: DeeplangGraph): Unit = setInGraph(graph, _.setParamsValid())
+  def setParametersValid(graph: FlowGraph): Unit = setInGraph(graph, _.setParamsValid())
 
-  def setInGraph(graph: DeeplangGraph, f: ActionA1A2ToFirst => Unit): Unit = {
+  def setInGraph(graph: FlowGraph, f: ActionA1A2ToFirst => Unit): Unit = {
     val node = graph.node(idA1A2ToFirst)
     f(node.value.asInstanceOf[ActionA1A2ToFirst])
   }

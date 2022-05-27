@@ -9,7 +9,7 @@ import ai.deepsense.commons.utils.FileOperations.deleteRecursivelyIfExists
 import ai.deepsense.deeplang.Action.Id
 import ai.deepsense.deeplang.documentation.OperationDocumentation
 import ai.deepsense.deeplang.actionobjects.Transformer
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseIOException
+import ai.deepsense.deeplang.actions.exceptions.HaranaIOException
 import ai.deepsense.deeplang.parameters.BooleanParameter
 import ai.deepsense.deeplang.parameters.Params
 import ai.deepsense.deeplang.parameters.StringParameter
@@ -58,7 +58,7 @@ case class WriteTransformer() extends Action1To0[Transformer] with Params with O
     } catch {
       case e: IOException =>
         logger.error(s"WriteTransformer error. Could not write transformer to the directory", e)
-        throw DeepSenseIOException(e)
+        throw HaranaIOException(e)
     }
   }
 

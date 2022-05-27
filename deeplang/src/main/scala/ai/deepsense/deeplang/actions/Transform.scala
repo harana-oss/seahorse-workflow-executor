@@ -28,8 +28,7 @@ case class Transform()
 
   override val name: String = "Transform"
 
-  override val description: String =
-    "Transforms a DataFrame using a Transformer"
+  override val description: String = "Transforms a DataFrame using a Transformer"
 
   override val since: Version = Version(1, 0, 0)
 

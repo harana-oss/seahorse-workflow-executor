@@ -6,7 +6,7 @@ import org.scalatest.BeforeAndAfter
 import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import org.mockito.ArgumentMatchers.any
 
 class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
@@ -39,7 +39,7 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
         )
         when(topologicallySortedMock.topologicallySorted).thenReturn(Some(topologicallySortedNodes))
         topologicallySortedNodes.zip(nodeInferenceResultForNodes).foreach {
-          case (node: DeeplangNode, result: NodeInferenceResult) =>
+          case (node: FlowNode, result: NodeInferenceResult) =>
             nodeInferenceMockShouldInferResultForNode(node, result)
         }
 
@@ -71,8 +71,8 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
 
         when(topologicallySortedMock.topologicallySorted).thenReturn(Some(topologicallySorted))
 
-        nodesWithKnowledge.foreach((node: DeeplangNode) => nodeInferenceMockShouldThrowForNode(node))
-        nodesToInfer.foreach((node: DeeplangNode) =>
+        nodesWithKnowledge.foreach((node: FlowNode) => nodeInferenceMockShouldThrowForNode(node))
+        nodesToInfer.foreach((node: FlowNode) =>
           nodeInferenceMockShouldInferResultForNode(node, knowledgeToInfer(node.id))
         )
 
@@ -100,13 +100,13 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
   }
 
   def nodeInferenceMockShouldInferResultForNode(
-      nodeCreateA1: DeeplangNode,
-      nodeCreateA1InferenceResult: NodeInferenceResult
+                                                 nodeCreateA1: FlowNode,
+                                                 nodeCreateA1InferenceResult: NodeInferenceResult
   ): Unit =
     when(nodeInferenceMock.inferKnowledge(isEqualTo(nodeCreateA1), any[InferContext], any[NodeInferenceResult]))
       .thenReturn(nodeCreateA1InferenceResult)
 
-  def nodeInferenceMockShouldThrowForNode(node: DeeplangNode): Unit =
+  def nodeInferenceMockShouldThrowForNode(node: FlowNode): Unit =
     when(nodeInferenceMock.inferKnowledge(isEqualTo(node), any[InferContext], any[NodeInferenceResult]))
       .thenThrow(new RuntimeException("Inference should not be called for node " + node.id))
 
@@ -118,17 +118,17 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
       with NodeInference {
 
     override def inferKnowledge(
-        node: DeeplangNode,
-        context: InferContext,
-        inputInferenceForNode: NodeInferenceResult
+                                 node: FlowNode,
+                                 context: InferContext,
+                                 inputInferenceForNode: NodeInferenceResult
     ): NodeInferenceResult =
       nodeInferenceMock.inferKnowledge(node, context, inputInferenceForNode)
 
     override def inputInferenceForNode(
-        node: DeeplangNode,
-        context: InferContext,
-        graphKnowledge: GraphKnowledge,
-        nodePredecessorsEndpoints: IndexedSeq[Option[Endpoint]]
+                                        node: FlowNode,
+                                        context: InferContext,
+                                        graphKnowledge: GraphKnowledge,
+                                        nodePredecessorsEndpoints: IndexedSeq[Option[Endpoint]]
     ): NodeInferenceResult = {
       nodeInferenceMock.inputInferenceForNode(
         node,
@@ -138,12 +138,12 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
       )
     }
 
-    override def topologicallySorted: Option[List[DeeplangNode]] =
+    override def topologicallySorted: Option[List[FlowNode]] =
       topologicallySortableMock.topologicallySorted
 
-    override def node(id: Node.Id): DeeplangNode = topologicallySortableMock.node(id)
+    override def node(id: Node.Id): FlowNode = topologicallySortableMock.node(id)
 
-    override def allPredecessorsOf(id: Node.Id): Set[DeeplangNode] =
+    override def allPredecessorsOf(id: Node.Id): Set[FlowNode] =
       topologicallySortableMock.allPredecessorsOf(id)
 
     override def predecessors(id: Node.Id): IndexedSeq[Option[Endpoint]] =
@@ -154,7 +154,7 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
 
     override def edges: Set[Edge] = ???
 
-    override def nodes: Set[DeeplangNode] = ???
+    override def nodes: Set[FlowNode] = ???
 
   }
 

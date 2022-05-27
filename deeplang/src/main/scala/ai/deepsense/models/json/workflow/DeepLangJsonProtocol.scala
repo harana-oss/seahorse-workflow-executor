@@ -1,9 +1,9 @@
 package ai.deepsense.models.json.workflow
 
 trait DeepLangJsonProtocol
-    extends DOperationCategoryNodeJsonProtocol
-    with DOperationDescriptorJsonProtocol
+    extends ActionCategoryNodeJsonProtocol
+    with ActionDescriptorJsonProtocol
     with HierarchyDescriptorJsonProtocol
-    with DOperationEnvelopesJsonProtocol
+    with ActionEnvelopesJsonProtocol
 
 object DeepLangJsonProtocol extends DeepLangJsonProtocol

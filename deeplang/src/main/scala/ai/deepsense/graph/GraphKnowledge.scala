@@ -1,6 +1,6 @@
 package ai.deepsense.graph
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.inference.exceptions.AllTypesNotCompilableException
 import ai.deepsense.deeplang.inference.exceptions.NoInputEdgesException
@@ -51,7 +51,7 @@ object GraphKnowledge {
 
   def apply(): GraphKnowledge = GraphKnowledge(Map.empty)
 
-  type InferenceErrors = Vector[DeepLangException]
+  type InferenceErrors = Vector[FlowException]
 
 }
 

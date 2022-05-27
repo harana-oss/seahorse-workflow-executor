@@ -1,5 +1,5 @@
 package ai.deepsense.deeplang.catalogs.actions.exceptions
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 
-abstract class ActionsCatalogException(message: String) extends DeepLangException(message)
+abstract class ActionsCatalogException(message: String) extends FlowException(message)

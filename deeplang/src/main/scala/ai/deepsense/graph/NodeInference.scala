@@ -1,21 +1,21 @@
 package ai.deepsense.graph
 
 import ai.deepsense.deeplang.inference.InferContext
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 
 trait NodeInference {
 
   def inferKnowledge(
-      node: DeeplangNode,
-      context: InferContext,
-      inputInferenceForNode: NodeInferenceResult
+                      node: FlowNode,
+                      context: InferContext,
+                      inputInferenceForNode: NodeInferenceResult
   ): NodeInferenceResult
 
   def inputInferenceForNode(
-      node: DeeplangNode,
-      context: InferContext,
-      graphKnowledge: GraphKnowledge,
-      nodePredecessorsEndpoints: IndexedSeq[Option[Endpoint]]
+                             node: FlowNode,
+                             context: InferContext,
+                             graphKnowledge: GraphKnowledge,
+                             nodePredecessorsEndpoints: IndexedSeq[Option[Endpoint]]
   ): NodeInferenceResult
 
 }

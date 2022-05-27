@@ -20,7 +20,7 @@ import spray.json._
 
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.deeplang.CatalogRecorder
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.workflow.WorkflowWithResultsJsonProtocol
 import ai.deepsense.models.workflows._
@@ -57,7 +57,7 @@ class WorkflowManagerClientActorSpec
   val workflow = WorkflowWithResults(
     workflowId,
     WorkflowMetadata(WorkflowType.Batch, "1.0.0"),
-    DeeplangGraph(),
+    FlowGraph(),
     JsObject(),
     ExecutionReport(Map(), None),
     WorkflowInfo.empty()

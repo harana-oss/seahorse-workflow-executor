@@ -8,7 +8,7 @@ import ai.deepsense.commons.serialization.Serialization
 
 class FailureDescriptionSerializationSpec extends StandardSpec with FailureDescriptionJsonProtocol with Serialization {
 
-  val id = DeepSenseFailure.Id.randomId
+  val id = HaranaFile.Id.randomId
 
   val failureDescription = FailureDescription(
     id,

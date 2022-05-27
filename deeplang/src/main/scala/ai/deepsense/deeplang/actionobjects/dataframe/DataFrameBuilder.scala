@@ -7,7 +7,7 @@ import org.apache.spark.sql.types.StructType
 
 import ai.deepsense.sparkutils.SparkSQLSession
 
-/** DeepSense DataFrame builder.
+/** Harana DataFrame builder.
   * @param sparkSQLSession
   *   Spark sql context.
   */

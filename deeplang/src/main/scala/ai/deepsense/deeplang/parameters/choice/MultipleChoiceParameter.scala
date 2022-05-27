@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang.parameters.choice
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.ParameterType
 import spray.json.DefaultJsonProtocol._
 import spray.json._
@@ -23,7 +23,7 @@ case class MultipleChoiceParameter[T <: Choice](override val name: String, overr
   override protected def valueFromJsMap(jsMap: Map[String, JsValue], graphReader: GraphReader): Set[T] =
     jsMap.toList.map { case (label, innerJsValue) => choiceFromJson(label, innerJsValue, graphReader) }.toSet
 
-  override def validate(value: Set[T]): Vector[DeepLangException] =
+  override def validate(value: Set[T]): Vector[FlowException] =
     value.toVector.flatMap(_.validateParams)
 
   override def replicate(name: String): MultipleChoiceParameter[T] = copy(name = name)

@@ -12,7 +12,7 @@ import ai.deepsense.deeplang.actionobjects.multicolumn.SingleColumnParams.Single
 import ai.deepsense.deeplang.actionobjects.spark.wrappers.models.MultiColumnStringIndexerModel
 import ai.deepsense.deeplang.actionobjects.spark.wrappers.models.SingleColumnStringIndexerModel
 import ai.deepsense.deeplang.actions.spark.wrappers.estimators.StringIndexer
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.selections.NameSingleColumnSelection
 import ai.deepsense.deeplang.Knowledge
@@ -169,7 +169,7 @@ class StringIndexerIntegSpec extends DeeplangIntegTestSupport {
         "in single column mode" should {
           "throw DeepLangException" in {
             val indexer = singleColumnStringIndexer(None, None)
-            a[DeepLangException] shouldBe thrownBy(
+            a[FlowException] shouldBe thrownBy(
               indexer.inferKnowledgeUntyped(unknownSchemaKnowledgeVector)(executionContext.inferContext)
             )
           }
@@ -177,7 +177,7 @@ class StringIndexerIntegSpec extends DeeplangIntegTestSupport {
         "in multi column mode" should {
           "throw DeepLangException" in {
             val indexer = multiColumnStringIndexer(None, None)
-            a[DeepLangException] shouldBe thrownBy(
+            a[FlowException] shouldBe thrownBy(
               indexer.inferKnowledgeUntyped(unknownSchemaKnowledgeVector)(executionContext.inferContext)
             )
           }

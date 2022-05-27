@@ -7,7 +7,7 @@ import org.mockito.ArgumentMatchers.any
 
 import ai.deepsense.commons.datasource.DatasourceTestData
 import ai.deepsense.commons.rest.client.datasources.DatasourceClient
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.Knowledge
 import ai.deepsense.deeplang.ActionObject
@@ -41,7 +41,7 @@ class ReadDatasourceSpec extends UnitSpec {
         when(datasourceClient.getDatasource(any())).thenReturn(Some(ds))
         val readDatasource     = ReadDatasource()
         readDatasource.setDatasourceId(UUID.randomUUID)
-        val multilangException = intercept[DeepLangMultiException] {
+        val multilangException = intercept[FlowMultiException] {
           readDatasource.inferKnowledgeUntyped(Vector.empty[Knowledge[ActionObject]])(context)
         }
         multilangException.exceptions(0).message shouldBe

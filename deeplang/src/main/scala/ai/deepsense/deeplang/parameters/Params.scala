@@ -8,8 +8,8 @@ import ai.deepsense.commons.utils.CollectionExtensions._
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.actionobjects.descriptions.HasInferenceResult
 import ai.deepsense.deeplang.actionobjects.descriptions.ParamsInferenceResult
-import ai.deepsense.deeplang.exceptions.DeepLangException
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.parameters.exceptions.ParamValueNotProvidedException
 import ai.deepsense.deeplang.parameters.multivalue.MultipleValuesParam
 import ai.deepsense.deeplang.parameters.wrappers.spark._
@@ -120,13 +120,13 @@ trait Params extends Serializable with HasInferenceResult with DefaultJsonProtoc
   private lazy val paramsByName: Map[String, Parameter[_]] =
     params.map { case param => param.name -> param }.toMap
 
-  protected def customValidateParams: Vector[DeepLangException] = Vector.empty
+  protected def customValidateParams: Vector[FlowException] = Vector.empty
 
   /** Validates params' values by:
     *   1. testing whether the params have values set (or default values), 2. testing whether the values meet the
     *      constraints, 3. testing custom validations, possibly spanning over multiple params.
     */
-  def validateParams: Vector[DeepLangException] = {
+  def validateParams: Vector[FlowException] = {
     val singleParameterErrors  = params.flatMap { param =>
       if (isDefined(param)) {
         val paramValue: Any          = $(param)
@@ -145,7 +145,7 @@ trait Params extends Serializable with HasInferenceResult with DefaultJsonProtoc
   def validateDynamicParams(params: Params*): Unit = {
     val validationResult = params.flatMap(param => param.validateParams).toVector
     if (validationResult.nonEmpty)
-      throw DeepLangMultiException(validationResult)
+      throw FlowMultiException(validationResult)
   }
 
   final def isSet(param: Parameter[_]): Boolean =

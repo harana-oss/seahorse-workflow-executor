@@ -5,7 +5,7 @@ import spray.json.DefaultJsonProtocol.IntJsonFormat
 import spray.json.DefaultJsonProtocol.StringJsonFormat
 import spray.json._
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.selections.ColumnSelectionJsonProtocol._
 
 /** Represents selecting single column of dataframe. */
@@ -110,7 +110,7 @@ object NameSingleColumnSelection {
   */
 case class MultipleColumnSelection(selections: Vector[ColumnSelection], excluding: Boolean = false) {
 
-  def validate: Vector[DeepLangException] = selections.flatMap(selection => selection.validate)
+  def validate: Vector[FlowException] = selections.flatMap(selection => selection.validate)
 
 }
 

@@ -5,7 +5,7 @@ import spray.json._
 
 import ai.deepsense.deeplang.UnitSpec
 import ai.deepsense.deeplang.actions.inout.InputStorageTypeChoice.File
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.ParameterType._
 import ai.deepsense.deeplang.parameters.choice.Choice
 import ai.deepsense.deeplang.parameters.choice.ChoiceParameter
@@ -241,7 +241,7 @@ class ParamsSpec extends UnitSpec {
 
 object ParamsSpec extends UnitSpec {
 
-  case class MockException(override val message: String) extends DeepLangException(message)
+  case class MockException(override val message: String) extends FlowException(message)
 
   case class MockParameter(name: String) extends Parameter[Int] {
 
@@ -253,7 +253,7 @@ object ParamsSpec extends UnitSpec {
 
     override def valueFromJson(jsValue: JsValue, graphReader: GraphReader): Int = jsValue.convertTo[Int]
 
-    override def validate(value: Int): Vector[DeepLangException] = Vector(MockException(name))
+    override def validate(value: Int): Vector[FlowException] = Vector(MockException(name))
 
     override def replicate(name: String): MockParameter = copy(name = name)
 

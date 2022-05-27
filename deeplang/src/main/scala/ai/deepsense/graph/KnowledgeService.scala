@@ -7,7 +7,7 @@ import ai.deepsense.deeplang.Knowledge
 import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.deeplang.Action
 
-object DefaultKnowledgeService {
+object KnowledgeService {
 
   /** @return Knowledge vector for output ports if no additional information is provided. */
   def defaultOutputKnowledge(catalog: ActionObjectCatalog, operation: Action): Vector[Knowledge[ActionObject]] =

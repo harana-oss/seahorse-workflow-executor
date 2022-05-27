@@ -17,7 +17,7 @@ trait SparkOperationsExtractor {
   def sparkOperations(): Seq[OperationWithSparkClassName] = {
     val operationIds = catalog.operations.keys
     operationIds
-      .map(operationId => catalog.createDOperation(operationId))
+      .map(operationId => catalog.createAction(operationId))
       .flatMap(operation =>
         sparkClassName(operation)
           .map(OperationWithSparkClassName(operation.asInstanceOf[DocumentedOperation], _))

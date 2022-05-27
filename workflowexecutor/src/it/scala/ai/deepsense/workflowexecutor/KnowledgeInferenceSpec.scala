@@ -11,7 +11,7 @@ import ai.deepsense.deeplang.CatalogRecorder
 import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.MockedInferContext
 import ai.deepsense.graph.AbstractInferenceSpec
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.graph.GraphKnowledge
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -25,13 +25,13 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with InnerWorkflowJso
     "infer knowledge for nested nodes (ex. CreateCustomTransformer)" in {
       val rootWorkflowWithSomeInnerWorkflow = {
         val createCustomTransformer = operationCatalog
-          .createDOperation(
+          .createAction(
             CreateCustomTransformer.id
           )
           .asInstanceOf[CreateCustomTransformer]
 
         createCustomTransformer.setInnerWorkflow(CreateCustomTransformer.default)
-        DeeplangGraph(Set(createCustomTransformer.toNode()))
+        FlowGraph(Set(createCustomTransformer.toNode()))
       }
 
       val inferenceResult = rootWorkflowWithSomeInnerWorkflow.inferKnowledge(
@@ -47,21 +47,21 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with InnerWorkflowJso
   "Node errors" should {
     "be properly inferred for inner workflow. For example" when {
       "sink node has no input connected " in {
-        val sinkExpectedToHaveErrors = operationCatalog.createDOperation(Sink.id).toNode()
+        val sinkExpectedToHaveErrors = operationCatalog.createAction(Sink.id).toNode()
         val rootWorkflowWithInvalidInnerWorkflow = {
           val createCustomTransformer = operationCatalog
-            .createDOperation(
+            .createAction(
               CreateCustomTransformer.id
             )
             .asInstanceOf[CreateCustomTransformer]
 
           val innerWorkflow = {
-            val source = operationCatalog.createDOperation(Source.id).toNode()
-            val graph  = DeeplangGraph(Set(source, sinkExpectedToHaveErrors), Set.empty)
+            val source = operationCatalog.createAction(Source.id).toNode()
+            val graph  = FlowGraph(Set(source, sinkExpectedToHaveErrors), Set.empty)
             InnerWorkflow(graph, JsObject(), List.empty)
           }
           createCustomTransformer.setInnerWorkflow(innerWorkflow)
-          DeeplangGraph(Set(createCustomTransformer.toNode()), Set.empty)
+          FlowGraph(Set(createCustomTransformer.toNode()), Set.empty)
         }
 
         val inferenceResult = rootWorkflowWithInvalidInnerWorkflow.inferKnowledge(
@@ -75,7 +75,7 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with InnerWorkflowJso
     }
   }
 
-  implicit class DOperationTestExtension(val dOperation: Action) {
+  implicit class ActionTestExtension(val dOperation: Action) {
 
     def toNode(): Node[Action] = Node(Node.Id.randomId, dOperation)
 

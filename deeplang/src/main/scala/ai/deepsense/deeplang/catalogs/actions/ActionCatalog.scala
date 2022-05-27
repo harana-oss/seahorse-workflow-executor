@@ -17,24 +17,24 @@ import javassist.bytecode.stackmap.TypeTag
 abstract class ActionCatalog {
 
   /** Tree describing categories structure. */
-  def categoryTree: DOperationCategoryNode
+  def categoryTree: ActionCategoryNode
 
   /** Map of all registered operation descriptors, where their ids are keys. */
   def operations: Map[Action.Id, ActionDescriptor]
 
-  /** Creates instance of requested DOperation class.
+  /** Creates instance of requested Action class.
     * @param id
-    *   id that identifies desired DOperation
+    *   id that identifies desired Action
     */
-  def createDOperation(id: Action.Id): Action
+  def createAction(id: Action.Id): Action
 
-  /** Registers DOperation, which can be later viewed and created.
+  /** Registers Action, which can be later viewed and created.
     * @param category
     *   category to which this operation directly belongs
     * @param visible
     *   a flag determining if the operation should be visible in the category tree
     */
-  def registerDOperation(
+  def registerAction(
                           category: ActionCategory,
                           factory: () => Action,
                           priority: SortPriority,
@@ -54,7 +54,7 @@ object ActionCatalog {
 
   private class ActionCatalogImpl() extends ActionCatalog {
 
-    var categoryTree = DOperationCategoryNode()
+    var categoryTree = ActionCategoryNode()
 
     var operations = Map.empty[Action.Id, ActionDescriptor]
 
@@ -65,7 +65,7 @@ object ActionCatalog {
         (category, operationFactoryByOperationId(id), priority)
       }
 
-    def registerDOperation(
+    def registerAction(
                             category: ActionCategory,
                             factory: () => Action,
                             priority: SortPriority,
@@ -107,15 +107,15 @@ object ActionCatalog {
       operationFactoryByOperationId(id) = factory
     }
 
-    def createDOperation(id: Action.Id): Action = operationFactoryByOperationId.get(id) match {
+    def createAction(id: Action.Id): Action = operationFactoryByOperationId.get(id) match {
       case Some(factory) => factory()
-      case None          => throw DOperationNotFoundException(id)
+      case None          => throw ActionNotFoundException(id)
     }
 
     // This is a special case operation that serves as a fallback when an unrecognized
     // UUID is encountered in a workflow. It is registered here so that the visibility flag
     // can be set to false.
-    registerDOperation(
+    registerAction(
       ActionCategories.Other,
       () => new UnknownOperation,
       SortPriority.coreDefault,

@@ -8,7 +8,7 @@ import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.{ReadDataFrame, WriteDataFrame}
 import ai.deepsense.deeplang.actions.inout._
 import ai.deepsense.deeplang.actions.readwritedataframe.{FilePath, FileScheme}
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph.Node.Id
 import ai.deepsense.graph._
 import ai.deepsense.graph.nodestate.{Aborted, NodeStatus, Queued, Running}
@@ -204,7 +204,7 @@ class WorkflowExecutorActorSpec
             RunningExecution(
               StatefulGraph(workflow.graph, states, None),
               StatefulGraph(
-                DeeplangGraph(Set(node1), Set()),
+                FlowGraph(Set(node1), Set()),
                 Map(
                   node1.id -> NodeStateWithResults(
                     NodeState(nodestate.Running(DateTimeConverter.now), Some(EntitiesMap())),
@@ -296,7 +296,7 @@ class WorkflowExecutorActorSpec
         val inferredState                            = mock[InferredState]
         when(statefulWorkflow.workflowWithResults).thenReturn(workflowWithResults)
         when(statefulWorkflow.inferState).thenReturn(inferredState)
-        when(statefulWorkflow.getNodesRemovedByWorkflow(workflow)).thenReturn(Set[DeeplangNode]())
+        when(statefulWorkflow.getNodesRemovedByWorkflow(workflow)).thenReturn(Set[FlowNode]())
 
         probe.send(wea, UpdateStruct(workflow))
 
@@ -540,7 +540,7 @@ class WorkflowExecutorActorSpec
   private def workflowWithResults(id: Workflow.Id): WorkflowWithResults = WorkflowWithResults(
     id,
     WorkflowMetadata(WorkflowType.Batch, "1.0.0"),
-    DeeplangGraph(Set(node1, node2), Set(Edge(node1, 0, node2, 0))),
+    FlowGraph(Set(node1, node2), Set(Edge(node1, 0, node2, 0))),
     JsObject(),
     ExecutionReport(Map(node1.id -> NodeState.draft, node2.id -> NodeState.draft)),
     WorkflowInfo.forId(id)

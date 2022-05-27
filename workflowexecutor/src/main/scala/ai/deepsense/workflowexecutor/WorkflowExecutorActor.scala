@@ -2,13 +2,13 @@ package ai.deepsense.workflowexecutor
 
 import akka.actor._
 
-import ai.deepsense.commons.exception.DeepSenseFailure
+import ai.deepsense.commons.exception.HaranaFile
 import ai.deepsense.commons.exception.FailureCode
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph._
 import ai.deepsense.models.json.graph.NodeStatusJsonProtocol
 import ai.deepsense.models.workflows._
@@ -162,7 +162,7 @@ abstract class WorkflowExecutorActor(
     }
   }
 
-  private def getGraphNodeExecutor(node: DeeplangNode, dooperable: Vector[ActionObject]): ActorRef = {
+  private def getGraphNodeExecutor(node: FlowNode, dooperable: Vector[ActionObject]): ActorRef = {
     val nodeExecutionContext = executionContext.createExecutionContext(workflowId, node.id)
     nodeExecutorFactory
       .createGraphNodeExecutor(context, nodeExecutionContext, node, dooperable)
@@ -237,7 +237,7 @@ object WorkflowExecutorActor {
 
   def inferenceErrorsDebugDescription(graphKnowledge: GraphKnowledge): FailureDescription = {
     FailureDescription(
-      DeepSenseFailure.Id.randomId,
+      HaranaFile.Id.randomId,
       FailureCode.IncorrectWorkflow,
       title = "Incorrect workflow",
       message = Some("Provided workflow cannot be launched, because it contains errors"),
@@ -250,10 +250,10 @@ object WorkflowExecutorActor {
 trait GraphNodeExecutorFactory {
 
   def createGraphNodeExecutor(
-      context: ActorContext,
-      executionContext: ExecutionContext,
-      node: DeeplangNode,
-      input: Vector[ActionObject]
+                               context: ActorContext,
+                               executionContext: ExecutionContext,
+                               node: FlowNode,
+                               input: Vector[ActionObject]
   ): ActorRef
 
 }
@@ -261,10 +261,10 @@ trait GraphNodeExecutorFactory {
 class GraphNodeExecutorFactoryImpl extends GraphNodeExecutorFactory {
 
   override def createGraphNodeExecutor(
-      context: ActorContext,
-      executionContext: ExecutionContext,
-      node: DeeplangNode,
-      input: Vector[ActionObject]
+                                        context: ActorContext,
+                                        executionContext: ExecutionContext,
+                                        node: FlowNode,
+                                        input: Vector[ActionObject]
   ): ActorRef = {
     val props = Props(new WorkflowNodeExecutorActor(executionContext, node, input))
       .withDispatcher("node-executor-dispatcher")

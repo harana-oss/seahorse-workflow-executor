@@ -181,7 +181,7 @@ class SqlColumnTransformationIntegSpec extends DeeplangIntegTestSupport with Tra
     }
 
     "fail when formula is not correct" in {
-      intercept[DOperationExecutionException] {
+      intercept[ActionExecutionException] {
         val dataFrame =
           applyFormulaToDataFrame("MAXIMUM(", "name", column1, "x", prepareDataFrame())
         dataFrame.sparkDataFrame.collect()

@@ -8,7 +8,7 @@ import ai.deepsense.deeplang.actionobjects.Transformer
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.MockActionObjectsFactory._
 import ai.deepsense.deeplang.actions.exceptions.TooManyPossibleTypesException
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.ParamsMatchers._
@@ -85,7 +85,7 @@ class FitSpec extends UnitSpec with DeeplangTestSupport {
         val inputDF   = DataFrame.forInference(createSchema())
         val estimator = new MockEstimator
         val fit       = Fit().setEstimatorParams(JsObject(estimator.paramA.name -> JsNumber(-2)))
-        a[DeepLangMultiException] shouldBe thrownBy {
+        a[FlowMultiException] shouldBe thrownBy {
           fit.inferKnowledgeUntyped(Vector(Knowledge(estimator), Knowledge(inputDF)))(mock[InferContext])
         }
       }

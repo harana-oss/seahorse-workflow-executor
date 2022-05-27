@@ -10,7 +10,7 @@ import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
 import ai.deepsense.deeplang.parameters.custom.PublicParam
 import ai.deepsense.deeplang.parameters.selections.MultipleColumnSelection
 import ai.deepsense.deeplang.parameters.selections.NameColumnSelection
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.graph.Edge
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -42,9 +42,9 @@ object InnerWorkflowTestFactory {
   def simpleGraph(
       graphReader: GraphReader,
       targetType: TargetTypeChoice = TargetTypeChoices.StringTargetTypeChoice()
-  ): DeeplangGraph = {
+  ): FlowGraph = {
     val innerNode = createInnerNode(targetType, graphReader)
-    DeeplangGraph(
+    FlowGraph(
       Set(sourceNode, sinkNode, innerNode),
       Set(Edge(sourceNode, 0, innerNode, 0), Edge(innerNode, 0, sinkNode, 0))
     )

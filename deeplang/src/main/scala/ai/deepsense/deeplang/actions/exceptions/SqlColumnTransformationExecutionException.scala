@@ -5,7 +5,7 @@ case class SqlColumnTransformationExecutionException(
     formula: String,
     outputColumnName: String,
     rootCause: Option[Throwable]
-) extends DOperationExecutionException(
+) extends ActionExecutionException(
       s"Problem while executing SqlColumnTransformation with the following formula: '$formula'",
       rootCause
     )

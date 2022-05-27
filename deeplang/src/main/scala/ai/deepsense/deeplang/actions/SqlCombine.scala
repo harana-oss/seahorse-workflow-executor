@@ -9,7 +9,7 @@ import ai.deepsense.commons.utils.Version
 import ai.deepsense.deeplang.Action.Id
 import ai.deepsense.deeplang.documentation.OperationDocumentation
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.inference.SqlSchemaInferrer
 import ai.deepsense.deeplang.parameters.exceptions.ParamsEqualException
@@ -111,7 +111,7 @@ final class SqlCombine
     )
   }
 
-  override protected def customValidateParams: Vector[DeepLangException] = {
+  override protected def customValidateParams: Vector[FlowException] = {
     if (getLeftTableName == getRightTableName) {
       ParamsEqualException(
         firstParamName = "left dataframe id",

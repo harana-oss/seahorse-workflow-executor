@@ -10,7 +10,7 @@ class ActionRegistrationSpec extends UnitSpec {
     val catalogs   = CatalogRecorder.resourcesCatalogRecorder.catalogs
     val operations = catalogs.operations
     "successfully register and create all Actions" in {
-      operations.operations.keys.foreach(id => operations.createDOperation(id))
+      operations.operations.keys.foreach(id => operations.createAction(id))
     }
     "report assigned categories" in {
       val delta = catalogs.categories.diff(operations.categories)

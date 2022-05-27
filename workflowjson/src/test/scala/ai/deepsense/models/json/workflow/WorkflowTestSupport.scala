@@ -35,10 +35,10 @@ trait WorkflowTestSupport extends StandardSpec with UnitTestSupport {
 
   val operation4 = mockOperation(2, 1, Action.Id.randomId, "name4", "version4")
 
-  when(catalog.createDOperation(operation1.id)).thenReturn(operation1)
-  when(catalog.createDOperation(operation2.id)).thenReturn(operation2)
-  when(catalog.createDOperation(operation3.id)).thenReturn(operation3)
-  when(catalog.createDOperation(operation4.id)).thenReturn(operation4)
+  when(catalog.createAction(operation1.id)).thenReturn(operation1)
+  when(catalog.createAction(operation2.id)).thenReturn(operation2)
+  when(catalog.createAction(operation3.id)).thenReturn(operation3)
+  when(catalog.createAction(operation4.id)).thenReturn(operation4)
 
   val node1 = Node(Node.Id.randomId, operation1)
 
@@ -54,21 +54,21 @@ trait WorkflowTestSupport extends StandardSpec with UnitTestSupport {
 
   val edges = preEdges.map(n => Edge(Endpoint(n._1.id, n._3), Endpoint(n._2.id, n._4)))
 
-  val graph = DeeplangGraph(nodes, edges)
+  val graph = FlowGraph(nodes, edges)
 
   val sourceOperation = mockOperation(0, 1, Source.id, "Source", "ver1")
 
-  when(catalog.createDOperation(Source.id)).thenReturn(sourceOperation)
+  when(catalog.createAction(Source.id)).thenReturn(sourceOperation)
 
   val sinkOperation = mockOperation(1, 0, Sink.id, "Sink", "ver1")
 
-  when(catalog.createDOperation(Sink.id)).thenReturn(sinkOperation)
+  when(catalog.createAction(Sink.id)).thenReturn(sinkOperation)
 
   val sourceNode = Node(Node.Id.randomId, sourceOperation)
 
   val sinkNode = Node(Node.Id.randomId, sinkOperation)
 
-  val innerWorkflowGraph = DeeplangGraph(nodes ++ Set(sourceNode, sinkNode), edges)
+  val innerWorkflowGraph = FlowGraph(nodes ++ Set(sourceNode, sinkNode), edges)
 
   def mockOperation(inArity: Int, outArity: Int, id: Action.Id, name: String, version: String): Action = {
     val dOperation   = mock[Action]

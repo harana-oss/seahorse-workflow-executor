@@ -2,10 +2,10 @@ package ai.deepsense.deeplang.exceptions
 
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.exception.FailureCode
-import ai.deepsense.commons.exception.DeepSenseException
+import ai.deepsense.commons.exception.HaranaException
 
-class DeepLangException(override val message: String, cause: Throwable = null)
-    extends DeepSenseException(
+class FlowException(override val message: String, cause: Throwable = null)
+    extends HaranaException(
       FailureCode.NodeFailure,
       "DeepLang Exception",
       message,
@@ -15,6 +15,6 @@ class DeepLangException(override val message: String, cause: Throwable = null)
         .getOrElse(Map())
     ) {
 
-  def toVector: Vector[DeepLangException] = Vector(this)
+  def toVector: Vector[FlowException] = Vector(this)
 
 }

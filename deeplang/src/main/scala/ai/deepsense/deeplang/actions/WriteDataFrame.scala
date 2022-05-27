@@ -9,7 +9,7 @@ import ai.deepsense.deeplang.Action.Id
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.documentation.OperationDocumentation
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseIOException
+import ai.deepsense.deeplang.actions.exceptions.HaranaIOException
 import ai.deepsense.deeplang.actions.inout._
 import ai.deepsense.deeplang.actions.readwritedataframe.filestorage.DataFrameToFileWriter
 import ai.deepsense.deeplang.actions.readwritedataframe.googlestorage.DataFrameToGoogleSheetWriter
@@ -62,7 +62,7 @@ class WriteDataFrame() extends Action1To0[DataFrame] with Params with OperationD
     } catch {
       case e: IOException =>
         logger.error(s"WriteDataFrame error. Could not write file to designated storage", e)
-        throw DeepSenseIOException(e)
+        throw HaranaIOException(e)
     }
   }
 

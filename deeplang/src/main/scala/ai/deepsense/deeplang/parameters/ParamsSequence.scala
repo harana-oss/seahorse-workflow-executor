@@ -5,7 +5,7 @@ import java.lang.reflect.Constructor
 import scala.reflect.runtime.universe._
 
 import spray.json._
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.exceptions.NoArgumentConstructorRequiredException
 import ai.deepsense.deeplang.utils.TypeUtils
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -43,7 +43,7 @@ case class ParamsSequence[T <: Params](override val name: String, override val d
 
   override def replicate(name: String): ParamsSequence[T] = copy(name = name)
 
-  override def validate(value: Seq[T]): Vector[DeepLangException] =
+  override def validate(value: Seq[T]): Vector[FlowException] =
     value.flatMap(_.validateParams).toVector
 
 }

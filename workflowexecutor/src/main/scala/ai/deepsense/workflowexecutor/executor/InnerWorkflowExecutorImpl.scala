@@ -7,7 +7,7 @@ import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.exceptions.CustomOperationExecutionException
 import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.workflow.InnerWorkflowJsonProtocol
@@ -82,7 +82,7 @@ class InnerWorkflowExecutorImpl(override val graphReader: GraphReader)
   }
 
   private def executeOperation(
-                                node: DeeplangNode,
+                                node: FlowNode,
                                 input: Vector[ActionObject],
                                 executionContext: ExecutionContext
   ): Vector[ActionObject] = {

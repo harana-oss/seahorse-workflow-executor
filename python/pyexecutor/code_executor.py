@@ -78,7 +78,7 @@ class CodeExecutor(object):
     def _run_custom_code(self, workflow_id, node_id, custom_operation_code):
         """
         :param workflow_id:
-        :param node_id: id of node of the DOperation associated with the custom code
+        :param node_id: id of node of the Action associated with the custom code
         :param custom_operation_code: The code is expected to include a top-level definition
         of a function named according to TRANSFORM_FUNCTION_NAME value
         :return: None

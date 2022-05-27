@@ -13,8 +13,7 @@ case class SqlColumnTransformation() extends TransformerAsOperation[SqlColumnTra
 
   override val name: String = "SQL Column Transformation"
 
-  override val description: String =
-    "Executes a SQL transformation on a column of a DataFrame"
+  override val description: String = "Executes a SQL transformation on a column of a DataFrame"
 
   override lazy val tTagTO_1: TypeTag[SqlColumnTransformer] = typeTag
 

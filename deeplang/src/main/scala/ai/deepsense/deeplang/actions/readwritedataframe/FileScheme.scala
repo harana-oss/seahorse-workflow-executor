@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang.actions.readwritedataframe
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 
 sealed abstract class FileScheme(val scheme: String) {
 
@@ -50,7 +50,7 @@ object FilePath {
 }
 
 case class UnknownFileSchemaForPath(path: String)
-    extends DeepLangException({
+    extends FlowException({
       val allSchemes = FileScheme.values.map(_.scheme).mkString("(", ", ", ")")
       s"Unknown file scheme for path $path. Known file schemes: $allSchemes"
     })

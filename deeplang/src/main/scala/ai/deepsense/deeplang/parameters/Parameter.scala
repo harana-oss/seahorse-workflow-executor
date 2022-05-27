@@ -5,7 +5,7 @@ import java.util.Objects
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.ParameterType._
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 
@@ -19,7 +19,7 @@ abstract class Parameter[T] extends java.io.Serializable {
 
   val parameterType: ParameterType
 
-  def validate(value: T): Vector[DeepLangException] = Vector.empty
+  def validate(value: T): Vector[FlowException] = Vector.empty
 
   val isGriddable: Boolean = false
 

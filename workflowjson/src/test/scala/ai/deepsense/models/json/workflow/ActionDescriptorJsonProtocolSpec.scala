@@ -32,17 +32,17 @@ class ActionDescriptorJsonProtocolSpec
     extends AnyFlatSpec
     with MockitoSugar
     with Matchers
-    with DOperationDescriptorJsonProtocol {
+    with ActionDescriptorJsonProtocol {
 
-  "DOperationDescriptor" should "be correctly serialized to json" in {
+  "ActionDescriptor" should "be correctly serialized to json" in {
     val (operationDescriptor, expectedJson) = operationDescriptorWithExpectedJsRepresentation
-    operationDescriptor.toJson(DOperationDescriptorFullFormat) shouldBe expectedJson
+    operationDescriptor.toJson(ActionDescriptorFullFormat) shouldBe expectedJson
   }
 
   it should "be correctly serialized to json omitting its parameters" in {
     val (operationDescriptor, expectedJson) = operationDescriptorWithExpectedJsRepresentation
     val jsonWithoutParameters               = JsObject(expectedJson.asJsObject.fields - "parameters")
-    operationDescriptor.toJson(DOperationDescriptorBaseFormat) shouldBe jsonWithoutParameters
+    operationDescriptor.toJson(ActionDescriptorBaseFormat) shouldBe jsonWithoutParameters
   }
 
   private[this] def operationDescriptorWithExpectedJsRepresentation: (ActionDescriptor, JsValue) = {

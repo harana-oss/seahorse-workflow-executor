@@ -14,7 +14,7 @@ import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
 import ai.deepsense.deeplang.parameters.custom.PublicParam
 import ai.deepsense.deeplang.parameters.selections.MultipleColumnSelection
 import ai.deepsense.deeplang.parameters.selections.NameColumnSelection
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.graph.Edge
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -117,7 +117,7 @@ class CreateCustomTransformerSpec extends UnitSpec {
     val node1 = Node(node1Id, node1Operation)
     val node2 = Node(node2Id, node2Operation)
 
-    val simpleGraph = DeeplangGraph(
+    val simpleGraph = FlowGraph(
       Set(sourceNode, sinkNode, node1, node2),
       Set(Edge(sourceNode, 0, node1, 0), Edge(node1, 0, node2, 0), Edge(node2, 0, sinkNode, 0))
     )

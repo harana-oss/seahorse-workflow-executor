@@ -8,7 +8,7 @@ import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.reportlib.model.ReportContent
 import ai.deepsense.reportlib.model.ReportType
 import ai.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeCompleted
@@ -18,7 +18,7 @@ import ai.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeStarted
 /** WorkflowNodeExecutorActor is responsible for execution of single node. Sends NodeStarted at the beginning and
   * NodeCompleted or NodeFailed at the end of execution depending on whether the execution succeeded or failed.
   */
-class WorkflowNodeExecutorActor(executionContext: ExecutionContext, node: DeeplangNode, input: Vector[ActionObject])
+class WorkflowNodeExecutorActor(executionContext: ExecutionContext, node: FlowNode, input: Vector[ActionObject])
     extends Actor
     with Logging {
 

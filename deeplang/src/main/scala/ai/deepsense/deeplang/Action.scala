@@ -21,7 +21,7 @@ import ai.deepsense.deeplang.parameters.choice.ChoiceParameter
 import ai.deepsense.graph.GraphKnowledge
 import ai.deepsense.graph.Operation
 
-/** DOperation that receives and returns instances of ActionObject. Can infer its output type based on type knowledge. */
+/** Action that receives and returns instances of ActionObject. Can infer its output type based on type knowledge. */
 @SerialVersionUID(1L)
 abstract class Action extends Operation with Serializable with Logging with Params {
 

@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang.actions.exceptions
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 
 case class SqlColumnExpressionSyntaxException(formula: String)
-    extends DeepLangException(s"Formula: '$formula' is not a valid Spark SQL expression")
+    extends FlowException(s"Formula: '$formula' is not a valid Spark SQL expression")

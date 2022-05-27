@@ -1,6 +1,6 @@
 package ai.deepsense.models.json.workflow.exceptions
 
-import ai.deepsense.commons.exception.DeepSenseException
+import ai.deepsense.commons.exception.HaranaException
 import ai.deepsense.commons.exception.FailureCode
 import ai.deepsense.commons.utils.Version
 
@@ -9,7 +9,7 @@ sealed abstract class WorkflowVersionException(
     message: String,
     cause: Option[Throwable] = None,
     details: Map[String, String] = Map()
-) extends DeepSenseException(FailureCode.IncorrectWorkflow, title, message, cause, details)
+) extends HaranaException(FailureCode.IncorrectWorkflow, title, message, cause, details)
 
 case class WorkflowVersionFormatException(stringVersion: String)
     extends WorkflowVersionException(

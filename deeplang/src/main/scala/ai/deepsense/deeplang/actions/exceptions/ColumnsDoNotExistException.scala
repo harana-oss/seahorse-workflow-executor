@@ -7,7 +7,7 @@ import ai.deepsense.deeplang.actions.exceptions.ColumnsDoNotExistException._
 import ai.deepsense.deeplang.parameters.selections._
 
 case class ColumnsDoNotExistException(invalidSelection: ColumnSelection, schema: StructType)
-    extends DOperationExecutionException(exceptionMessage(invalidSelection, schema), None)
+    extends ActionExecutionException(exceptionMessage(invalidSelection, schema), None)
 
 object ColumnsDoNotExistException {
 

@@ -12,10 +12,10 @@ import ai.deepsense.deeplang.catalogs.actions.ActionDescriptor
 import ai.deepsense.deeplang.PortPosition
 import ai.deepsense.deeplang.utils.TypeUtils
 
-/** Exposes various json formats of DOperationDescription. Reading from json is not supported. */
-trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonProtocol with SprayJsonSupport {
+/** Exposes various json formats of ActionDescription. Reading from json is not supported. */
+trait ActionDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonProtocol with SprayJsonSupport {
 
-  class DOperationDescriptorShortFormat extends RootJsonFormat[ActionDescriptor] {
+  class ActionDescriptorShortFormat extends RootJsonFormat[ActionDescriptor] {
 
     override def write(obj: ActionDescriptor): JsValue =
       JsObject("id" -> obj.id.toJson, "name" -> obj.name.toJson, "description" -> obj.description.toJson)
@@ -26,9 +26,9 @@ trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonPr
   }
 
   /** Only id and name of operation. */
-  object DOperationDescriptorShortFormat extends DOperationDescriptorShortFormat
+  object ActionDescriptorShortFormat extends ActionDescriptorShortFormat
 
-  class DOperationDescriptorBaseFormat extends DOperationDescriptorShortFormat {
+  class ActionDescriptorBaseFormat extends ActionDescriptorShortFormat {
 
     override def write(obj: ActionDescriptor): JsValue = {
       JsObject(
@@ -77,10 +77,10 @@ trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonPr
   }
 
   /** All operation's info except for parameters. */
-  object DOperationDescriptorBaseFormat extends DOperationDescriptorBaseFormat
+  object ActionDescriptorBaseFormat extends ActionDescriptorBaseFormat
 
   /** Full operation's info. */
-  object DOperationDescriptorFullFormat extends DOperationDescriptorBaseFormat {
+  object ActionDescriptorFullFormat extends ActionDescriptorBaseFormat {
 
     override def write(obj: ActionDescriptor): JsValue =
       JsObject(super.write(obj).asJsObject.fields.updated("parameters", obj.parametersJsonDescription))
@@ -89,4 +89,4 @@ trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonPr
 
 }
 
-object DOperationDescriptorJsonProtocol extends DOperationDescriptorJsonProtocol
+object ActionDescriptorJsonProtocol extends ActionDescriptorJsonProtocol

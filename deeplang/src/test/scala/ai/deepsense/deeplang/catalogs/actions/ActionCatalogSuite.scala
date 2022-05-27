@@ -14,7 +14,7 @@ import ai.deepsense.deeplang.actions.UnknownOperation
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 
-object DOperationCatalogTestResources {
+object ActionCatalogTestResources {
 
   object CategoryTree {
 
@@ -139,7 +139,7 @@ object DOperationCatalogTestResources {
 
   }
 
-  case class DOperationD() extends ActionMock {
+  case class ActionD() extends ActionMock {
 
     override val id = idD
 
@@ -157,7 +157,7 @@ object DOperationCatalogTestResources {
 
 object ViewingTestResources extends MockitoSugar {
 
-  import DOperationCatalogTestResources._
+  import ActionCatalogTestResources._
 
   val categoryA = CategoryTree.ML.Regression
 
@@ -177,12 +177,12 @@ object ViewingTestResources extends MockitoSugar {
 
   val priorityD = SortPriority(3)
 
-  catalog.registerDOperation(categoryA, () => new ActionA(), priorityA)
-  catalog.registerDOperation(categoryB, () => new ActionB(), priorityB)
-  catalog.registerDOperation(categoryC, () => new ActionC(), priorityC)
-  catalog.registerDOperation(categoryD, () => new DOperationD(), priorityD)
+  catalog.registerAction(categoryA, () => new ActionA(), priorityA)
+  catalog.registerAction(categoryB, () => new ActionB(), priorityB)
+  catalog.registerAction(categoryC, () => new ActionC(), priorityC)
+  catalog.registerAction(categoryD, () => new ActionD(), priorityD)
 
-  val operationD = catalog.createDOperation(idD)
+  val operationD = catalog.createAction(idD)
 
   val expectedA = ActionDescriptor(
     idA,
@@ -233,7 +233,7 @@ object ViewingTestResources extends MockitoSugar {
     categoryD,
     priorityD,
     hasDocumentation = false,
-    DOperationD().paramsToJson,
+    ActionD().paramsToJson,
     List(XTypeTag.tpe, YTypeTag.tpe),
     operationD.inPortsLayout,
     List(XTypeTag.tpe),
@@ -244,25 +244,25 @@ object ViewingTestResources extends MockitoSugar {
 
 class ActionCatalogSuite extends AnyFunSuite with Matchers with MockitoSugar {
 
-  test("It is possible to create instance of registered DOperation") {
-    import DOperationCatalogTestResources._
+  test("It is possible to create instance of registered Action") {
+    import ActionCatalogTestResources._
     val catalog  = ActionCatalog()
-    catalog.registerDOperation(CategoryTree.ML.Regression, () => new ActionA(), ViewingTestResources.priorityA)
-    val instance = catalog.createDOperation(idA)
+    catalog.registerAction(CategoryTree.ML.Regression, () => new ActionA(), ViewingTestResources.priorityA)
+    val instance = catalog.createAction(idA)
     assert(instance == ActionA())
   }
 
-  test("Attempt of creating unregistered DOperation raises exception") {
+  test("Attempt of creating unregistered Action raises exception") {
     val nonExistingOperationId = Action.Id.randomId
-    val exception              = intercept[DOperationNotFoundException] {
+    val exception              = intercept[ActionNotFoundException] {
       val catalog = ActionCatalog()
-      catalog.createDOperation(nonExistingOperationId)
+      catalog.createAction(nonExistingOperationId)
     }
     exception.operationId shouldBe nonExistingOperationId
   }
 
   test("It is possible to view list of registered Actions descriptors") {
-    import DOperationCatalogTestResources._
+    import ActionCatalogTestResources._
     import ViewingTestResources._
 
     val exceptUnknown = catalog.operations - new UnknownOperation().id
@@ -271,16 +271,16 @@ class ActionCatalogSuite extends AnyFunSuite with Matchers with MockitoSugar {
   }
 
   test("SortPriority inSequence assigns values with step 100") {
-    import ai.deepsense.deeplang.catalogs.actions.DOperationCatalogTestResources.CategoryTree
+    import ai.deepsense.deeplang.catalogs.actions.ActionCatalogTestResources.CategoryTree
     CategoryTree.ML.Classification.priority shouldBe SortPriority(300)
     CategoryTree.ML.Regression.priority shouldBe SortPriority(400)
   }
 
   test("It is possible to get tree of registered categories and Actions") {
-    import DOperationCatalogTestResources.CategoryTree._
+    import ActionCatalogTestResources.CategoryTree._
     import ViewingTestResources._
 
-    val root: DOperationCategoryNode = catalog.categoryTree
+    val root: ActionCategoryNode = catalog.categoryTree
     root.category shouldBe None
     root.operations shouldBe empty
     root.successors.keys should contain theSameElementsAs Seq(ML)

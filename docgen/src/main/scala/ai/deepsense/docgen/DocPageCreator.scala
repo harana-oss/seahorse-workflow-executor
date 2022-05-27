@@ -272,7 +272,7 @@ trait DocPageCreator {
 
   private def appendExamplesSectionIfNecessary(writer: PrintWriter, operation: DocumentedOperation): Unit = {
     val createExamplesSection: Boolean = operation match {
-      // It is impossible to match DOperation1To2[DataFrame, DataFrame, Transformer] in match-case
+      // It is impossible to match Action1To2[DataFrame, DataFrame, Transformer] in match-case
       case op: Action1To2[_, _, _] =>
         (op.tTagTI_0.tpe <:< typeTag[DataFrame].tpe) &&
         (op.tTagTO_0.tpe <:< typeTag[DataFrame].tpe) &&

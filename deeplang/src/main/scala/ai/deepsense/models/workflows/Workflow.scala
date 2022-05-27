@@ -3,9 +3,9 @@ package ai.deepsense.models.workflows
 import spray.json.JsObject
 
 import ai.deepsense.commons.models
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 
-case class Workflow(metadata: WorkflowMetadata, graph: DeeplangGraph, additionalData: JsObject)
+case class Workflow(metadata: WorkflowMetadata, graph: FlowGraph, additionalData: JsObject)
 
 object Workflow {
 

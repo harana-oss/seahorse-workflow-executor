@@ -13,8 +13,8 @@ import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.ReadDatasource.ReadDataSourceParameters
 import ai.deepsense.deeplang.actions.inout.InputStorageTypeChoice
 import ai.deepsense.deeplang.actions.readwritedatasource.FromDatasourceConverters
-import ai.deepsense.deeplang.exceptions.DeepLangException
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.Parameter
@@ -56,7 +56,7 @@ class ReadDatasource() extends Action0To1[DataFrame] with ReadDataSourceParamete
 
     val parametersValidationErrors = readDataFrame.validateParams
     if (parametersValidationErrors.nonEmpty)
-      throw new DeepLangMultiException(parametersValidationErrors)
+      throw new FlowMultiException(parametersValidationErrors)
     readDataFrame.inferKnowledge()(context)
   }
 
@@ -100,7 +100,7 @@ class ReadDatasource() extends Action0To1[DataFrame] with ReadDataSourceParamete
 
   private def checkDataSourceExists(datasourceOpt: Option[Datasource]) = datasourceOpt match {
     case Some(datasource) => datasource
-    case None             => throw new DeepLangException(s"Datasource with id = ${getDatasourceId()} not found")
+    case None             => throw new FlowException(s"Datasource with id = ${getDatasourceId()} not found")
   }
 
   private def wrapAsSubQuery(query: String): String =

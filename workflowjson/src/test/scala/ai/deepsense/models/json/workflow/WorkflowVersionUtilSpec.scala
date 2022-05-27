@@ -10,7 +10,7 @@ import spray.json._
 
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.commons.utils.Version
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.workflow.exceptions.WorkflowVersionFormatException
 import ai.deepsense.models.json.StandardSpec
@@ -25,7 +25,7 @@ class WorkflowVersionUtilSpec extends StandardSpec with UnitTestSupport with Log
 
   override val graphReader = mock[GraphReader]
 
-  when(graphReader.read(any())).thenReturn(DeeplangGraph())
+  when(graphReader.read(any())).thenReturn(FlowGraph())
 
   "WorkflowVersionUtil" should {
     "allow to extract the version as a string and as an object" in {
@@ -69,7 +69,7 @@ class WorkflowVersionUtilSpec extends StandardSpec with UnitTestSupport with Log
 
   val incorrectVersionMeta = correctVersionMeta.copy(apiVersion = "X" + currentVersionString)
 
-  val correctWorkflow = Workflow(correctVersionMeta, DeeplangGraph(), JsObject())
+  val correctWorkflow = Workflow(correctVersionMeta, FlowGraph(), JsObject())
 
   val correctWorkflowString = correctWorkflow.toJson.prettyPrint
 
@@ -83,7 +83,7 @@ class WorkflowVersionUtilSpec extends StandardSpec with UnitTestSupport with Log
   val workflowWithResults = WorkflowWithResults(
     workflowId,
     correctVersionMeta,
-    DeeplangGraph(),
+    FlowGraph(),
     JsObject(),
     ExecutionReport(Map(), EntitiesMap(), None),
     WorkflowInfo.forId(workflowId)

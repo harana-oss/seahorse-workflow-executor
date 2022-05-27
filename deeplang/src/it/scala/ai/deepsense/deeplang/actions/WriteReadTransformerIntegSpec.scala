@@ -7,7 +7,7 @@ import org.scalatest.BeforeAndAfter
 import ai.deepsense.deeplang.actionobjects.PythonTransformer
 import ai.deepsense.deeplang.actionobjects.TargetTypeChoices
 import ai.deepsense.deeplang.actionobjects.TypeConverter
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseIOException
+import ai.deepsense.deeplang.actions.exceptions.HaranaIOException
 
 class WriteReadTransformerIntegSpec extends WriteReadTransformerIntegTest with BeforeAndAfter {
 
@@ -37,7 +37,7 @@ class WriteReadTransformerIntegSpec extends WriteReadTransformerIntegTest with B
         new TypeConverter().setTargetType(TargetTypeChoices.BooleanTargetTypeChoice())
       val outputPath: Path = tempDir.resolve("TypeConverter")
       writeTransformer(transformer, outputPath.toString, overwrite = true)
-      a[DeepSenseIOException] shouldBe thrownBy {
+      a[HaranaIOException] shouldBe thrownBy {
         writeTransformer(transformer, outputPath.toString, overwrite = false)
       }
     }

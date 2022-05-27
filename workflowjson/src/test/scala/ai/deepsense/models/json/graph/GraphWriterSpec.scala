@@ -6,7 +6,7 @@ import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.Edge
 import ai.deepsense.graph.Endpoint
 import ai.deepsense.graph.Node
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph
 
 class GraphWriterSpec extends GraphJsonTestSupport {
 
@@ -34,7 +34,7 @@ class GraphWriterSpec extends GraphJsonTestSupport {
 
   val edges = edgesList.map(n => Edge(Endpoint(n._1.id, n._3), Endpoint(n._2.id, n._4))).toSet
 
-  val graph = DeeplangGraph(nodes, edges)
+  val graph = FlowGraph(nodes, edges)
 
   val graphJson = graph.toJson.asJsObject
 

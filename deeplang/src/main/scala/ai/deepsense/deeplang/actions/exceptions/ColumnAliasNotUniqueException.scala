@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang.actions.exceptions
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 
 case class ColumnAliasNotUniqueException(alias: String)
-    extends DeepLangException(s"Alias '$alias' is not unique within the input DataFrame")
+    extends FlowException(s"Alias '$alias' is not unique within the input DataFrame")

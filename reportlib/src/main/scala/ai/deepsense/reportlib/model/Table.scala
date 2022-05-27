@@ -19,7 +19,7 @@ case class Table(
     "columnNames and columnTypes should have the same size"
   )
   require(
-    values.filter(_.length != columnTypes.length).isEmpty,
+    !values.exists(_.length != columnTypes.length),
     "at least one data row has size different than columnTypes size"
   )
 

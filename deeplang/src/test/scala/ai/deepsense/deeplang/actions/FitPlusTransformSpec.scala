@@ -7,7 +7,7 @@ import ai.deepsense.deeplang.actionobjects.Transformer
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.MockActionObjectsFactory._
 import ai.deepsense.deeplang.actions.exceptions.TooManyPossibleTypesException
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang._
 
@@ -75,7 +75,7 @@ class FitPlusTransformSpec extends UnitSpec with DeeplangTestSupport {
             Vector(Knowledge(estimator), mock[Knowledge[DataFrame]])
           val fpt                                           = new FitPlusTransform
           fpt.setEstimatorParams(JsObject(estimator.paramA.name -> JsNumber(-2)))
-          a[DeepLangMultiException] shouldBe thrownBy {
+          a[FlowMultiException] shouldBe thrownBy {
             fpt.inferKnowledgeUntyped(inputKnowledge)(mock[InferContext])
           }
         }

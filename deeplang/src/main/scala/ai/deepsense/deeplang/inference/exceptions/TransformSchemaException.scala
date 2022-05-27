@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang.inference.exceptions
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 
 class TransformSchemaException(message: String, cause: Option[Exception] = None)
-    extends DeepLangException(message, cause.orNull)
+    extends FlowException(message, cause.orNull)

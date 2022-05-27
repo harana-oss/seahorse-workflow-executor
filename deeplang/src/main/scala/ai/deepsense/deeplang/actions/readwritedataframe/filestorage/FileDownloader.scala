@@ -13,7 +13,7 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 
 import ai.deepsense.deeplang.ExecutionContext
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseIOException
+import ai.deepsense.deeplang.actions.exceptions.HaranaIOException
 import ai.deepsense.deeplang.actions.readwritedataframe.FilePath
 
 private[filestorage] object FileDownloader {
@@ -74,7 +74,7 @@ private[filestorage] object FileDownloader {
       bufferedWriter.flush()
       bufferedWriter.close()
     } catch {
-      case e: IOException => throw new DeepSenseIOException(e)
+      case e: IOException => throw new HaranaIOException(e)
     }
   }
 

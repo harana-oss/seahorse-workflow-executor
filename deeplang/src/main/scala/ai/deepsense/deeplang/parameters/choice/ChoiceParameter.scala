@@ -4,7 +4,7 @@ import scala.reflect.runtime.universe._
 
 import spray.json._
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.ParameterType
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 
@@ -28,7 +28,7 @@ class ChoiceParameter[T <: Choice](override val name: String, override val descr
     choiceFromJson(label, innerJsValue, graphReader)
   }
 
-  override def validate(value: T): Vector[DeepLangException] =
+  override def validate(value: T): Vector[FlowException] =
     value.validateParams
 
   override def replicate(name: String): ChoiceParameter[T] =

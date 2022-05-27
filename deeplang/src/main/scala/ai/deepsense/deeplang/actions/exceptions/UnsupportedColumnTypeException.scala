@@ -5,7 +5,7 @@ import org.apache.spark.sql.types.DataType
 import ai.deepsense.commons.types.ColumnType.ColumnType
 
 case class UnsupportedColumnTypeException(override val message: String)
-    extends DOperationExecutionException(message, None)
+    extends ActionExecutionException(message, None)
 
 object UnsupportedColumnTypeException {
 

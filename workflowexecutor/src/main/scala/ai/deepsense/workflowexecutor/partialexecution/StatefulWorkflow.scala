@@ -6,7 +6,7 @@ import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.CommonExecutionContext
 import ai.deepsense.deeplang.ActionObject
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph.Node
 import ai.deepsense.graph.Node._
 import ai.deepsense.models.workflows._
@@ -26,7 +26,7 @@ class StatefulWorkflow(
 
   private var additionalData       = thirdPartyData
 
-  def getNodesRemovedByWorkflow(workflow: Workflow): Set[DeeplangNode] = {
+  def getNodesRemovedByWorkflow(workflow: Workflow): Set[FlowNode] = {
     val previousNodes  = execution.graph.nodes
     val newNodes       = workflow.graph.nodes
     val removedNodesId = previousNodes.map(node => node.id).diff(newNodes.map(node => node.id))
@@ -70,7 +70,7 @@ class StatefulWorkflow(
     workflowInfo
   )
 
-  def node(id: Node.Id): DeeplangNode = execution.node(id)
+  def node(id: Node.Id): FlowNode = execution.node(id)
 
   def nodeStarted(id: Node.Id): Unit =
     execution = execution.nodeStarted(id)

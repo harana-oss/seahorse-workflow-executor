@@ -2,7 +2,7 @@ package ai.deepsense.commons.exception
 
 import ai.deepsense.commons.models
 
-object DeepSenseFailure {
+object HaranaFile {
 
   type Id = models.Id
 

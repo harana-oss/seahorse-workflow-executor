@@ -3,7 +3,7 @@ package ai.deepsense.models.json.graph
 import ai.deepsense.commons.json.IdJsonProtocol
 import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
-import ai.deepsense.deeplang.catalogs.actions.exceptions.DOperationNotFoundException
+import ai.deepsense.deeplang.catalogs.actions.exceptions.ActionNotFoundException
 import spray.json._
 
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -18,7 +18,7 @@ object OperationJsonProtocol extends IdJsonProtocol {
 
   val Parameters = "parameters"
 
-  implicit object DOperationWriter extends JsonWriter[Action] with DefaultJsonProtocol with IdJsonProtocol {
+  implicit object ActionWriter extends JsonWriter[Action] with DefaultJsonProtocol with IdJsonProtocol {
 
     override def write(operation: Action): JsValue = {
       JsObject(
@@ -29,7 +29,7 @@ object OperationJsonProtocol extends IdJsonProtocol {
 
   }
 
-  class DOperationReader(graphReader: GraphReader) extends JsonReader[Action] with DefaultJsonProtocol {
+  class ActionReader(graphReader: GraphReader) extends JsonReader[Action] with DefaultJsonProtocol {
 
     override def read(json: JsValue): Action = json match {
       case JsObject(fields) =>
@@ -40,10 +40,10 @@ object OperationJsonProtocol extends IdJsonProtocol {
 
         val operation =
           try
-            graphReader.catalog.createDOperation(operationId)
+            graphReader.catalog.createAction(operationId)
           catch {
-            case notFound: DOperationNotFoundException =>
-              deserializationError(s"DOperation with id = '${notFound.operationId}' does not exist", notFound)
+            case notFound: ActionNotFoundException =>
+              deserializationError(s"Action with id = '${notFound.operationId}' does not exist", notFound)
           }
 
         val parameters =

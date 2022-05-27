@@ -8,7 +8,7 @@ import ai.deepsense.deeplang.actionobjects.MetricValue
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.MockActionObjectsFactory._
 import ai.deepsense.deeplang.actions.exceptions.TooManyPossibleTypesException
-import ai.deepsense.deeplang.exceptions.DeepLangMultiException
+import ai.deepsense.deeplang.exceptions.FlowMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.parameters.ParamsMatchers._
@@ -95,7 +95,7 @@ class EvaluateSpec extends UnitSpec with DeeplangTestSupport {
         val paramsForEvaluator  = JsObject(evaluator.paramA.name -> JsNumber(-2))
         val evaluatorWithParams = Evaluate().setEvaluatorParams(paramsForEvaluator)
 
-        a[DeepLangMultiException] shouldBe thrownBy {
+        a[FlowMultiException] shouldBe thrownBy {
           evaluatorWithParams.inferKnowledgeUntyped(Vector(Knowledge(evaluator), Knowledge(inputDF)))(
             mock[InferContext]
           )

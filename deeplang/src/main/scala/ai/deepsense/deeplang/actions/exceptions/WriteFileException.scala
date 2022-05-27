@@ -4,11 +4,11 @@ import scala.compat.Platform.EOL
 
 import org.apache.spark.SparkException
 
-import ai.deepsense.commons.exception.DeepSenseException
+import ai.deepsense.commons.exception.HaranaException
 import ai.deepsense.commons.exception.FailureCode
 
 case class WriteFileException(path: String, e: SparkException)
-    extends DeepSenseException(
+    extends HaranaException(
       code = FailureCode.NodeFailure,
       title = "WriteFileException",
       message = s"Unable to write file: $path",

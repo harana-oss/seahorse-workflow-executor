@@ -8,7 +8,7 @@ import ai.deepsense.deeplang.PortPosition.PortPosition
 import ai.deepsense.deeplang.catalogs.SortPriority
 import ai.deepsense.deeplang.utils.TypeUtils
 
-/** Represents a registered DOperation and stores its name and i/o port types. */
+/** Represents a registered Action and stores its name and i/o port types. */
 case class ActionDescriptor(
                              id: Action.Id,
                              name: String,

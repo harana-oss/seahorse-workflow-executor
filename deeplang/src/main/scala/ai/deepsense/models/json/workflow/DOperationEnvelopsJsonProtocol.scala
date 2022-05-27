@@ -4,20 +4,20 @@ import ai.deepsense.commons.json.envelope.EnvelopeJsonWriter
 import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.catalogs.actions.ActionDescriptor
 
-trait ActionsEnvelopeJsonProtocol extends DOperationDescriptorJsonProtocol {
+trait ActionsEnvelopeJsonProtocol extends ActionDescriptorJsonProtocol {
 
   val operationsEnvelopeLabel = "operations"
 
-  implicit private val operationsFormat = DOperationDescriptorBaseFormat
+  implicit private val operationsFormat = ActionDescriptorBaseFormat
 
   implicit val operationsEnvelopeWriter =
     new EnvelopeJsonWriter[Map[Action.Id, ActionDescriptor]](operationsEnvelopeLabel)
 
 }
 
-trait DOperationEnvelopeJsonProtocol extends DOperationDescriptorJsonProtocol {
+trait ActionEnvelopeJsonProtocol extends ActionDescriptorJsonProtocol {
 
-  implicit private val operationFormat = DOperationDescriptorFullFormat
+  implicit private val operationFormat = ActionDescriptorFullFormat
 
   val operationEnvelopeLabel = "operation"
 
@@ -26,6 +26,6 @@ trait DOperationEnvelopeJsonProtocol extends DOperationDescriptorJsonProtocol {
 
 }
 
-trait DOperationEnvelopesJsonProtocol extends ActionsEnvelopeJsonProtocol with DOperationEnvelopeJsonProtocol
+trait ActionEnvelopesJsonProtocol extends ActionsEnvelopeJsonProtocol with ActionEnvelopeJsonProtocol
 
-object DOperationEnvelopesJsonProtocol extends DOperationEnvelopesJsonProtocol
+object ActionEnvelopesJsonProtocol extends ActionEnvelopesJsonProtocol

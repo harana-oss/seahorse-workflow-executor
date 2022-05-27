@@ -10,7 +10,7 @@ import ai.deepsense.deeplang.actions.readwritedataframe.FilePath
 import ai.deepsense.deeplang.actions.readwritedataframe.FilePathFromLibraryPath
 import ai.deepsense.deeplang.actions.readwritedataframe.FileScheme
 import ai.deepsense.deeplang.actions.readwritedataframe.filestorage.csv.CsvSchemaStringifierBeforeCsvWriting
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.ExecutionContext
 import ai.deepsense.deeplang.filesystemclients.FileSystemClient
 import org.apache.spark.sql.SaveMode
@@ -59,6 +59,6 @@ object DataFrameToFileWriter {
   }
 
   case class NotSupportedScheme(fileScheme: FileScheme)
-      extends DeepLangException(s"Not supported file scheme ${fileScheme.pathPrefix}")
+      extends FlowException(s"Not supported file scheme ${fileScheme.pathPrefix}")
 
 }

@@ -6,9 +6,9 @@ import spray.json._
 import ai.deepsense.deeplang.parameters.ParameterType.ParameterType
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 
-/** This parameter type is used to forward parameters from the DOperation to its input ActionObjects. Value of this
-  * parameter is a Json that can be inserted as values of parameters of ActionObject that is used in DOperation. For
-  * example, DOperation Transform dynamically renders parameters of its input Transformer.
+/** This parameter type is used to forward parameters from the Action to its input ActionObjects. Value of this
+  * parameter is a Json that can be inserted as values of parameters of ActionObject that is used in Action. For
+  * example, Action Transform dynamically renders parameters of its input Transformer.
   * @param inputPort
   *   number of port on which the ActionObject is received
   */

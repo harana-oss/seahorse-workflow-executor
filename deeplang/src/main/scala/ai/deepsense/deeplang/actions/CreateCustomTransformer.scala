@@ -74,7 +74,7 @@ object CreateCustomTransformer {
   private val sinkNodeId: Node.Id = "d7798d5e-b1c6-4027-873e-a6d653957418"
 
   val default = InnerWorkflow(
-    DeeplangGraph(
+    FlowGraph(
       nodes = Set(Node(sourceNodeId, Source()), Node(sinkNodeId, Sink())),
       edges = Set(Edge(Endpoint(sourceNodeId, 0), Endpoint(sinkNodeId, 0)))
     ),

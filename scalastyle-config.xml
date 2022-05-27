@@ -16,7 +16,7 @@
 
 <scalastyle>
 
-  <name>Scalastyle configuration for DeepSense.io</name>
+  <name>Scalastyle configuration for Harana</name>
 
   <check level="error" class="org.scalastyle.file.HeaderMatchesChecker" enabled="true">
     <parameters>

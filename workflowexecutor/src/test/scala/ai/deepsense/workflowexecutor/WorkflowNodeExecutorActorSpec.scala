@@ -17,7 +17,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.actionobjects.report.Report
 import ai.deepsense.deeplang.inference.InferenceWarnings
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph.Node
 import ai.deepsense.reportlib.model.ReportContent
 import ai.deepsense.sparkutils.AkkaUtils
@@ -65,7 +65,7 @@ class WorkflowNodeExecutorActorSpec
     "receives delete" should {
       "use delete DataFrame from storage" in {
 
-        val node = mock[DeeplangNode]
+        val node = mock[FlowNode]
         when(node.id).thenReturn(Node.Id.randomId)
         val dOperation = mockOperation
         when(node.value).thenReturn(dOperation)
@@ -121,7 +121,7 @@ class WorkflowNodeExecutorActorSpec
     }
   }
 
-  private def nodeExecutorActor(input: Vector[ActionObject], node: DeeplangNode): ActorRef =
+  private def nodeExecutorActor(input: Vector[ActionObject], node: FlowNode): ActorRef =
     system.actorOf(Props(new WorkflowNodeExecutorActor(executionContext, node, input)))
 
   private def inferableOperable: ActionObject = {
@@ -143,7 +143,7 @@ class WorkflowNodeExecutorActorSpec
     dOperation
   }
 
-  private def fixtureFailingInference(): (TestProbe, ActorRef, DeeplangNode, NullPointerException) = {
+  private def fixtureFailingInference(): (TestProbe, ActorRef, FlowNode, NullPointerException) = {
     val operation = mockOperation
     val cause     = new NullPointerException("test exception")
     when(operation.inferKnowledgeUntyped(any())(any()))
@@ -152,7 +152,7 @@ class WorkflowNodeExecutorActorSpec
     (probe, testedActor, node, cause)
   }
 
-  private def fixtureFailingOperation(): (TestProbe, ActorRef, DeeplangNode, NullPointerException) = {
+  private def fixtureFailingOperation(): (TestProbe, ActorRef, FlowNode, NullPointerException) = {
     val operation = mockOperation
     val cause     = new NullPointerException("test exception")
     when(operation.executeUntyped(any[Vector[ActionObject]]())(any[ExecutionContext]()))
@@ -161,7 +161,7 @@ class WorkflowNodeExecutorActorSpec
     (probe, testedActor, node, cause)
   }
 
-  private def fixtureFailingOperationError(): (TestProbe, ActorRef, DeeplangNode, Throwable) = {
+  private def fixtureFailingOperationError(): (TestProbe, ActorRef, FlowNode, Throwable) = {
     val operation = mockOperation
     val cause     = new AssertionError("test exception")
     when(operation.executeUntyped(any[Vector[ActionObject]]())(any[ExecutionContext]()))
@@ -170,7 +170,7 @@ class WorkflowNodeExecutorActorSpec
     (probe, testedActor, node, cause)
   }
 
-  private def fixtureSucceedingOperation(): (TestProbe, ActorRef, DeeplangNode, Vector[ActionObject]) = {
+  private def fixtureSucceedingOperation(): (TestProbe, ActorRef, FlowNode, Vector[ActionObject]) = {
     val operation = mockOperation
     val output    = Vector(operableWithReports, operableWithReports)
     when(operation.executeUntyped(any())(any()))
@@ -181,8 +181,8 @@ class WorkflowNodeExecutorActorSpec
 
   private def fixtureWithOperation(
       dOperation: Action
-  ): (TestProbe, ActorRef, DeeplangNode, Action, Vector[ActionObject]) = {
-    val node = mock[DeeplangNode]
+  ): (TestProbe, ActorRef, FlowNode, Action, Vector[ActionObject]) = {
+    val node = mock[FlowNode]
     when(node.id).thenReturn(Node.Id.randomId)
     when(node.value).thenReturn(dOperation)
     val probe       = TestProbe()
@@ -191,7 +191,7 @@ class WorkflowNodeExecutorActorSpec
     (probe, testedActor, node, dOperation, input)
   }
 
-  private def fixutre(): (TestProbe, ActorRef, DeeplangNode, Action, Vector[ActionObject]) = {
+  private def fixutre(): (TestProbe, ActorRef, FlowNode, Action, Vector[ActionObject]) = {
     val dOperation = mockOperation
     when(dOperation.inferKnowledgeUntyped(any())(any()))
       .thenReturn((Vector[Knowledge[ActionObject]](), mock[InferenceWarnings]))

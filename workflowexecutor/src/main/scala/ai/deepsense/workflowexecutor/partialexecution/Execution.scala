@@ -4,7 +4,7 @@ import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.deeplang.inference.InferContext
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph.Node.Id
 import ai.deepsense.graph._
 import ai.deepsense.models.workflows.ExecutionReport
@@ -18,7 +18,7 @@ object Execution {
   def apply(graph: StatefulGraph, selectedNodes: Set[Node.Id] = Set.empty): IdleExecution =
     IdleExecution(graph, selectedNodes)
 
-  def selectedNodes(directedGraph: DeeplangGraph, nodes: Seq[Id]): Set[Id] = {
+  def selectedNodes(directedGraph: FlowGraph, nodes: Seq[Id]): Set[Id] = {
     val graphNodeIds  = directedGraph.nodes.map(_.id)
     val filteredNodes = nodes.filter(graphNodeIds.contains).toSet
     filteredNodes
@@ -31,7 +31,7 @@ object Execution {
 
 sealed abstract class Execution {
 
-  final def node(id: Node.Id): DeeplangNode = graph.node(id)
+  final def node(id: Node.Id): FlowNode = graph.node(id)
 
   def executionReport: ExecutionReport =
     ExecutionReport(graph.states.mapValues(_.nodeState), graph.executionFailure)
@@ -77,7 +77,7 @@ case class IdleExecution(override val graph: StatefulGraph, selectedNodes: Set[N
   override def nodeStarted(id: Id): Execution =
     throw new IllegalStateException("A node cannot start in IdleExecution")
 
-  def updateStructure(newStructure: DeeplangGraph, nodes: Set[Id] = Set.empty): IdleExecution = {
+  def updateStructure(newStructure: FlowGraph, nodes: Set[Id] = Set.empty): IdleExecution = {
     val selected     = Execution.selectedNodes(newStructure, nodes.toSeq)
     val substructure = newStructure.subgraph(selected)
     val newStates    = findStates(newStructure, substructure, selected)
@@ -109,7 +109,7 @@ case class IdleExecution(override val graph: StatefulGraph, selectedNodes: Set[N
     (selected, subgraph)
   }
 
-  private def operationParamsChanged(newNode: DeeplangGraph.DeeplangNode, graph: StatefulGraph): Boolean = {
+  private def operationParamsChanged(newNode: FlowGraph.FlowNode, graph: StatefulGraph): Boolean = {
     graph.nodes.find(_.id == newNode.id) match {
       case Some(oldNode) =>
         !newNode.value.sameAs(oldNode.value)
@@ -117,7 +117,7 @@ case class IdleExecution(override val graph: StatefulGraph, selectedNodes: Set[N
     }
   }
 
-  private def findStates(newStructure: DeeplangGraph, substructure: DeeplangGraph, nodes: Set[Node.Id]): NodeStates = {
+  private def findStates(newStructure: FlowGraph, substructure: FlowGraph, nodes: Set[Node.Id]): NodeStates = {
     val noMissingStates = newStructure.nodes.map { case Node(id, _) =>
       id -> graph.states.getOrElse(id, NodeStateWithResults.draft)
     }.toMap

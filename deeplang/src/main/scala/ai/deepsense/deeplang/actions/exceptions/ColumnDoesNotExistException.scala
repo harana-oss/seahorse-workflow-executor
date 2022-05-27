@@ -8,7 +8,7 @@ import ai.deepsense.deeplang.parameters.selections.NameSingleColumnSelection
 import ai.deepsense.deeplang.parameters.selections.SingleColumnSelection
 
 case class ColumnDoesNotExistException(selection: SingleColumnSelection, schema: StructType)
-    extends DOperationExecutionException(exceptionMessage(selection, schema), None)
+    extends ActionExecutionException(exceptionMessage(selection, schema), None)
 
 object ColumnDoesNotExistException {
 

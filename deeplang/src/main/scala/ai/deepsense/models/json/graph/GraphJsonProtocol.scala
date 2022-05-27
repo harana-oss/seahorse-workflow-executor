@@ -5,11 +5,11 @@ import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
 import ai.deepsense.deeplang.actions.CreateCustomTransformer
 import ai.deepsense.deeplang.actions.UnknownOperation
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
-import ai.deepsense.graph.DeeplangGraph
+import ai.deepsense.graph.FlowGraph.FlowNode
+import ai.deepsense.graph.FlowGraph
 import ai.deepsense.graph.Edge
 import ai.deepsense.graph.Node
-import ai.deepsense.models.json.graph.OperationJsonProtocol.DOperationReader
+import ai.deepsense.models.json.graph.OperationJsonProtocol.ActionReader
 
 object GraphJsonProtocol {
 
@@ -24,17 +24,17 @@ object GraphJsonProtocol {
 
   val NodeId = "id"
 
-  class GraphReader(val catalog: ActionCatalog) extends JsonReader[DeeplangGraph] with DefaultJsonProtocol {
+  class GraphReader(val catalog: ActionCatalog) extends JsonReader[FlowGraph] with DefaultJsonProtocol {
 
-    private val dOperationReader = new DOperationReader(this)
+    private val dOperationReader = new ActionReader(this)
 
-    override def read(json: JsValue): DeeplangGraph = json match {
+    override def read(json: JsValue): FlowGraph = json match {
       case JsObject(fields) => read(fields)
       case x                =>
         throw new DeserializationException(s"Expected JsObject with a Graph but got $x")
     }
 
-    private def readNode(nodeJs: JsValue): DeeplangNode = nodeJs match {
+    private def readNode(nodeJs: JsValue): FlowNode = nodeJs match {
       case JsObject(fields) =>
         val nodeId    =
           try
@@ -55,7 +55,7 @@ object GraphJsonProtocol {
         throw new DeserializationException(s"Expected JsObject with a node but got $x")
     }
 
-    private def readNodes(nodesJs: JsValue): Set[DeeplangNode] = nodesJs match {
+    private def readNodes(nodesJs: JsValue): Set[FlowNode] = nodesJs match {
       case JsArray(elements) => elements.map(readNode).toSet
       case x                 =>
         throw new DeserializationException(s"Expected JsArray with nodes but got $x")
@@ -67,17 +67,17 @@ object GraphJsonProtocol {
         throw new DeserializationException(s"Expected JsArray with edges but got $x")
     }
 
-    private def read(fields: Map[String, JsValue]): DeeplangGraph = {
-      val nodes: Set[DeeplangNode] = fields.get(Nodes).map(readNodes).getOrElse(Set())
+    private def read(fields: Map[String, JsValue]): FlowGraph = {
+      val nodes: Set[FlowNode] = fields.get(Nodes).map(readNodes).getOrElse(Set())
       val edges: Set[Edge]         = fields.get(Edges).map(readEdges).getOrElse(Set())
-      DeeplangGraph(nodes, edges)
+      FlowGraph(nodes, edges)
     }
 
   }
 
-  implicit object GraphWriter extends JsonWriter[DeeplangGraph] with DefaultJsonProtocol {
+  implicit object GraphWriter extends JsonWriter[FlowGraph] with DefaultJsonProtocol {
 
-    override def write(graph: DeeplangGraph): JsValue = {
+    override def write(graph: FlowGraph): JsValue = {
       JsObject(
         Nodes -> JsArray(graph.nodes.map(_.toJson).toVector),
         Edges -> JsArray(graph.getValidEdges.map(_.toJson).toVector)

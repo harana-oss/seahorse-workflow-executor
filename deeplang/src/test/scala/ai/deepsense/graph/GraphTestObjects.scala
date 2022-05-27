@@ -7,11 +7,11 @@ import org.scalatestplus.mockito.MockitoSugar
 import ai.deepsense.commons.utils.Version
 import ai.deepsense.deeplang._
 import ai.deepsense.deeplang.actionobjects.ActionObjectMock
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 
 object RandomNodeFactory {
 
-  def randomNode(operation: Action): DeeplangNode = Node(Node.Id.randomId, operation)
+  def randomNode(operation: Action): FlowNode = Node(Node.Id.randomId, operation)
 
 }
 
@@ -25,7 +25,7 @@ object DClassesForActions extends MockitoSugar {
 
 }
 
-object DOperationTestClasses {
+object ActionTestClasses {
 
   import ai.deepsense.graph.DClassesForActions._
 

@@ -4,7 +4,7 @@ import spray.json._
 
 import org.scalatest.matchers.should.Matchers
 import ai.deepsense.commons.datetime.DateTimeConverter
-import ai.deepsense.commons.exception.DeepSenseFailure
+import ai.deepsense.commons.exception.HaranaFile
 import ai.deepsense.commons.exception.FailureCode
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
@@ -82,7 +82,7 @@ class NodeStatusJsonProtocolSpec extends GraphJsonTestSupport {
   val ended = started.plusDays(1)
 
   val error = FailureDescription(
-    DeepSenseFailure.Id.randomId,
+    HaranaFile.Id.randomId,
     FailureCode.CannotUpdateRunningWorkflow,
     "This is a test FailureDescription",
     Some("This is a long test description"),

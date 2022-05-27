@@ -13,8 +13,8 @@ import ai.deepsense.deeplang.Action.Id
 import ai.deepsense.deeplang.documentation.OperationDocumentation
 import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.actions.ReadDataFrame.ReadDataFrameParameters
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseIOException
-import ai.deepsense.deeplang.actions.exceptions.DeepSenseUnknownHostException
+import ai.deepsense.deeplang.actions.exceptions.HaranaIOException
+import ai.deepsense.deeplang.actions.exceptions.HaranaUnknownHostException
 import ai.deepsense.deeplang.actions.inout._
 import ai.deepsense.deeplang.actions.readwritedataframe.filestorage.DataFrameFromFileReader
 import ai.deepsense.deeplang.actions.readwritedataframe.googlestorage.DataFrameFromGoogleSheetReader
@@ -63,8 +63,8 @@ case class ReadDataFrame()
       }
       DataFrame.fromSparkDataFrame(dataframe)
     } catch {
-      case e: UnknownHostException => throw DeepSenseUnknownHostException(e)
-      case e: IOException          => throw DeepSenseIOException(e)
+      case e: UnknownHostException => throw HaranaUnknownHostException(e)
+      case e: IOException          => throw HaranaIOException(e)
     }
   }
 

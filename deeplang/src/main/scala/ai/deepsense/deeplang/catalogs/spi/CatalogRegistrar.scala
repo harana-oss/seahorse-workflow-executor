@@ -61,7 +61,7 @@ object CatalogRegistrar {
                                     factory: OperationFactory,
                                     priority: SortPriority
     ): Unit =
-      operationsCatalog.registerDOperation(category, factory, priority)
+      operationsCatalog.registerAction(category, factory, priority)
 
     override def registerOperable[C <: ActionObject: TypeTag](): Unit =
       operables.register(typeTag[C])

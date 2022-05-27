@@ -69,7 +69,7 @@ case class Fit()
     estimatorWithParams(estimator, ctx.graphReader).fit.infer(ctx)(())(dataFrameKnowledge)
   }
 
-  /** Note that DOperation should never mutate input ActionObject. This method copies input estimator and sets parameters
+  /** Note that Action should never mutate input ActionObject. This method copies input estimator and sets parameters
     * in copy.
     */
   private def estimatorWithParams(

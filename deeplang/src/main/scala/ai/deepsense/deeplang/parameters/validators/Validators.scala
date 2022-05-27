@@ -5,7 +5,7 @@ import scala.util.matching.Regex
 import spray.json.JsObject
 import spray.json.JsString
 
-import ai.deepsense.deeplang.exceptions.DeepLangException
+import ai.deepsense.deeplang.exceptions.FlowException
 import ai.deepsense.deeplang.parameters.exceptions._
 import ai.deepsense.deeplang.parameters.validators.ValidatorType.ValidatorType
 
@@ -31,7 +31,7 @@ case class RangeValidator(
 
   val validatorType = ValidatorType.Range
 
-  override def validate(name: String, parameter: Double): Vector[DeepLangException] = {
+  override def validate(name: String, parameter: Double): Vector[FlowException] = {
     val beginComparison: (Double, Double) => Boolean = if (beginIncluded) (_ >= _) else (_ > _)
     val endComparison: (Double, Double) => Boolean   = if (endIncluded) (_ <= _) else (_ < _)
     if (!(beginComparison(parameter, begin) && endComparison(parameter, end)))
@@ -41,7 +41,7 @@ case class RangeValidator(
   }
 
   /** Validates if parameter value can be reached using given step */
-  private def validateStep(name: String, value: Double): Vector[DeepLangException] = {
+  private def validateStep(name: String, value: Double): Vector[FlowException] = {
     step.foreach { s =>
       if (math.abs(takeSteps(countStepsTo(value, s), s) - value) >= Epsilon)
         return Vector(OutOfRangeWithStepException(name, value, begin, end, s))
@@ -178,7 +178,7 @@ case class ArrayLengthValidator(min: Int = 1, max: Int = Int.MaxValue) extends V
 
   override val validatorType = ValidatorType.ArrayLength
 
-  override def validate(name: String, parameter: Array[Double]): Vector[DeepLangException] = {
+  override def validate(name: String, parameter: Array[Double]): Vector[FlowException] = {
     val length = parameter.length
     if (length < min)
       Vector(new ArrayTooShort(name, length, min))
@@ -221,7 +221,7 @@ case class ComplexArrayValidator(
 
   override val validatorType = ValidatorType.ArrayComplex
 
-  override def validate(name: String, parameter: Array[Double]): Vector[DeepLangException] = {
+  override def validate(name: String, parameter: Array[Double]): Vector[FlowException] = {
     val arrayExceptions          = lengthValidator.validate(name, parameter)
     val elementsRangesExceptions = parameter.zipWithIndex.flatMap { case (value, idx) =>
       rangeValidator.validate(s"$name[$idx]", value)
@@ -270,7 +270,7 @@ trait RegexValidatorLike extends Validator[String] {
   override def configurationToJson: JsObject =
     JsObject("regex" -> JsString(regex.toString()))
 
-  override def validate(name: String, parameter: String): Vector[DeepLangException] = {
+  override def validate(name: String, parameter: String): Vector[FlowException] = {
     if (parameter.matches(regex.toString))
       Vector.empty
     else
@@ -288,7 +288,7 @@ trait ColumnNameStringValidator extends RegexValidatorLike {
 
   def exception: ValidationException
 
-  override def validate(name: String, parameter: String): Vector[DeepLangException] = {
+  override def validate(name: String, parameter: String): Vector[FlowException] = {
     if (parameter.nonEmpty)
       super.validate(name, parameter)
     else

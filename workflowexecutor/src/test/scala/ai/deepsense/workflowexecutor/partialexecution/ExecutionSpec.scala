@@ -11,7 +11,7 @@ import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.deeplang.Action
-import ai.deepsense.graph.DeeplangGraph.DeeplangNode
+import ai.deepsense.graph.FlowGraph.FlowNode
 import ai.deepsense.graph._
 import ai.deepsense.graph.nodestate.Completed
 import ai.deepsense.graph.nodestate.NodeStatus
@@ -24,7 +24,7 @@ import ai.deepsense.reportlib.model.factory.ReportContentTestFactory
 
 class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport {
 
-  val directedGraph = DeeplangGraph(nodeSet, edgeSet)
+  val directedGraph = FlowGraph(nodeSet, edgeSet)
 
   val statefulGraph =
     StatefulGraph(directedGraph, directedGraph.nodes.map(_.id -> NodeStateWithResults.draft).toMap, None)
@@ -61,7 +61,7 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
     "infer knowledge only on the selected part" in {
       val graph = mock[StatefulGraph]
       when(graph.readyNodes).thenReturn(Seq.empty)
-      when(graph.directedGraph).thenReturn(DeeplangGraph())
+      when(graph.directedGraph).thenReturn(FlowGraph())
       val subgraph = mock[StatefulGraph]
       when(subgraph.readyNodes).thenReturn(Seq.empty)
       when(graph.subgraph(any())).thenReturn(subgraph)
@@ -132,7 +132,7 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
     }
     "mark all selected nodes as Draft" in {
       val statefulGraph = StatefulGraph(
-        DeeplangGraph(nodeSet, edgeSet),
+        FlowGraph(nodeSet, edgeSet),
         Map(
           idA -> nodeCompletedState.withKnowledge(mock[NodeInferenceResult]),
           idB -> nodeCompletedState.withKnowledge(mock[NodeInferenceResult]),
@@ -160,7 +160,7 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
         val stateWD = nodeCompletedIdState(idD)
         val stateWE = nodeCompletedIdState(idE)
         val statefulGraph = StatefulGraph(
-          DeeplangGraph(nodeSet, edgeSet),
+          FlowGraph(nodeSet, edgeSet),
           Map(
             idA -> nodeCompletedIdState(idA),
             idB -> nodeCompletedIdState(idB),
@@ -209,8 +209,8 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
 
       val graph = mock[StatefulGraph]
       when(graph.readyNodes).thenReturn(Seq.empty)
-      val directedGraph = mock[DeeplangGraph]
-      when(directedGraph.nodes).thenReturn(Set[DeeplangNode]())
+      val directedGraph = mock[FlowGraph]
+      when(directedGraph.nodes).thenReturn(Set[FlowNode]())
       when(graph.directedGraph).thenReturn(directedGraph)
       when(graph.subgraph(any())).thenReturn(graph)
       when(graph.inferAndApplyKnowledge(any())).thenReturn(failedGraph)
@@ -224,13 +224,13 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
       val changedC = Node(Node.Id.randomId, op1To1) // Notice: different Id
 
       def validate(
-          changedC: DeeplangNode,
-          updatedGraph: DeeplangGraph,
-          statefulGraph: StatefulGraph,
-          stateWD: NodeStateWithResults,
-          stateWE: NodeStateWithResults,
-          stateC: NodeStateWithResults,
-          execution: IdleExecution
+                    changedC: FlowNode,
+                    updatedGraph: FlowGraph,
+                    statefulGraph: StatefulGraph,
+                    stateWD: NodeStateWithResults,
+                    stateWE: NodeStateWithResults,
+                    stateC: NodeStateWithResults,
+                    execution: IdleExecution
       ): Unit = {
         val updatedExecution = execution.updateStructure(updatedGraph, Set(idE))
         updatedExecution.graph.states(idA) shouldBe statefulGraph.states(idA)
@@ -255,13 +255,13 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
       val changedC = Node(idC, changedCOp)
 
       def validate(
-          changedC: DeeplangNode,
-          updatedGraph: DeeplangGraph,
-          statefulGraph: StatefulGraph,
-          stateWD: NodeStateWithResults,
-          stateWE: NodeStateWithResults,
-          stateC: NodeStateWithResults,
-          execution: IdleExecution
+                    changedC: FlowNode,
+                    updatedGraph: FlowGraph,
+                    statefulGraph: StatefulGraph,
+                    stateWD: NodeStateWithResults,
+                    stateWE: NodeStateWithResults,
+                    stateC: NodeStateWithResults,
+                    execution: IdleExecution
       ): Unit = {
         val updatedExecution = execution.updateStructure(updatedGraph, Set(idE))
         updatedExecution.graph.states(idA) shouldBe statefulGraph.states(idA)
@@ -283,7 +283,7 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
     "be idle" when {
       "stated with an empty structure and enqueued" in {
         val statefulGraph = StatefulGraph(
-          DeeplangGraph(nodeSet, edgeSet),
+          FlowGraph(nodeSet, edgeSet),
           Map(
             idA -> nodeCompletedIdState(idA),
             idB -> nodeCompletedIdState(idB),
@@ -296,7 +296,7 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
 
         val execution = IdleExecution(statefulGraph, statefulGraph.nodes.map(_.id))
 
-        val emptyStructure = execution.updateStructure(DeeplangGraph(), Set())
+        val emptyStructure = execution.updateStructure(FlowGraph(), Set())
         val enqueued       = emptyStructure.inferAndApplyKnowledge(mock[InferContext]).enqueue
 
         enqueued shouldBe an[IdleExecution]
@@ -317,11 +317,11 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
         val node2 = Node(Node.Id.randomId, op2)
         val node3 = Node(Node.Id.randomId, op1)
         val edge  = Edge(node1, 0, node2, 0)
-        val graph = DeeplangGraph(Set(node1, node2), Set(edge))
+        val graph = FlowGraph(Set(node1, node2), Set(edge))
         val statefulGraph =
           StatefulGraph(graph, Map(node1.id -> nodeCompletedState, node2.id -> nodeCompletedState), None)
         val execution    = IdleExecution(statefulGraph)
-        val newStructure = DeeplangGraph(Set(node1, node2, node3), Set())
+        val newStructure = FlowGraph(Set(node1, node2, node3), Set())
 
         val updatedExecution = execution.updateStructure(newStructure)
 
@@ -333,10 +333,10 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
   }
 
   def checkSuccessorsStatesAfterANodeChange(
-      changedC: DeeplangNode,
-      validate: (
-          DeeplangNode,
-          DeeplangGraph,
+                                             changedC: FlowNode,
+                                             validate: (
+          FlowNode,
+          FlowGraph,
           StatefulGraph,
           NodeStateWithResults,
           NodeStateWithResults,
@@ -344,11 +344,11 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
           IdleExecution
       ) => Unit
   ): Unit = {
-    val graph = DeeplangGraph(nodeSet, edgeSet)
+    val graph = FlowGraph(nodeSet, edgeSet)
 
     val edgeBtoC = Edge(nodeB, 0, changedC, 0)
     val edgeCtoD = Edge(changedC, 0, nodeD, 0)
-    val updatedGraph = DeeplangGraph(
+    val updatedGraph = FlowGraph(
       Set(nodeA, nodeB, changedC, nodeD, nodeE),
       Set(edge1, edgeBtoC, edgeCtoD, edge4, edge5)
     )

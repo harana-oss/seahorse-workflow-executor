@@ -3,18 +3,18 @@ package ai.deepsense.models.json.workflow
 import spray.json._
 
 import ai.deepsense.commons.json.IdJsonProtocol
-import ai.deepsense.deeplang.catalogs.actions.DOperationCategoryNode
+import ai.deepsense.deeplang.catalogs.actions.ActionCategoryNode
 
-trait DOperationCategoryNodeJsonProtocol
+trait ActionCategoryNodeJsonProtocol
     extends DefaultJsonProtocol
     with IdJsonProtocol
-    with DOperationDescriptorJsonProtocol {
+    with ActionDescriptorJsonProtocol {
 
-  implicit object DOperationCategoryNodeFormat extends RootJsonFormat[DOperationCategoryNode] {
+  implicit object ActionCategoryNodeFormat extends RootJsonFormat[ActionCategoryNode] {
 
-    implicit private val operationFormat = DOperationDescriptorShortFormat
+    implicit private val operationFormat = ActionDescriptorShortFormat
 
-    override def write(obj: DOperationCategoryNode): JsValue = {
+    override def write(obj: ActionCategoryNode): JsValue = {
       val fields    = Map("items" -> obj.operations.toJson, "catalog" -> obj.successors.values.toJson)
       val allFields = obj.category match {
         case Some(value) => fields ++ Map("id" -> obj.category.get.id.toJson, "name" -> obj.category.get.name.toJson)
@@ -23,11 +23,11 @@ trait DOperationCategoryNodeJsonProtocol
       JsObject(allFields)
     }
 
-    override def read(json: JsValue): DOperationCategoryNode =
+    override def read(json: JsValue): ActionCategoryNode =
       throw new UnsupportedOperationException
 
   }
 
 }
 
-object DOperationCategoryNodeJsonProtocol extends DOperationCategoryNodeJsonProtocol
+object ActionCategoryNodeJsonProtocol extends ActionCategoryNodeJsonProtocol

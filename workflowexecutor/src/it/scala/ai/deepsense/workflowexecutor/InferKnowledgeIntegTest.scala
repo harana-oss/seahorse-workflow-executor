@@ -5,7 +5,7 @@ import ai.deepsense.deeplang.CatalogRecorder
 import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.DeeplangIntegTestSupport
 import ai.deepsense.deeplang.DeeplangTestSupport
-import ai.deepsense.graph.DefaultKnowledgeService
+import ai.deepsense.graph.KnowledgeService
 import ai.deepsense.graph.Node
 import ai.deepsense.graph.NodeInferenceImpl
 import ai.deepsense.graph.NodeInferenceResult
@@ -21,9 +21,9 @@ class InferKnowledgeIntegTest extends DeeplangIntegTestSupport with DeeplangTest
   for (operation <- dopsCatalog.operations.values) {
     operation.name should {
       "not throw in inferKnowledge" in {
-        val op             = dopsCatalog.createDOperation(operation.id)
+        val op             = dopsCatalog.createAction(operation.id)
         val opNode         = Node[Action](operation.id, op)
-        val inputKnowledge = DefaultKnowledgeService.defaultInputKnowledge(doplCatalog, op)
+        val inputKnowledge = KnowledgeService.defaultInputKnowledge(doplCatalog, op)
         noException should be thrownBy
           nodeInference.inferKnowledge(opNode, inferCtx, NodeInferenceResult(inputKnowledge))
       }
