@@ -20,7 +20,7 @@ object CommonSettingsPlugin extends AutoPlugin {
     crossScalaVersions := Seq(Version.scala),
     scalacOptions := Seq(
       "-unchecked", "-deprecation", "-encoding", "utf8", "-feature",
-      "-language:existentials", "-language:implicitConversions", "-Xfatal-warnings"
+      "-language:existentials", "-language:implicitConversions"
     ),
     javacOptions ++= Seq(
       "-source", Version.java,
@@ -61,7 +61,7 @@ object CommonSettingsPlugin extends AutoPlugin {
         Tests.Argument(TestFrameworks.ScalaTest, "-oF", "-u", s"target/test-reports-${Version.spark}")
       ),
       javaOptions := Seq(s"-DlogFile=${name.value}", "-Xmx2G", "-Xms2G"),
-      fork := true,
+      fork := false,
       unmanagedClasspath += baseDirectory.value / "conf"
     )
   }
@@ -76,7 +76,7 @@ object CommonSettingsPlugin extends AutoPlugin {
           "-u", s"target/test-reports-${Version.spark}"
         )
       ),
-      fork := true,
+      fork := false,
       javaOptions := Seq(s"-DlogFile=${name.value}"),
       unmanagedClasspath += baseDirectory.value / "conf"
     )

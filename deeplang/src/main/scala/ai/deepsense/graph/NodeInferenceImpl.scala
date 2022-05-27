@@ -23,6 +23,7 @@ trait NodeInferenceImpl extends NodeInference {
   ): NodeInferenceResult = {
 
     val NodeInferenceResult(inKnowledge, warnings, errors) = inputInferenceForNode
+
     val parametersValidationErrors                         = node.value.validateParams
 
     def defaultInferenceResult(additionalErrors: Vector[DeepLangException] = Vector.empty) =

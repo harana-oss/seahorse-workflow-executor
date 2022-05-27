@@ -87,10 +87,8 @@ abstract class WorkflowExecutorActor(
     sendInferredState(statefulWorkflow.inferState)
   }
 
-  def sendInferredState(inferredState: InferredState): Unit = {
-    if (inferredState == null) println(">>> inferredState == null")
+  def sendInferredState(inferredState: InferredState): Unit =
     publisher.foreach(_ ! inferredState)
-  }
 
   private def abort(): Unit = {
     val startingPointExecution = statefulWorkflow.currentExecution
