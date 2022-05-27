@@ -3,7 +3,7 @@ package ai.deepsense.models.json.workflow
 import spray.json._
 
 import ai.deepsense.commons.json.IdJsonProtocol
-import ai.deepsense.deeplang.catalogs.doperations.DOperationCategoryNode
+import ai.deepsense.deeplang.catalogs.actions.DOperationCategoryNode
 
 trait DOperationCategoryNodeJsonProtocol
     extends DefaultJsonProtocol

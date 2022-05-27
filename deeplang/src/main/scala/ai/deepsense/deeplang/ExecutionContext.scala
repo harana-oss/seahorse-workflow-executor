@@ -2,17 +2,16 @@ package ai.deepsense.deeplang
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame => SparkDataFrame}
-
 import ai.deepsense.commons.mail.EmailSender
 import ai.deepsense.commons.models.Id
 import ai.deepsense.commons.rest.client.NotebookRestClient
 import ai.deepsense.commons.rest.client.NotebooksClientFactory
 import ai.deepsense.commons.utils.Logging
-import ai.deepsense.deeplang.OperationExecutionDispatcher.Result
-import ai.deepsense.deeplang.doperables.dataframe.DataFrameBuilder
+import ai.deepsense.deeplang.ActionExecutionDispatcher.Result
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrameBuilder
+import ai.deepsense.deeplang.filesystemclients.FileSystemClient
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.sparkutils.SparkSQLSession
 
@@ -69,7 +68,7 @@ object CommonExecutionContext {
 
 }
 
-/** Holds information needed by DOperations and DMethods during execution. */
+/** Holds information needed by Actions and DMethods during execution. */
 case class ExecutionContext(
     sparkContext: SparkContext,
     sparkSQLSession: SparkSQLSession,

@@ -47,7 +47,7 @@ class SparkSQLSession private[sparkutils](val sparkSession: SparkSession) {
 
   def newSession(): SparkSQLSession = new SparkSQLSession(sparkSession.newSession())
 
-  // This is for pyexecutor.py and DOperables and SparkSessionInitializer
+  // This is for pyexecutor.py and ActionObjects and SparkSessionInitializer
   def getSparkSession = sparkSession
 }
 

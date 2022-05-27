@@ -2,7 +2,6 @@ package ai.deepsense.workflowexecutor.executor
 
 import java.io._
 import java.net.InetAddress
-
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 import org.apache.spark.SparkContext
@@ -18,15 +17,15 @@ import scala.io.Source
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
-
 import ai.deepsense.commons.json.datasources.DatasourceListJsonProtocol
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.rest.client.datasources.DatasourceInMemoryClientFactory
 import ai.deepsense.commons.rest.client.datasources.DatasourceTypes.DatasourceList
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.commons.utils.Version
-import ai.deepsense.deeplang.OperationExecutionDispatcher
+import ai.deepsense.deeplang.ActionExecutionDispatcher
 import ai.deepsense.deeplang._
+import ai.deepsense.deeplang.filesystemclients.{FileInfo, FileSystemClient}
 import ai.deepsense.graph.CyclicGraphException
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.workflow.WorkflowVersionUtil
@@ -53,7 +52,7 @@ case class WorkflowExecutor(
     tempPath: String
 ) extends Executor {
 
-  val dOperableCache          = mutable.Map[Entity.Id, DOperable]()
+  val dOperableCache          = mutable.Map[Entity.Id, ActionObject]()
 
   private val actorSystemName = "WorkflowExecutor"
 
@@ -75,7 +74,7 @@ case class WorkflowExecutor(
     val pythonBinary = ConfigFactory.load
       .getString("pythoncaretaker.python-binary-default")
 
-    val operationExecutionDispatcher = new OperationExecutionDispatcher
+    val operationExecutionDispatcher = new ActionExecutionDispatcher
 
     val customCodeEntryPoint =
       new CustomCodeEntryPoint(sparkContext, sparkSQLSession, dataFrameStorage, operationExecutionDispatcher)

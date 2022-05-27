@@ -3,7 +3,7 @@ package ai.deepsense.docgen
 import java.io.File
 import java.io.PrintWriter
 
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 
 trait RedirectCreator {
 
@@ -22,7 +22,7 @@ trait RedirectCreator {
     }.sum
   }
 
-  private def createRedirect(redirectFile: File, operation: DOperation, sparkClassName: String) = {
+  private def createRedirect(redirectFile: File, operation: Action, sparkClassName: String) = {
     val writer = new PrintWriter(redirectFile)
     writer.println("---")
     writer.println("layout: redirect")

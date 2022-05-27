@@ -8,8 +8,8 @@ import ai.deepsense.commons.spark.sql.UserDefinedFunctions
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.commons.utils.Version
 import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
-import ai.deepsense.deeplang.doperables.dataframe.DataFrameBuilder
+import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrameBuilder
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.sparkutils.SparkSQLSession
@@ -32,7 +32,7 @@ trait Executor extends Logging {
       sparkSQLSession: SparkSQLSession,
       tempPath: String,
       libraryPath: String,
-      dOperableCatalog: Option[DOperableCatalog] = None
+      dOperableCatalog: Option[ActionObjectCatalog] = None
   ): CommonExecutionContext = {
 
     val operationsCatalog =

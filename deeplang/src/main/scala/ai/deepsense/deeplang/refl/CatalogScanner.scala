@@ -8,9 +8,9 @@ import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.catalogs.SortPriority
 import ai.deepsense.deeplang.catalogs.spi.CatalogRegistrant
 import ai.deepsense.deeplang.catalogs.spi.CatalogRegistrar
-import ai.deepsense.deeplang.DOperation
-import ai.deepsense.deeplang.DOperationCategories
-import ai.deepsense.deeplang.TypeUtils
+import ai.deepsense.deeplang.Action
+import ai.deepsense.deeplang.ActionCategories
+import ai.deepsense.deeplang.utils.TypeUtils
 import org.reflections.Reflections
 import org.reflections.util.ConfigurationBuilder
 
@@ -23,7 +23,7 @@ import scala.collection.JavaConversions._
 class CatalogScanner(jarsUrls: Seq[URL]) extends CatalogRegistrant with Logging {
 
   /** Scans jars on classpath for classes annotated with [[ai.deepsense.deeplang.refl.Register]] annotation and at the
-    * same time implementing [[ai.deepsense.deeplang.DOperation]] interface. Found classes are then registered in
+    * same time implementing [[ai.deepsense.deeplang.Action]] interface. Found classes are then registered in
     * appropriate catalogs.
     *
     * @see
@@ -77,14 +77,14 @@ class CatalogScanner(jarsUrls: Seq[URL]) extends CatalogRegistrant with Logging 
   }
 
   private def registerDOperation(
-      registrar: CatalogRegistrar,
-      operation: Class[DOperation],
-      priority: SortPriority
+                                  registrar: CatalogRegistrar,
+                                  operation: Class[Action],
+                                  priority: SortPriority
   ): Unit = TypeUtils.constructorForClass(operation) match {
     case Some(constructor) =>
       registrar.registerOperation(
-        DOperationCategories.UserDefined,
-        () => TypeUtils.createInstance[DOperation](constructor),
+        ActionCategories.UserDefined,
+        () => TypeUtils.createInstance[Action](constructor),
         priority
       )
     case None              =>
@@ -105,6 +105,6 @@ class CatalogScanner(jarsUrls: Seq[URL]) extends CatalogRegistrant with Logging 
 
   }
 
-  object DOperationMatcher extends AssignableFromExtractor(classOf[DOperation])
+  object DOperationMatcher extends AssignableFromExtractor(classOf[Action])
 
 }

@@ -7,8 +7,8 @@ import spray.json._
 
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.models.Entity
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.deeplang.doperables.ColumnsFilterer
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.deeplang.actionobjects.ColumnsFilterer
 import ai.deepsense.graph._
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.workflow.ExecutionReportJsonProtocol

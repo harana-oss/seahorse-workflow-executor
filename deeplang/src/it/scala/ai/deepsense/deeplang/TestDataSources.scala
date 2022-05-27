@@ -6,9 +6,9 @@ import org.joda.time.DateTime
 
 import ai.deepsense.api.datasourcemanager.model._
 import ai.deepsense.commons.rest.client.datasources.DatasourceInMemoryClient
-import ai.deepsense.deeplang.doperations.inout.InputFileFormatChoice
-import ai.deepsense.deeplang.doperations.readwritedataframe.FilePath
-import ai.deepsense.deeplang.doperations.readwritedataframe.FileScheme
+import ai.deepsense.deeplang.actions.inout.InputFileFormatChoice
+import ai.deepsense.deeplang.actions.readwritedataframe.FilePath
+import ai.deepsense.deeplang.actions.readwritedataframe.FileScheme
 
 trait TestDataSources {
   self: TestFiles =>

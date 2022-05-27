@@ -7,20 +7,20 @@ import spray.json._
 
 import ai.deepsense.commons.json.EnumerationSerializer
 import ai.deepsense.commons.json.IdJsonProtocol
-import ai.deepsense.deeplang.DPortPosition._
-import ai.deepsense.deeplang.catalogs.doperations.DOperationDescriptor
-import ai.deepsense.deeplang.DPortPosition
-import ai.deepsense.deeplang.TypeUtils
+import ai.deepsense.deeplang.PortPosition._
+import ai.deepsense.deeplang.catalogs.actions.ActionDescriptor
+import ai.deepsense.deeplang.PortPosition
+import ai.deepsense.deeplang.utils.TypeUtils
 
 /** Exposes various json formats of DOperationDescription. Reading from json is not supported. */
 trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonProtocol with SprayJsonSupport {
 
-  class DOperationDescriptorShortFormat extends RootJsonFormat[DOperationDescriptor] {
+  class DOperationDescriptorShortFormat extends RootJsonFormat[ActionDescriptor] {
 
-    override def write(obj: DOperationDescriptor): JsValue =
+    override def write(obj: ActionDescriptor): JsValue =
       JsObject("id" -> obj.id.toJson, "name" -> obj.name.toJson, "description" -> obj.description.toJson)
 
-    override def read(json: JsValue): DOperationDescriptor =
+    override def read(json: JsValue): ActionDescriptor =
       throw new UnsupportedOperationException
 
   }
@@ -30,7 +30,7 @@ trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonPr
 
   class DOperationDescriptorBaseFormat extends DOperationDescriptorShortFormat {
 
-    override def write(obj: DOperationDescriptor): JsValue = {
+    override def write(obj: ActionDescriptor): JsValue = {
       JsObject(
         super.write(obj).asJsObject.fields ++ Map(
           "category"         -> obj.category.id.toJson,
@@ -48,7 +48,7 @@ trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonPr
     private def portTypesToJson(
         portTypes: Seq[Type],
         addRequiredField: Boolean,
-        portsLayout: Vector[DPortPosition]
+        portsLayout: Vector[PortPosition]
     ): JsValue = {
       val required = if (addRequiredField) Some(true) else None
       // TODO use real value as soon as it is supported
@@ -60,9 +60,9 @@ trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonPr
       fields.toList.toJson
     }
 
-    implicit private val positionSerializer = EnumerationSerializer.jsonEnumFormat(DPortPosition)
+    implicit private val positionSerializer = EnumerationSerializer.jsonEnumFormat(PortPosition)
 
-    private def portToJson(index: Int, required: Option[Boolean], portType: Type, position: DPortPosition): JsValue = {
+    private def portToJson(index: Int, required: Option[Boolean], portType: Type, position: PortPosition): JsValue = {
       val fields = Map(
         "portIndex"     -> index.toJson,
         "typeQualifier" -> TypeUtils.describeType(portType).toJson,
@@ -82,7 +82,7 @@ trait DOperationDescriptorJsonProtocol extends DefaultJsonProtocol with IdJsonPr
   /** Full operation's info. */
   object DOperationDescriptorFullFormat extends DOperationDescriptorBaseFormat {
 
-    override def write(obj: DOperationDescriptor): JsValue =
+    override def write(obj: ActionDescriptor): JsValue =
       JsObject(super.write(obj).asJsObject.fields.updated("parameters", obj.parametersJsonDescription))
 
   }

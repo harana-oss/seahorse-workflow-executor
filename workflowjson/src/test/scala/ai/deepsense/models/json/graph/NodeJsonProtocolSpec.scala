@@ -5,7 +5,7 @@ import org.mockito.Mockito._
 import spray.json._
 
 import ai.deepsense.commons.json.IdJsonProtocol
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.Node
 
@@ -14,9 +14,9 @@ class NodeJsonProtocolSpec extends GraphJsonTestSupport with IdJsonProtocol {
   import ai.deepsense.models.json.graph.NodeJsonProtocol._
 
   "Node with Operation transformed to Json" should {
-    val expectedOperationId   = DOperation.Id.randomId
+    val expectedOperationId   = Action.Id.randomId
     val expectedOperationName = "expectedName"
-    val dOperation            = mock[DOperation]
+    val dOperation            = mock[Action]
 
     when(dOperation.id).thenReturn(expectedOperationId)
     when(dOperation.name).thenReturn(expectedOperationName)
@@ -33,7 +33,7 @@ class NodeJsonProtocolSpec extends GraphJsonTestSupport with IdJsonProtocol {
 
     "have correct 'operation' field" in {
       val operationField = nodeJson.fields("operation").asJsObject
-      operationField.fields("id").convertTo[DOperation.Id] shouldBe expectedOperationId
+      operationField.fields("id").convertTo[Action.Id] shouldBe expectedOperationId
       operationField.fields("name").convertTo[String] shouldBe expectedOperationName
     }
   }

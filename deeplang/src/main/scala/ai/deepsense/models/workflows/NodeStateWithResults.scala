@@ -3,15 +3,15 @@ package ai.deepsense.models.workflows
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.deeplang.inference.InferenceWarnings
-import ai.deepsense.deeplang.DKnowledge
-import ai.deepsense.deeplang.DOperable
+import ai.deepsense.deeplang.Knowledge
+import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.graph.NodeInferenceResult
 import ai.deepsense.reportlib.model.ReportContent
 
 case class NodeStateWithResults(
-    nodeState: NodeState,
-    dOperables: Map[Entity.Id, DOperable],
-    knowledge: Option[NodeInferenceResult]
+                                 nodeState: NodeState,
+                                 dOperables: Map[Entity.Id, ActionObject],
+                                 knowledge: Option[NodeInferenceResult]
 ) {
 
   def abort: NodeStateWithResults = copy(nodeState = nodeState.abort)
@@ -45,13 +45,13 @@ case class NodeStateWithResults(
   def finish(
       entitiesIds: Seq[Entity.Id],
       reports: Map[Entity.Id, ReportContent],
-      dOperables: Map[Entity.Id, DOperable]
+      dOperables: Map[Entity.Id, ActionObject]
   ): NodeStateWithResults = {
     val results             = EntitiesMap(dOperables, reports)
     val dOperablesKnowledge =
       entitiesIds
         .flatMap(id => dOperables.get(id))
-        .map(DKnowledge(_))
+        .map(Knowledge(_))
         .toVector
     val newWarnings         = knowledge.map(_.warnings).getOrElse(InferenceWarnings.empty)
     val newKnowledge        = Some(NodeInferenceResult(dOperablesKnowledge, newWarnings, Vector()))

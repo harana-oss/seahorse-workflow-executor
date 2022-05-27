@@ -6,8 +6,8 @@ import org.scalatest.matchers.should.Matchers
 import spray.json._
 
 import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization
-import ai.deepsense.deeplang.doperables.spark.wrappers.transformers.TransformerSerialization._
+import ai.deepsense.deeplang.actionobjects.spark.wrappers.transformers.TransformerSerialization
+import ai.deepsense.deeplang.actionobjects.spark.wrappers.transformers.TransformerSerialization._
 import ai.deepsense.deeplang.utils.CustomTransformerFactory
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.workflow.InnerWorkflowJsonReader

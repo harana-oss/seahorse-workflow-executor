@@ -6,8 +6,8 @@ import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfter
 
 import ai.deepsense.commons.models.Id
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperations.exceptions.CustomOperationExecutionException
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
+import ai.deepsense.deeplang.actions.exceptions.CustomOperationExecutionException
 
 class ContextualDataFrameStorageSpec extends UnitSpec with BeforeAndAfter with DeeplangTestSupport {
 

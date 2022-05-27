@@ -11,7 +11,7 @@ import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.serialization.Serialization
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.UnitTestSupport
-import ai.deepsense.deeplang.DOperable
+import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.deeplang.exceptions.DeepLangException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
@@ -124,14 +124,14 @@ class StatefulGraphSpec
             idA,
             results(idA),
             Map(results(idA).head -> ReportContentTestFactory.someReport),
-            Map(results(idA).head -> mock[DOperable])
+            Map(results(idA).head -> mock[ActionObject])
           )
           .nodeStarted(idB)
           .nodeFinished(
             idB,
             results(idB),
             Map(results(idB).head -> ReportContentTestFactory.someReport),
-            Map(results(idB).head -> mock[DOperable])
+            Map(results(idB).head -> mock[ActionObject])
           )
 
         g.readyNodes should have size 2
@@ -161,7 +161,7 @@ class StatefulGraphSpec
         idA,
         results(idA),
         Map(results(idA).head -> ReportContentTestFactory.someReport),
-        Map(results(idA).head -> mock[DOperable])
+        Map(results(idA).head -> mock[ActionObject])
       )
       running2.readyNodes should have size 1
       verifyNodeReady(idB, 1, running2)
@@ -172,7 +172,7 @@ class StatefulGraphSpec
           idB,
           results(idB),
           Map(results(idB).head -> ReportContentTestFactory.someReport),
-          Map(results(idB).head -> mock[DOperable])
+          Map(results(idB).head -> mock[ActionObject])
         )
       running3.readyNodes should have size 2
       verifyNodeReady(idC, 1, running3)
@@ -224,14 +224,14 @@ class StatefulGraphSpec
     }
     "be serializable" in {
       import ai.deepsense.graph.DOperationTestClasses._
-      val operationWithInitializedLogger = new DOperationAToALogging
+      val operationWithInitializedLogger = new ActionAToALogging
       val id                             = Node.Id.randomId
       val id2                            = Node.Id.randomId
       val nodes = Seq(
-        randomNode(DOperationCreateA1()),
-        Node(id2, DOperationA1ToA()),
+        randomNode(ActionCreateA1()),
+        Node(id2, ActionA1ToA()),
         Node(id, operationWithInitializedLogger),
-        randomNode(DOperationA1A2ToA())
+        randomNode(ActionA1A2ToA())
       )
       val edges = Set[Edge](
         Edge(nodes(0), 0, nodes(1), 0),
@@ -242,7 +242,7 @@ class StatefulGraphSpec
       val graph   = StatefulGraph(nodes.toSet, edges)
       val graphIn = serializeDeserialize(graph)
       graphIn shouldBe graph
-      val operation = graphIn.node(id).value.asInstanceOf[DOperationAToALogging]
+      val operation = graphIn.node(id).value.asInstanceOf[ActionAToALogging]
       operation.trace("Logging just to clarify that it works after deserialization!")
       operation.tTagTI_0.tpe should not be null
     }

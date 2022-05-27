@@ -1,6 +1,6 @@
 package ai.deepsense.deeplang.utils
 
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 
 object DataFrameUtils {
 

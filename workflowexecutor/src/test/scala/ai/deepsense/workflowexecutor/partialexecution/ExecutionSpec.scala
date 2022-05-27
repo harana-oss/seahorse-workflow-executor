@@ -7,10 +7,10 @@ import org.scalatestplus.mockito.MockitoSugar
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.inference.InferContext
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph._
 import ai.deepsense.graph.nodestate.Completed
@@ -193,8 +193,8 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
         val idEResults = results(idE)
         def reports(ids: Seq[Entity.Id]): Map[Entity.Id, ReportContent] =
           ids.map(_ -> ReportContentTestFactory.someReport).toMap
-        def dOperables(ids: Seq[Entity.Id]): Map[Entity.Id, DOperable] =
-          ids.map(_ -> mock[DOperable]).toMap
+        def dOperables(ids: Seq[Entity.Id]): Map[Entity.Id, ActionObject] =
+          ids.map(_ -> mock[ActionObject]).toMap
         val finished = eStarted
           .nodeFinished(idC, idCResults, reports(idCResults), dOperables(idCResults))
           .nodeFinished(idE, idEResults, reports(idEResults), dOperables(idEResults))
@@ -305,11 +305,11 @@ class ExecutionSpec extends StandardSpec with MockitoSugar with GraphTestSupport
         Execution.empty.enqueue shouldBe an[IdleExecution]
       }
       "draft disconnected node" in {
-        val op1 = mock[DOperation]
+        val op1 = mock[Action]
         when(op1.inArity).thenReturn(0)
         when(op1.outArity).thenReturn(1)
         when(op1.sameAs(any())).thenReturn(true)
-        val op2 = mock[DOperation]
+        val op2 = mock[Action]
         when(op2.inArity).thenReturn(1)
         when(op2.outArity).thenReturn(0)
         when(op2.sameAs(any())).thenReturn(true)

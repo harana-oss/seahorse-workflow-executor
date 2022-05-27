@@ -3,7 +3,7 @@ package ai.deepsense.graph
 import org.mockito.ArgumentMatchers.{ eq => isEqualTo, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
@@ -11,7 +11,7 @@ import org.mockito.ArgumentMatchers.any
 
 class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
 
-  val topologicallySortedMock = mock[TopologicallySortable[DOperation]]
+  val topologicallySortedMock = mock[TopologicallySortable[Action]]
 
   val nodeInferenceMock = mock[NodeInference]
 
@@ -86,7 +86,7 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
     "throw an exception" when {
       "graph contains cycle" in {
         intercept[CyclicGraphException] {
-          val topologicallySortedMock = mock[TopologicallySortable[DOperation]]
+          val topologicallySortedMock = mock[TopologicallySortable[Action]]
           when(topologicallySortedMock.topologicallySorted).thenReturn(None)
           val graph                   = DirectedGraphWithSomeLogicMocked(
             topologicallySortedMock,
@@ -111,9 +111,9 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with BeforeAndAfter {
       .thenThrow(new RuntimeException("Inference should not be called for node " + node.id))
 
   case class DirectedGraphWithSomeLogicMocked(
-      val topologicallySortableMock: TopologicallySortable[DOperation],
-      val nodeInferenceMock: NodeInference
-  ) extends TopologicallySortable[DOperation]
+                                               val topologicallySortableMock: TopologicallySortable[Action],
+                                               val nodeInferenceMock: NodeInference
+  ) extends TopologicallySortable[Action]
       with KnowledgeInference
       with NodeInference {
 

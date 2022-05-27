@@ -14,21 +14,21 @@ trait GraphTestSupport {
   self: MockitoSugar =>
 
   val op0To1 = {
-    val m = mock[DOperation0To1[DOperable]]
+    val m = mock[Action0To1[ActionObject]]
     when(m.sameAs(any())).thenReturn(true)
     m
   }
 
   val op1To1 = createOp1To1
 
-  def createOp1To1: DOperation1To1[DOperable, DOperable] = {
-    val m = mock[DOperation1To1[DOperable, DOperable]]
+  def createOp1To1: Action1To1[ActionObject, ActionObject] = {
+    val m = mock[Action1To1[ActionObject, ActionObject]]
     when(m.sameAs(any())).thenReturn(true)
     m
   }
 
   val op2To2 = {
-    val m = mock[DOperation2To2[DOperable, DOperable, DOperable, DOperable]]
+    val m = mock[Action2To2[ActionObject, ActionObject, ActionObject, ActionObject]]
     when(m.sameAs(any())).thenReturn(true)
     m
   }
@@ -71,7 +71,7 @@ trait GraphTestSupport {
     )
   }
 
-  protected def generateNodes(ops: DOperation*): Seq[(Node.Id, DeeplangNode)] = {
+  protected def generateNodes(ops: Action*): Seq[(Node.Id, DeeplangNode)] = {
     val nodes = ops.map(o => Node(Node.Id.randomId, o))
     nodes.map(n => n.id -> n)
   }

@@ -4,9 +4,9 @@ import spray.json._
 
 import ai.deepsense.commons.json.envelope.Envelope
 import ai.deepsense.commons.json.envelope.EnvelopeJsonFormat
-import ai.deepsense.deeplang.doperables.descriptions.DataFrameInferenceResult
-import ai.deepsense.deeplang.doperables.descriptions.InferenceResult
-import ai.deepsense.deeplang.doperables.descriptions.ParamsInferenceResult
+import ai.deepsense.deeplang.actionobjects.descriptions.DataFrameInferenceResult
+import ai.deepsense.deeplang.actionobjects.descriptions.InferenceResult
+import ai.deepsense.deeplang.actionobjects.descriptions.ParamsInferenceResult
 import ai.deepsense.reportlib.model._
 
 trait InferenceResultJsonProtocol extends DefaultJsonProtocol with StructTypeJsonProtocol {

@@ -7,8 +7,8 @@ import spray.json._
 
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.models.Entity
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.deeplang.doperables.ColumnsFilterer
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.deeplang.actionobjects.ColumnsFilterer
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.workflow.ExecutionReportJsonProtocol._
 import ai.deepsense.models.workflows.EntitiesMap
@@ -25,7 +25,7 @@ class GlobalMQSerializerSpec extends StandardSpec with MockitoSugar {
       val executionReport = ExecutionReport(
         Map(Node.Id.randomId -> ai.deepsense.graph.nodestate.Draft()),
         EntitiesMap(
-          Map[Entity.Id, DOperable](Entity.Id.randomId -> new ColumnsFilterer),
+          Map[Entity.Id, ActionObject](Entity.Id.randomId -> new ColumnsFilterer),
           Map(Entity.Id.randomId                       -> ReportContentTestFactory.someReport)
         ),
         None

@@ -6,29 +6,29 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
+import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
 import ai.deepsense.deeplang.exceptions.DeepLangException
 import ai.deepsense.deeplang.exceptions.DeepLangMultiException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarning
 import ai.deepsense.deeplang.inference.InferenceWarnings
-import ai.deepsense.deeplang.params.exceptions.ValidationException
-import ai.deepsense.graph.DClassesForDOperations._
+import ai.deepsense.deeplang.parameters.exceptions.ValidationException
+import ai.deepsense.graph.DClassesForActions._
 import ai.deepsense.graph.DOperationTestClasses._
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 
 class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Matchers {
 
-  val hierarchy = new DOperableCatalog
+  val hierarchy = new ActionObjectCatalog
 
-  hierarchy.registerDOperable[A1]()
-  hierarchy.registerDOperable[A2]()
+  hierarchy.registerActionObject[A1]()
+  hierarchy.registerActionObject[A2]()
 
-  val knowledgeA1: DKnowledge[DOperable] = DKnowledge(A1())
+  val knowledgeA1: Knowledge[ActionObject] = Knowledge(A1())
 
-  val knowledgeA2: DKnowledge[DOperable] = DKnowledge(A2())
+  val knowledgeA2: Knowledge[ActionObject] = Knowledge(A2())
 
-  val knowledgeA12: DKnowledge[DOperable] = DKnowledge(A1(), A2())
+  val knowledgeA12: Knowledge[ActionObject] = Knowledge(A1(), A2())
 
   val inferenceCtx: InferContext = createInferContext(hierarchy)
 
@@ -36,9 +36,9 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
     *   - have invalid parameters
     *   - throw inference errors By default it infers A1 on its output port.
     */
-  case class DOperationA1A2ToFirst() extends DOperation2To1[A1, A2, A] with DOperationBaseFields {
+  case class ActionA1A2ToFirst() extends Action2To1[A1, A2, A] with ActionBaseFields {
 
-    import DOperationA1A2ToFirst._
+    import ActionA1A2ToFirst._
 
     override protected def execute(t1: A1, t2: A2)(context: ExecutionContext): A = ???
 
@@ -62,9 +62,9 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
       multiException = true
     }
 
-    override protected def inferKnowledge(k0: DKnowledge[A1], k1: DKnowledge[A2])(
+    override protected def inferKnowledge(k0: Knowledge[A1], k1: Knowledge[A2])(
         context: InferContext
-    ): (DKnowledge[A], InferenceWarnings) = {
+    ): (Knowledge[A], InferenceWarnings) = {
       if (inferenceShouldThrow) {
         if (multiException)
           throw multiInferenceError
@@ -82,7 +82,7 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
 
   }
 
-  object DOperationA1A2ToFirst {
+  object ActionA1A2ToFirst {
 
     val parameterInvalidError = new ValidationException("") {}
 
@@ -102,13 +102,13 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
 
   val idA1A2ToFirst = Node.Id.randomId
 
-  protected def nodeCreateA1 = Node(idCreateA1, DOperationCreateA1())
+  protected def nodeCreateA1 = Node(idCreateA1, ActionCreateA1())
 
-  protected def nodeA1ToA = Node(idA1ToA, DOperationA1ToA())
+  protected def nodeA1ToA = Node(idA1ToA, ActionA1ToA())
 
-  protected def nodeAToA1A2 = Node(idAToA1A2, DOperationAToA1A2())
+  protected def nodeAToA1A2 = Node(idAToA1A2, ActionAToA1A2())
 
-  protected def nodeA1A2ToFirst = Node(idA1A2ToFirst, DOperationA1A2ToFirst())
+  protected def nodeA1A2ToFirst = Node(idA1A2ToFirst, ActionA1A2ToFirst())
 
   def validGraph: DeeplangGraph = DeeplangGraph(
     nodes = Set(nodeCreateA1, nodeAToA1A2, nodeA1A2ToFirst),
@@ -120,22 +120,22 @@ class AbstractInferenceSpec extends AnyWordSpec with DeeplangTestSupport with Ma
   )
 
   def setParametersValid(node: DeeplangNode): Unit =
-    node.value.asInstanceOf[DOperationA1A2ToFirst].setParamsValid()
+    node.value.asInstanceOf[ActionA1A2ToFirst].setParamsValid()
 
   def setInferenceErrorThrowing(node: DeeplangNode): Unit =
-    node.value.asInstanceOf[DOperationA1A2ToFirst].setInferenceErrorThrowing()
+    node.value.asInstanceOf[ActionA1A2ToFirst].setInferenceErrorThrowing()
 
   def setInferenceErrorMultiThrowing(node: DeeplangNode): Unit =
-    node.value.asInstanceOf[DOperationA1A2ToFirst].setInferenceErrorThrowingMultiException()
+    node.value.asInstanceOf[ActionA1A2ToFirst].setInferenceErrorThrowingMultiException()
 
   def setParametersInvalid(node: DeeplangNode): Unit =
-    node.value.asInstanceOf[DOperationA1A2ToFirst].setParamsInvalid()
+    node.value.asInstanceOf[ActionA1A2ToFirst].setParamsInvalid()
 
   def setParametersValid(graph: DeeplangGraph): Unit = setInGraph(graph, _.setParamsValid())
 
-  def setInGraph(graph: DeeplangGraph, f: DOperationA1A2ToFirst => Unit): Unit = {
+  def setInGraph(graph: DeeplangGraph, f: ActionA1A2ToFirst => Unit): Unit = {
     val node = graph.node(idA1A2ToFirst)
-    f(node.value.asInstanceOf[DOperationA1A2ToFirst])
+    f(node.value.asInstanceOf[ActionA1A2ToFirst])
   }
 
 }

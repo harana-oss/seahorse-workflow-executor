@@ -4,9 +4,9 @@ import spray.json._
 
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperations.exceptions.CustomOperationExecutionException
-import ai.deepsense.deeplang.params.custom.InnerWorkflow
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
+import ai.deepsense.deeplang.actions.exceptions.CustomOperationExecutionException
+import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -82,16 +82,16 @@ class InnerWorkflowExecutorImpl(override val graphReader: GraphReader)
   }
 
   private def executeOperation(
-      node: DeeplangNode,
-      input: Vector[DOperable],
-      executionContext: ExecutionContext
-  ): Vector[DOperable] = {
-    val inputKnowledge = input.map(dOperable => DKnowledge(dOperable))
+                                node: DeeplangNode,
+                                input: Vector[ActionObject],
+                                executionContext: ExecutionContext
+  ): Vector[ActionObject] = {
+    val inputKnowledge = input.map(dOperable => Knowledge(dOperable))
     node.value.inferKnowledgeUntyped(inputKnowledge)(executionContext.inferContext)
     node.value.executeUntyped(input)(executionContext)
   }
 
-  private def nodeExecutionResultsFrom(operationResults: Vector[DOperable]): NodeExecutionResults = {
+  private def nodeExecutionResultsFrom(operationResults: Vector[ActionObject]): NodeExecutionResults = {
     val results = operationResults.map(dOperable => (Entity.Id.randomId, dOperable))
     NodeExecutionResults(results.map(_._1), Map(), results.toMap)
   }

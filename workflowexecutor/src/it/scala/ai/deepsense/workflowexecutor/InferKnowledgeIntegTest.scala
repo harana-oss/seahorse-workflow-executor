@@ -1,8 +1,8 @@
 package ai.deepsense.workflowexecutor
 
-import ai.deepsense.deeplang.catalogs.DCatalog
+import ai.deepsense.deeplang.catalogs.FlowCatalog
 import ai.deepsense.deeplang.CatalogRecorder
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.DeeplangIntegTestSupport
 import ai.deepsense.deeplang.DeeplangTestSupport
 import ai.deepsense.graph.DefaultKnowledgeService
@@ -14,7 +14,7 @@ class InferKnowledgeIntegTest extends DeeplangIntegTestSupport with DeeplangTest
 
   val nodeInference = new NodeInferenceImpl {}
 
-  val DCatalog(_, doplCatalog, dopsCatalog) = CatalogRecorder.resourcesCatalogRecorder.catalogs
+  val FlowCatalog(_, doplCatalog, dopsCatalog) = CatalogRecorder.resourcesCatalogRecorder.catalogs
 
   val inferCtx                              = createInferContext(doplCatalog)
 
@@ -22,7 +22,7 @@ class InferKnowledgeIntegTest extends DeeplangIntegTestSupport with DeeplangTest
     operation.name should {
       "not throw in inferKnowledge" in {
         val op             = dopsCatalog.createDOperation(operation.id)
-        val opNode         = Node[DOperation](operation.id, op)
+        val opNode         = Node[Action](operation.id, op)
         val inputKnowledge = DefaultKnowledgeService.defaultInputKnowledge(doplCatalog, op)
         noException should be thrownBy
           nodeInference.inferKnowledge(opNode, inferCtx, NodeInferenceResult(inputKnowledge))

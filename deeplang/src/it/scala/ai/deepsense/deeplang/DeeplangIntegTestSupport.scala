@@ -14,8 +14,8 @@ import org.scalatest.BeforeAndAfterAll
 
 import ai.deepsense.commons.models.Id
 import ai.deepsense.commons.spark.sql.UserDefinedFunctions
-import ai.deepsense.deeplang.OperationExecutionDispatcher.Result
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.ActionExecutionDispatcher.Result
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.utils.DataFrameMatchers
 import ai.deepsense.sparkutils.SparkSQLSession
 import ai.deepsense.sparkutils.spi.SparkSessionInitializer
@@ -23,7 +23,7 @@ import ai.deepsense.sparkutils.spi.SparkSessionInitializer
 /** Adds features to facilitate integration testing using Spark */
 trait DeeplangIntegTestSupport extends UnitSpec with BeforeAndAfterAll with LocalExecutionContext {
 
-  def executeOperation(op: DOperation, dfs: DataFrame*): DataFrame =
+  def executeOperation(op: Action, dfs: DataFrame*): DataFrame =
     op.executeUntyped(dfs.toVector)(executionContext).head.asInstanceOf[DataFrame]
 
   def createDir(path: String): Unit =
@@ -63,7 +63,7 @@ private class MockedCustomCodeExecutionProvider
       new MockedCustomOperationExecutor
     )
 
-private class MockedCustomOperationExecutor extends OperationExecutionDispatcher {
+private class MockedCustomOperationExecutor extends ActionExecutionDispatcher {
 
   override def executionStarted(workflowId: Id, nodeId: Id): Future[Result] =
     Future.successful(Right(()))

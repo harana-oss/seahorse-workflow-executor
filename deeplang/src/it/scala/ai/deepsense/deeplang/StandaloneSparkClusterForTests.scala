@@ -3,17 +3,16 @@ package ai.deepsense.deeplang
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.util.UUID
-
 import scala.sys.process.Process
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.time.SpanSugar._
-
 import ai.deepsense.commons.BuildInfo
 import ai.deepsense.commons.spark.sql.UserDefinedFunctions
-import ai.deepsense.deeplang.doperables.dataframe.DataFrameBuilder
-import ai.deepsense.deeplang.doperations.readwritedataframe.FileScheme
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrameBuilder
+import ai.deepsense.deeplang.actions.readwritedataframe.FileScheme
+import ai.deepsense.deeplang.filesystemclients.LocalFileSystemClient
 import ai.deepsense.sparkutils.SparkSQLSession
 
 object StandaloneSparkClusterForTests {

@@ -1,5 +1,7 @@
 package ai.deepsense.deeplang
 
+import ai.deepsense.deeplang.utils.TypeUtils
+
 import scala.reflect.runtime.universe.typeTag
 
 class TypeUtilsSpec extends UnitSpec {

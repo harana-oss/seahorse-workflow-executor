@@ -5,7 +5,7 @@ import spray.json.JsObject
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.CommonExecutionContext
-import ai.deepsense.deeplang.DOperable
+import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.Node
 import ai.deepsense.graph.Node._
@@ -79,7 +79,7 @@ class StatefulWorkflow(
       id: Node.Id,
       entitiesIds: Seq[Entity.Id],
       reports: Map[Entity.Id, ReportContent],
-      dOperables: Map[Entity.Id, DOperable]
+      dOperables: Map[Entity.Id, ActionObject]
   ): Unit =
     execution = execution.nodeFinished(id, entitiesIds, reports, dOperables)
 

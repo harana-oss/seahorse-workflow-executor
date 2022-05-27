@@ -7,15 +7,15 @@ import org.apache.spark.sql.types.StructType
 import spray.json._
 
 import ai.deepsense.commons.exception.DeepSenseException
-import ai.deepsense.deeplang.doperables.SqlColumnTransformer
-import ai.deepsense.deeplang.doperables.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice
-import ai.deepsense.deeplang.doperables.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
-import ai.deepsense.deeplang.doperations._
-import ai.deepsense.deeplang.doperations.custom.Sink
-import ai.deepsense.deeplang.doperations.custom.Source
-import ai.deepsense.deeplang.doperations.spark.wrappers.evaluators.CreateRegressionEvaluator
-import ai.deepsense.deeplang.params.custom.InnerWorkflow
-import ai.deepsense.deeplang.params.selections.NameSingleColumnSelection
+import ai.deepsense.deeplang.actionobjects.SqlColumnTransformer
+import ai.deepsense.deeplang.actionobjects.multicolumn.MultiColumnParams.SingleOrMultiColumnChoices.SingleColumnChoice
+import ai.deepsense.deeplang.actionobjects.multicolumn.SingleColumnParams.SingleTransformInPlaceChoices.NoInPlaceChoice
+import ai.deepsense.deeplang.actions._
+import ai.deepsense.deeplang.actions.custom.Sink
+import ai.deepsense.deeplang.actions.custom.Source
+import ai.deepsense.deeplang.actions.spark.wrappers.evaluators.CreateRegressionEvaluator
+import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
+import ai.deepsense.deeplang.parameters.selections.NameSingleColumnSelection
 import ai.deepsense.deeplang.CatalogRecorder
 import ai.deepsense.deeplang.DeeplangIntegTestSupport
 import ai.deepsense.deeplang.InnerWorkflowExecutor

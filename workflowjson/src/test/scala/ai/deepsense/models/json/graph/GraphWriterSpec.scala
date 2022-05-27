@@ -2,7 +2,7 @@ package ai.deepsense.models.json.graph
 
 import spray.json._
 
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.Edge
 import ai.deepsense.graph.Endpoint
 import ai.deepsense.graph.Node
@@ -12,13 +12,13 @@ class GraphWriterSpec extends GraphJsonTestSupport {
 
   import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphWriter
 
-  val operation1 = mockOperation(0, 1, DOperation.Id.randomId, "name1")
+  val operation1 = mockOperation(0, 1, Action.Id.randomId, "name1")
 
-  val operation2 = mockOperation(1, 1, DOperation.Id.randomId, "name2")
+  val operation2 = mockOperation(1, 1, Action.Id.randomId, "name2")
 
-  val operation3 = mockOperation(1, 1, DOperation.Id.randomId, "name3")
+  val operation3 = mockOperation(1, 1, Action.Id.randomId, "name3")
 
-  val operation4 = mockOperation(2, 1, DOperation.Id.randomId, "name4")
+  val operation4 = mockOperation(2, 1, Action.Id.randomId, "name4")
 
   val node1 = Node(Node.Id.randomId, operation1)
 

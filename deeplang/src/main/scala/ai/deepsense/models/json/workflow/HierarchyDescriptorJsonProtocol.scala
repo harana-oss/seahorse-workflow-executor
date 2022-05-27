@@ -3,9 +3,9 @@ package ai.deepsense.models.json.workflow
 import spray.httpx.SprayJsonSupport
 import spray.json._
 
-import ai.deepsense.deeplang.catalogs.doperable.ClassDescriptor
-import ai.deepsense.deeplang.catalogs.doperable.HierarchyDescriptor
-import ai.deepsense.deeplang.catalogs.doperable.TraitDescriptor
+import ai.deepsense.deeplang.catalogs.actionobjects.ClassDescriptor
+import ai.deepsense.deeplang.catalogs.actionobjects.HierarchyDescriptor
+import ai.deepsense.deeplang.catalogs.actionobjects.TraitDescriptor
 
 trait HierarchyDescriptorJsonProtocol extends DefaultJsonProtocol with SprayJsonSupport with NullOptions {
 

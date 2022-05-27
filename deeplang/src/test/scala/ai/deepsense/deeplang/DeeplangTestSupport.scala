@@ -5,13 +5,13 @@ import org.apache.spark.sql.types.StructType
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 
-import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.deeplang.inference.InferContext
 
 trait DeeplangTestSupport extends MockitoSugar {
 
-  protected def createInferContext(dOperableCatalog: DOperableCatalog): InferContext = MockedInferContext(
+  protected def createInferContext(dOperableCatalog: ActionObjectCatalog): InferContext = MockedInferContext(
     dOperableCatalog
   )
 

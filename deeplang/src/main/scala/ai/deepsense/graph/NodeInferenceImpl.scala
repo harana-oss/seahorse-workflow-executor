@@ -2,13 +2,13 @@ package ai.deepsense.graph
 
 import scala.reflect.runtime.{universe => ru}
 
-import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
+import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
 import ai.deepsense.deeplang.exceptions.DeepLangException
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.InferenceWarnings
-import ai.deepsense.deeplang.DKnowledge
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Knowledge
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.DefaultKnowledgeService._
 import ai.deepsense.graph.TypesAccordance.TypesAccordance
@@ -81,18 +81,18 @@ trait NodeInferenceImpl extends NodeInference {
     * @param node
     *   Node that contains input port.
     * @param catalog
-    *   Catalog of registered DOperables.
+    *   Catalog of registered ActionObjects.
     * @param graphKnowledge
     *   Contains inference results computed so far. This method assumes that graphKnowledge contains all required data.
     */
   private def inputKnowledgeAndAccordanceForInputPort(
-      node: DeeplangNode,
-      catalog: DOperableCatalog,
-      graphKnowledge: GraphKnowledge,
-      portIndex: Int,
-      predecessorEndpointOption: Option[Endpoint]
-  ): (DKnowledge[DOperable], TypesAccordance) = {
-    val inPortType = node.value.inPortTypes(portIndex).asInstanceOf[ru.TypeTag[DOperable]]
+                                                       node: DeeplangNode,
+                                                       catalog: ActionObjectCatalog,
+                                                       graphKnowledge: GraphKnowledge,
+                                                       portIndex: Int,
+                                                       predecessorEndpointOption: Option[Endpoint]
+  ): (Knowledge[ActionObject], TypesAccordance) = {
+    val inPortType = node.value.inPortTypes(portIndex).asInstanceOf[ru.TypeTag[ActionObject]]
     predecessorEndpointOption match {
       case None                      => (defaultKnowledge(catalog, inPortType), TypesAccordance.NotProvided(portIndex))
       case Some(predecessorEndpoint) =>
@@ -113,14 +113,14 @@ trait NodeInferenceImpl extends NodeInference {
     * @param inPortType
     *   Type of input port.
     * @param catalog
-    *   Catalog of registered DOperables.
+    *   Catalog of registered ActionObjects.
     */
   private def inputKnowledgeAndAccordanceForInputPort(
-      catalog: DOperableCatalog,
-      predecessorKnowledge: DKnowledge[DOperable],
-      portIndex: Int,
-      inPortType: ru.TypeTag[DOperable]
-  ): (DKnowledge[DOperable], TypesAccordance) = {
+                                                       catalog: ActionObjectCatalog,
+                                                       predecessorKnowledge: Knowledge[ActionObject],
+                                                       portIndex: Int,
+                                                       inPortType: ru.TypeTag[ActionObject]
+  ): (Knowledge[ActionObject], TypesAccordance) = {
     val filteredTypes = predecessorKnowledge.filterTypes(inPortType.tpe)
     val filteredSize  = filteredTypes.size
     if (filteredSize == predecessorKnowledge.size)
@@ -132,10 +132,10 @@ trait NodeInferenceImpl extends NodeInference {
   }
 
   private def createDefaultKnowledge(
-      catalog: DOperableCatalog,
-      operation: DOperation,
-      warnings: InferenceWarnings,
-      errors: Vector[DeepLangException]
+                                      catalog: ActionObjectCatalog,
+                                      operation: Action,
+                                      warnings: InferenceWarnings,
+                                      errors: Vector[DeepLangException]
   ): NodeInferenceResult = {
     val outKnowledge = defaultOutputKnowledge(catalog, operation)
     NodeInferenceResult(outKnowledge, warnings, errors)

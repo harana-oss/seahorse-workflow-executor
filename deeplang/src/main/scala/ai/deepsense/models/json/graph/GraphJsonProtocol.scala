@@ -1,10 +1,10 @@
 package ai.deepsense.models.json.graph
 
 import spray.json._
-import ai.deepsense.deeplang.DOperation
-import ai.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
-import ai.deepsense.deeplang.doperations.CreateCustomTransformer
-import ai.deepsense.deeplang.doperations.UnknownOperation
+import ai.deepsense.deeplang.Action
+import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
+import ai.deepsense.deeplang.actions.CreateCustomTransformer
+import ai.deepsense.deeplang.actions.UnknownOperation
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.DeeplangGraph
 import ai.deepsense.graph.Edge
@@ -24,7 +24,7 @@ object GraphJsonProtocol {
 
   val NodeId = "id"
 
-  class GraphReader(val catalog: DOperationsCatalog) extends JsonReader[DeeplangGraph] with DefaultJsonProtocol {
+  class GraphReader(val catalog: ActionCatalog) extends JsonReader[DeeplangGraph] with DefaultJsonProtocol {
 
     private val dOperationReader = new DOperationReader(this)
 
@@ -45,7 +45,7 @@ object GraphJsonProtocol {
           }
         val operation =
           try
-            nodeJs.convertTo[DOperation](dOperationReader)
+            nodeJs.convertTo[Action](dOperationReader)
           catch {
             case e: DeserializationException =>
               new UnknownOperation

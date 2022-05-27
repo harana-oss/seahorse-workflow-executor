@@ -1,7 +1,7 @@
 package ai.deepsense.deeplang.inference.exceptions
 
 import ai.deepsense.deeplang.exceptions.DeepLangException
-import ai.deepsense.deeplang.params.selections.MultipleColumnSelection
+import ai.deepsense.deeplang.parameters.selections.MultipleColumnSelection
 
 case class SelectedIncorrectColumnsNumber(
     multipleColumnSelection: MultipleColumnSelection,

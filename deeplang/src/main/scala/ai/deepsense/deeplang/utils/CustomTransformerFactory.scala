@@ -3,10 +3,10 @@ package ai.deepsense.deeplang.utils
 import spray.json.JsObject
 
 import ai.deepsense.deeplang.InnerWorkflowParser
-import ai.deepsense.deeplang.doperables.CustomTransformer
-import ai.deepsense.deeplang.doperables.ParamWithValues
-import ai.deepsense.deeplang.params.custom.InnerWorkflow
-import ai.deepsense.deeplang.params.custom.PublicParam
+import ai.deepsense.deeplang.actionobjects.CustomTransformer
+import ai.deepsense.deeplang.actionobjects.ParamWithValues
+import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
+import ai.deepsense.deeplang.parameters.custom.PublicParam
 
 object CustomTransformerFactory {
 

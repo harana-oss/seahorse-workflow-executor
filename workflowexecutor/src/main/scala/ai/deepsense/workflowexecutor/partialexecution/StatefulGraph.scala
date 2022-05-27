@@ -12,8 +12,8 @@ import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang.inference.InferContext
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.GraphKnowledge._
 import ai.deepsense.graph.Node.Id
@@ -29,7 +29,7 @@ case class StatefulGraph(
     directedGraph: DeeplangGraph,
     states: Map[Node.Id, NodeStateWithResults],
     executionFailure: Option[FailureDescription]
-) extends TopologicallySortable[DOperation]
+) extends TopologicallySortable[Action]
     with KnowledgeInference
     with NodeInferenceImpl
     with Logging {
@@ -54,7 +54,7 @@ case class StatefulGraph(
       id: Node.Id,
       entitiesIds: Seq[Entity.Id],
       reports: Map[Entity.Id, ReportContent],
-      dOperables: Map[Entity.Id, DOperable]
+      dOperables: Map[Entity.Id, ActionObject]
   ): StatefulGraph =
     changeState(id)(_.finish(entitiesIds, reports, dOperables))
 
@@ -239,7 +239,7 @@ case class StatefulGraph(
   protected def predecessorsReady(id: Node.Id): Boolean =
     StatefulGraph.predecessorsReady(id, directedGraph, states)
 
-  protected def inputFor(id: Node.Id): Option[Seq[DOperable]] = {
+  protected def inputFor(id: Node.Id): Option[Seq[ActionObject]] = {
     if (predecessorsReady(id)) {
       val entities = directedGraph.predecessors(id).flatten.map { case Endpoint(predecessorId, portIndex) =>
         states(predecessorId) match {
@@ -371,4 +371,4 @@ object StatefulGraph {
 
 }
 
-case class ReadyNode(node: DeeplangNode, input: Seq[DOperable])
+case class ReadyNode(node: DeeplangNode, input: Seq[ActionObject])

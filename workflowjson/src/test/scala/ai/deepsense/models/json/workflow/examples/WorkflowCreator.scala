@@ -4,7 +4,7 @@ import java.util.UUID
 
 import spray.json._
 
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.DeeplangGraph
 import ai.deepsense.graph.Edge
@@ -23,7 +23,7 @@ abstract class WorkflowCreator extends WorkflowWithVariablesJsonProtocol {
 
   protected def experimentName: String
 
-  protected def node(operation: DOperation): DeeplangNode = Node(UUID.randomUUID(), operation)
+  protected def node(operation: Action): DeeplangNode = Node(UUID.randomUUID(), operation)
 
   override val graphReader: GraphReader = null
 

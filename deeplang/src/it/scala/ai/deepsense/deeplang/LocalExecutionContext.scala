@@ -6,12 +6,12 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.scalatestplus.mockito.MockitoSugar._
-
 import ai.deepsense.commons.rest.client.datasources.DatasourceClient
 import ai.deepsense.commons.rest.client.datasources.DatasourceInMemoryClientFactory
 import ai.deepsense.commons.spark.sql.UserDefinedFunctions
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperables.dataframe.DataFrameBuilder
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrameBuilder
+import ai.deepsense.deeplang.filesystemclients.LocalFileSystemClient
 import ai.deepsense.sparkutils.SparkSQLSession
 
 trait LocalExecutionContext {

@@ -1,14 +1,14 @@
 package ai.deepsense.docgen
 
-import ai.deepsense.deeplang.catalogs.doperations.DOperationCategory
-import ai.deepsense.deeplang.doperables._
-import ai.deepsense.deeplang.doperables.stringindexingwrapper.StringIndexingEstimatorWrapper
-import ai.deepsense.deeplang.doperations.EstimatorAsFactory
-import ai.deepsense.deeplang.doperations.EstimatorAsOperation
-import ai.deepsense.deeplang.doperations.EvaluatorAsFactory
-import ai.deepsense.deeplang.doperations.TransformerAsOperation
+import ai.deepsense.deeplang.catalogs.actions.ActionCategory
+import ai.deepsense.deeplang.actionobjects._
+import ai.deepsense.deeplang.actionobjects.stringindexingwrapper.StringIndexingEstimatorWrapper
+import ai.deepsense.deeplang.actions.EstimatorAsFactory
+import ai.deepsense.deeplang.actions.EstimatorAsOperation
+import ai.deepsense.deeplang.actions.EvaluatorAsFactory
+import ai.deepsense.deeplang.actions.TransformerAsOperation
 import ai.deepsense.deeplang.CatalogRecorder
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 
 trait SparkOperationsExtractor {
 
@@ -25,7 +25,7 @@ trait SparkOperationsExtractor {
       .toSeq
   }
 
-  private def sparkClassName(operation: DOperation): Option[String] = {
+  private def sparkClassName(operation: Action): Option[String] = {
     operation match {
       case (t: TransformerAsOperation[_]) =>
         t.transformer match {
@@ -67,7 +67,7 @@ trait SparkOperationsExtractor {
 
   def mapByCategory(
       operations: Seq[OperationWithSparkClassName]
-  ): Map[DOperationCategory, Seq[OperationWithSparkClassName]] = {
+  ): Map[ActionCategory, Seq[OperationWithSparkClassName]] = {
 
     val operationsWithCategories = operations.map { operationWithName =>
       val category = catalog.operations(operationWithName.op.id).category
@@ -83,6 +83,6 @@ trait SparkOperationsExtractor {
     )
   }
 
-  private case class OperationWithCategory(category: DOperationCategory, op: OperationWithSparkClassName)
+  private case class OperationWithCategory(category: ActionCategory, op: OperationWithSparkClassName)
 
 }

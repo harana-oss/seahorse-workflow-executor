@@ -5,8 +5,8 @@ import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.inference.exceptions.AllTypesNotCompilableException
 import ai.deepsense.deeplang.inference.exceptions.NoInputEdgesException
 import ai.deepsense.deeplang.inference.warnings.SomeTypesNotCompilableWarning
-import ai.deepsense.deeplang.DKnowledge
-import ai.deepsense.deeplang.DOperable
+import ai.deepsense.deeplang.Knowledge
+import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.graph.GraphKnowledge.InferenceErrors
 
 /** Represents inferred information about Graph which is send and used by front-end. It contains mapping from nodes to
@@ -31,7 +31,7 @@ case class GraphKnowledge(private[graph] val resultsMap: Map[Node.Id, NodeInfere
 
   def getResult(id: Node.Id): NodeInferenceResult = resultsMap(id)
 
-  def getKnowledge(id: Node.Id): Vector[DKnowledge[DOperable]] = getResult(id).ports
+  def getKnowledge(id: Node.Id): Vector[Knowledge[ActionObject]] = getResult(id).ports
 
   def results: Map[Node.Id, NodeInferenceResult] = resultsMap
 
@@ -56,9 +56,9 @@ object GraphKnowledge {
 }
 
 case class NodeInferenceResult(
-    ports: Vector[DKnowledge[DOperable]],
-    warnings: InferenceWarnings = InferenceWarnings.empty,
-    errors: InferenceErrors = Vector.empty
+                                ports: Vector[Knowledge[ActionObject]],
+                                warnings: InferenceWarnings = InferenceWarnings.empty,
+                                errors: InferenceErrors = Vector.empty
 )
 
 object NodeInferenceResult {

@@ -22,7 +22,7 @@ class CustomCodeEntryPoint(
     val sparkContext: SparkContext,
     val sparkSQLSession: SparkSQLSession,
     val dataFrameStorage: DataFrameStorage,
-    val operationExecutionDispatcher: OperationExecutionDispatcher
+    val operationExecutionDispatcher: ActionExecutionDispatcher
 ) extends Logging {
 
   import ai.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint._

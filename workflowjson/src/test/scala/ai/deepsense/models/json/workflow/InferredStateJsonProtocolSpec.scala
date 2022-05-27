@@ -7,15 +7,15 @@ import org.scalatest.matchers.should.Matchers
 import spray.json._
 
 import ai.deepsense.commons.models.Entity
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperables.descriptions.ParamsInferenceResult
-import ai.deepsense.deeplang.doperables.descriptions.DataFrameInferenceResult
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
+import ai.deepsense.deeplang.actionobjects.descriptions.ParamsInferenceResult
+import ai.deepsense.deeplang.actionobjects.descriptions.DataFrameInferenceResult
 import ai.deepsense.deeplang.exceptions.DeepLangException
 import ai.deepsense.deeplang.inference.InferenceWarning
 import ai.deepsense.deeplang.inference.InferenceWarnings
-import ai.deepsense.deeplang.params.Params
-import ai.deepsense.deeplang.DKnowledge
-import ai.deepsense.deeplang.DOperable
+import ai.deepsense.deeplang.parameters.Params
+import ai.deepsense.deeplang.Knowledge
+import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.graph.GraphKnowledge
 import ai.deepsense.graph.NodeInferenceResult
 import ai.deepsense.models.workflows._
@@ -69,10 +69,10 @@ class InferredStateJsonProtocolSpec extends WorkflowJsonTestSupport with Inferre
       node1.id,
       NodeInferenceResult(
         Vector(
-          DKnowledge(Set(operable)),
-          DKnowledge(Set(operable, parametricOperable)),
-          DKnowledge(Set[DOperable](parametricOperable)),
-          DKnowledge(Set[DOperable](dataFrame))
+          Knowledge(Set(operable)),
+          Knowledge(Set(operable, parametricOperable)),
+          Knowledge(Set[ActionObject](parametricOperable)),
+          Knowledge(Set[ActionObject](dataFrame))
         ),
         InferenceWarnings(new InferenceWarning("warning1") {}, new InferenceWarning("warning2") {}),
         Vector(
@@ -82,7 +82,7 @@ class InferredStateJsonProtocolSpec extends WorkflowJsonTestSupport with Inferre
       )
     )
 
-    def dOperableJsName(o: DOperable): JsString = JsString(o.getClass.getCanonicalName)
+    def dOperableJsName(o: ActionObject): JsString = JsString(o.getClass.getCanonicalName)
     val mockOperableName                        = dOperableJsName(operable)
     val parametricOperableName                  = dOperableJsName(parametricOperable)
     val dataFrameName                           = dOperableJsName(dataFrame)
@@ -181,6 +181,6 @@ class InferredStateJsonProtocolSpec extends WorkflowJsonTestSupport with Inferre
     (executionStates, executionStatesJson)
   }
 
-  abstract class ParametricOperable extends DOperable with Params
+  abstract class ParametricOperable extends ActionObject with Params
 
 }

@@ -6,18 +6,18 @@ import org.scalatestplus.mockito.MockitoSugar
 
 import ai.deepsense.commons.utils.Version
 import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.doperables.DOperableMock
+import ai.deepsense.deeplang.actionobjects.ActionObjectMock
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 
 object RandomNodeFactory {
 
-  def randomNode(operation: DOperation): DeeplangNode = Node(Node.Id.randomId, operation)
+  def randomNode(operation: Action): DeeplangNode = Node(Node.Id.randomId, operation)
 
 }
 
-object DClassesForDOperations extends MockitoSugar {
+object DClassesForActions extends MockitoSugar {
 
-  trait A extends DOperableMock
+  trait A extends ActionObjectMock
 
   case class A1() extends A
 
@@ -27,22 +27,22 @@ object DClassesForDOperations extends MockitoSugar {
 
 object DOperationTestClasses {
 
-  import ai.deepsense.graph.DClassesForDOperations._
+  import ai.deepsense.graph.DClassesForActions._
 
-  trait DOperationBaseFields extends DOperation {
+  trait ActionBaseFields extends Action {
 
     // NOTE: id will be different for each instance
-    override val id: DOperation.Id = DOperation.Id.randomId
+    override val id: Action.Id = Action.Id.randomId
 
     override val name: String = ""
 
     override val description: String = ""
 
-    val specificParams: Array[ai.deepsense.deeplang.params.Param[_]] = Array()
+    val specificParams: Array[ai.deepsense.deeplang.parameters.Parameter[_]] = Array()
 
   }
 
-  case class DOperationCreateA1() extends DOperation0To1[A1] with DOperationBaseFields {
+  case class ActionCreateA1() extends Action0To1[A1] with ActionBaseFields {
 
     override protected def execute()(context: ExecutionContext): A1 = ???
 
@@ -51,7 +51,7 @@ object DOperationTestClasses {
 
   }
 
-  case class DOperationReceiveA1() extends DOperation1To0[A1] with DOperationBaseFields {
+  case class ActionReceiveA1() extends Action1To0[A1] with ActionBaseFields {
 
     override protected def execute(t0: A1)(context: ExecutionContext): Unit = ???
 
@@ -60,7 +60,7 @@ object DOperationTestClasses {
 
   }
 
-  case class DOperationA1ToA() extends DOperation1To1[A1, A] with DOperationBaseFields {
+  case class ActionA1ToA() extends Action1To1[A1, A] with ActionBaseFields {
 
     override protected def execute(t1: A1)(context: ExecutionContext): A = ???
 
@@ -72,7 +72,7 @@ object DOperationTestClasses {
 
   }
 
-  case class DOperationAToA1A2() extends DOperation1To2[A, A1, A2] with DOperationBaseFields {
+  case class ActionAToA1A2() extends Action1To2[A, A1, A2] with ActionBaseFields {
 
     override protected def execute(in: A)(context: ExecutionContext): (A1, A2) = ???
 
@@ -87,7 +87,7 @@ object DOperationTestClasses {
 
   }
 
-  case class DOperationA1A2ToA() extends DOperation2To1[A1, A2, A] with DOperationBaseFields {
+  case class ActionA1A2ToA() extends Action2To1[A1, A2, A] with ActionBaseFields {
 
     override protected def execute(t1: A1, t2: A2)(context: ExecutionContext): A = ???
 
@@ -102,7 +102,7 @@ object DOperationTestClasses {
 
   }
 
-  case class DOperationAToALogging() extends DOperation1To1[A, A] with DOperationBaseFields {
+  case class ActionAToALogging() extends Action1To1[A, A] with ActionBaseFields {
 
     logger.trace("Initializing logging to test the serialization")
 

@@ -1,7 +1,7 @@
 package ai.deepsense.deeplang.catalogs
 
 import ai.deepsense.deeplang.catalogs.spi.CatalogRegistrant
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.UnitSpec
 import ai.deepsense.deeplang.catalogs.spi.CatalogRegistrar.DefaultCatalogRegistrar
 import org.scalatest.BeforeAndAfter

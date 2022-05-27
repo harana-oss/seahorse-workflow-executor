@@ -22,8 +22,8 @@ import ai.deepsense.commons.mail.EmailSenderConfig
 import ai.deepsense.deeplang._
 import ai.deepsense.commons.rest.client.NotebooksClientFactory
 import ai.deepsense.commons.rest.client.datasources.DatasourceRestClientFactory
-import ai.deepsense.deeplang.catalogs.DCatalog
-import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
+import ai.deepsense.deeplang.catalogs.FlowCatalog
+import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.workflows.Workflow
 import ai.deepsense.sparkutils.AkkaUtils
@@ -82,7 +82,7 @@ case class SessionExecutor(
 
   private val wmReportsPath          = config.getString("workflow-manager.reports.path")
 
-  val DCatalog(_, dOperableCatalog, dOperationsCatalog) =
+  val FlowCatalog(_, dOperableCatalog, dOperationsCatalog) =
     CatalogRecorder.resourcesCatalogRecorder.catalogs
 
   val graphReader = new GraphReader(dOperationsCatalog)
@@ -109,7 +109,7 @@ case class SessionExecutor(
       pythonBinaryPath.getOrElse(pythonBinaryDefault)
     }
 
-    val operationExecutionDispatcher = new OperationExecutionDispatcher
+    val operationExecutionDispatcher = new ActionExecutionDispatcher
 
     val customCodeEntryPoint =
       new CustomCodeEntryPoint(sparkContext, sparkSQLSession, dataFrameStorage, operationExecutionDispatcher)
@@ -186,14 +186,14 @@ case class SessionExecutor(
   }
 
   private def createWorkflowsSubscriberActor(
-      sparkContext: SparkContext,
-      sparkSQLSession: SparkSQLSession,
-      dOperableCatalog: DOperableCatalog,
-      dataFrameStorage: DataFrameStorageImpl,
-      customCodeExecutionProvider: CustomCodeExecutionProvider,
-      system: ActorSystem,
-      workflowManagerClientActor: ActorRef,
-      communicationFactory: MQCommunicationFactory
+                                              sparkContext: SparkContext,
+                                              sparkSQLSession: SparkSQLSession,
+                                              dOperableCatalog: ActionObjectCatalog,
+                                              dataFrameStorage: DataFrameStorageImpl,
+                                              customCodeExecutionProvider: CustomCodeExecutionProvider,
+                                              system: ActorSystem,
+                                              workflowManagerClientActor: ActorRef,
+                                              communicationFactory: MQCommunicationFactory
   ): ActorRef = {
 
     def createHeartbeatPublisher: ActorRef = {

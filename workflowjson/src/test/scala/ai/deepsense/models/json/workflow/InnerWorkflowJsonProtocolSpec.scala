@@ -3,8 +3,8 @@ package ai.deepsense.models.json.workflow
 import spray.json._
 
 import org.scalatest.matchers.should.Matchers
-import ai.deepsense.deeplang.params.custom.PublicParam
-import ai.deepsense.deeplang.params.custom.InnerWorkflow
+import ai.deepsense.deeplang.parameters.custom.PublicParam
+import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
 import ai.deepsense.graph.Node
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphWriter

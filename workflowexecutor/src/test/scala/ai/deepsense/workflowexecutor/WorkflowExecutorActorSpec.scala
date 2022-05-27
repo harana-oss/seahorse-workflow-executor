@@ -4,10 +4,10 @@ import ai.deepsense.commons.datetime.DateTimeConverter
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperations.{ReadDataFrame, WriteDataFrame}
-import ai.deepsense.deeplang.doperations.inout._
-import ai.deepsense.deeplang.doperations.readwritedataframe.{FilePath, FileScheme}
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
+import ai.deepsense.deeplang.actions.{ReadDataFrame, WriteDataFrame}
+import ai.deepsense.deeplang.actions.inout._
+import ai.deepsense.deeplang.actions.readwritedataframe.{FilePath, FileScheme}
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.Node.Id
 import ai.deepsense.graph._
@@ -419,7 +419,7 @@ class WorkflowExecutorActorSpec
   private def mockResults(size: Int): NodeExecutionResults = {
     val ids       = (1 to size).map(_ => Entity.Id.randomId)
     val reports   = ids.map(id => id -> mock[ReportContent]).toMap
-    val operables = ids.map(id => id -> mock[DOperable]).toMap
+    val operables = ids.map(id => id -> mock[ActionObject]).toMap
     NodeExecutionResults(ids, reports, operables)
   }
 

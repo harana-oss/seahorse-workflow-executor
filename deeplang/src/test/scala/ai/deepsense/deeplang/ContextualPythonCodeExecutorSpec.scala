@@ -17,7 +17,7 @@ class ContextualPythonCodeExecutorSpec extends UnitSpec with BeforeAndAfter {
 
   val pythonCodeExecutor = mock[CustomCodeExecutor]
 
-  val operationExecutionDispatcher = mock[OperationExecutionDispatcher]
+  val operationExecutionDispatcher = mock[ActionExecutionDispatcher]
 
   val customCodeExecutionProvider = mock[CustomCodeExecutionProvider]
 

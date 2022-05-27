@@ -6,13 +6,13 @@ import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.graph.GraphKnowledge.InferenceErrors
 
 case class SinglePortKnowledgeInferenceResult(
-    knowledge: DKnowledge[DOperable],
-    warnings: InferenceWarnings,
-    errors: InferenceErrors
+                                               knowledge: Knowledge[ActionObject],
+                                               warnings: InferenceWarnings,
+                                               errors: InferenceErrors
 )
 
 trait KnowledgeInference {
-  self: TopologicallySortable[DOperation] with NodeInference =>
+  self: TopologicallySortable[Action] with NodeInference =>
 
   /** @return A graph knowledge with inferred results for every node. */
   def inferKnowledge(context: InferContext, initialKnowledge: GraphKnowledge): GraphKnowledge = {

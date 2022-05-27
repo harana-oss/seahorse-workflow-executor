@@ -4,9 +4,9 @@ import ai.deepsense.deeplang.inference.InferenceWarnings
 import ai.deepsense.deeplang.inference.exceptions.AllTypesNotCompilableException
 import ai.deepsense.deeplang.inference.exceptions.NoInputEdgesException
 import ai.deepsense.deeplang.inference.warnings.SomeTypesNotCompilableWarning
-import ai.deepsense.deeplang.DKnowledge
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.graph.DClassesForDOperations.A1
+import ai.deepsense.deeplang.Knowledge
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.graph.DClassesForActions.A1
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 
 class NodeInferenceImplSpec extends AbstractInferenceSpec {
@@ -28,7 +28,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
     "return inference with warnings when not all types are compatible" in {
       val inferenceResult = testInputInferenceForNode(0, nodeA1ToA, Vector(knowledgeA12))
       inferenceResult shouldBe NodeInferenceResult(
-        Vector(DKnowledge(A1())),
+        Vector(Knowledge(A1())),
         warnings = InferenceWarnings(
           SomeTypesNotCompilableWarning(portIndex = 0)
         )
@@ -37,7 +37,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
     "return inference with error when types not compatible" in {
       val inferenceResult = testInputInferenceForNode(0, nodeA1ToA, Vector(knowledgeA2))
       inferenceResult shouldBe NodeInferenceResult(
-        Vector(DKnowledge(A1())),
+        Vector(Knowledge(A1())),
         errors = Vector(AllTypesNotCompilableException(portIndex = 0))
       )
     }
@@ -77,7 +77,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA1),
-        warnings = InferenceWarnings(DOperationA1A2ToFirst.warning)
+        warnings = InferenceWarnings(ActionA1A2ToFirst.warning)
       )
     }
     "not infer types and return default knowledge with validation errors when parameters are not valid" in {
@@ -87,7 +87,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
-        errors = Vector(DOperationA1A2ToFirst.parameterInvalidError)
+        errors = Vector(ActionA1A2ToFirst.parameterInvalidError)
       )
     }
     "return default knowledge when node inference throws an error" in {
@@ -98,7 +98,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
-        errors = Vector(DOperationA1A2ToFirst.inferenceError)
+        errors = Vector(ActionA1A2ToFirst.inferenceError)
       )
     }
     "skip duplicated errors" in {
@@ -107,14 +107,14 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       setParametersInvalid(node)
       val inputInferenceForNode = NodeInferenceResult(
         ports = Vector(knowledgeA1, knowledgeA2),
-        errors = Vector(DOperationA1A2ToFirst.parameterInvalidError, DOperationA1A2ToFirst.inferenceError)
+        errors = Vector(ActionA1A2ToFirst.parameterInvalidError, ActionA1A2ToFirst.inferenceError)
       )
       val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
         errors = Vector(
-          DOperationA1A2ToFirst.parameterInvalidError,
-          DOperationA1A2ToFirst.inferenceError
+          ActionA1A2ToFirst.parameterInvalidError,
+          ActionA1A2ToFirst.inferenceError
         )
       )
     }
@@ -123,13 +123,13 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
       setInferenceErrorMultiThrowing(node)
       val inputInferenceForNode = NodeInferenceResult(
         ports = Vector(knowledgeA1, knowledgeA2),
-        errors = Vector(DOperationA1A2ToFirst.parameterInvalidError)
+        errors = Vector(ActionA1A2ToFirst.parameterInvalidError)
       )
       val inferenceResult       = nodeInference.inferKnowledge(node, inferenceCtx, inputInferenceForNode)
       inferenceResult shouldBe NodeInferenceResult(
         Vector(knowledgeA12),
         errors = Vector(
-          DOperationA1A2ToFirst.parameterInvalidError
+          ActionA1A2ToFirst.parameterInvalidError
         )
       )
     }
@@ -138,7 +138,7 @@ class NodeInferenceImplSpec extends AbstractInferenceSpec {
   def testInputInferenceForNode(
       predecessorPortIndex: Int,
       node: DeeplangNode,
-      predecessorKnowledge: Vector[DKnowledge[DOperable]]
+      predecessorKnowledge: Vector[Knowledge[ActionObject]]
   ): NodeInferenceResult = {
     val predecessorId             = Node.Id.randomId
     val nodePredecessorsEndpoints = IndexedSeq(

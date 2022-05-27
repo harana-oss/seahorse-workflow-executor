@@ -7,7 +7,7 @@ import akka.actor.PoisonPill
 import ai.deepsense.commons.models.Entity
 import ai.deepsense.commons.utils.Logging
 import ai.deepsense.deeplang._
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.reportlib.model.ReportContent
 import ai.deepsense.reportlib.model.ReportType
@@ -18,7 +18,7 @@ import ai.deepsense.workflowexecutor.WorkflowExecutorActor.Messages.NodeStarted
 /** WorkflowNodeExecutorActor is responsible for execution of single node. Sends NodeStarted at the beginning and
   * NodeCompleted or NodeFailed at the end of execution depending on whether the execution succeeded or failed.
   */
-class WorkflowNodeExecutorActor(executionContext: ExecutionContext, node: DeeplangNode, input: Vector[DOperable])
+class WorkflowNodeExecutorActor(executionContext: ExecutionContext, node: DeeplangNode, input: Vector[ActionObject])
     extends Actor
     with Logging {
 
@@ -76,30 +76,30 @@ class WorkflowNodeExecutorActor(executionContext: ExecutionContext, node: Deepla
     logger.debug(s"Sending $nodeStarted.")
   }
 
-  def nodeExecutionResultsFrom(operationResults: Vector[DOperable]): NodeExecutionResults = {
-    val registeredResults: Seq[(Entity.Id, DOperable)]  = registerResults(operationResults)
-    val registeredResultsMap: Map[Entity.Id, DOperable] = registeredResults.toMap
+  def nodeExecutionResultsFrom(operationResults: Vector[ActionObject]): NodeExecutionResults = {
+    val registeredResults: Seq[(Entity.Id, ActionObject)]  = registerResults(operationResults)
+    val registeredResultsMap: Map[Entity.Id, ActionObject] = registeredResults.toMap
     val reports: Map[Entity.Id, ReportContent]          = collectReports(registeredResultsMap)
     NodeExecutionResults(registeredResults.map(_._1), reports, registeredResultsMap)
   }
 
-  private def registerResults(operables: Seq[DOperable]): Seq[(Entity.Id, DOperable)] = {
+  private def registerResults(operables: Seq[ActionObject]): Seq[(Entity.Id, ActionObject)] = {
     logger.debug(s"Registering data from operation output ports in node ${node.id}")
-    val results: Seq[(Entity.Id, DOperable)] = operables.map(dOperable => (Entity.Id.randomId, dOperable))
+    val results: Seq[(Entity.Id, ActionObject)] = operables.map(dOperable => (Entity.Id.randomId, dOperable))
     logger.debug(s"Data registered for $nodeDescription: results=$results")
     results
   }
 
-  def collectReports(results: Map[Entity.Id, DOperable]): Map[Entity.Id, ReportContent] = {
+  def collectReports(results: Map[Entity.Id, ActionObject]): Map[Entity.Id, ReportContent] = {
     logger.debug(s"Collecting reports for ${node.id}")
     results.map { case (id, dOperable) =>
-      (id, dOperable.report(extended = node.value.getReportType == DOperation.ReportParam.Extended()).content)
+      (id, dOperable.report(extended = node.value.getReportType == Action.ReportParam.Extended()).content)
     }
   }
 
-  def executeOperation(): Vector[DOperable] = {
+  def executeOperation(): Vector[ActionObject] = {
     logger.debug(s"$nodeDescription inputVector.size = ${input.size}")
-    val inputKnowledge = input.map(dOperable => DKnowledge(dOperable))
+    val inputKnowledge = input.map(dOperable => Knowledge(dOperable))
     // if inference throws, we do not perform execution
     node.value.inferKnowledgeUntyped(inputKnowledge)(executionContext.inferContext)
 

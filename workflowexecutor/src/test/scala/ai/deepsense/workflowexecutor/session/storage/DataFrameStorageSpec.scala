@@ -7,7 +7,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import ai.deepsense.commons.StandardSpec
 import ai.deepsense.commons.models.Id
 import ai.deepsense.deeplang.DataFrameStorage
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 
 class DataFrameStorageSpec extends StandardSpec with BeforeAndAfter with MockitoSugar {
 

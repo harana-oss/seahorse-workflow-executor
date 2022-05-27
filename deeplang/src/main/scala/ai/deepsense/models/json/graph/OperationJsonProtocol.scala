@@ -1,9 +1,9 @@
 package ai.deepsense.models.json.graph
 
 import ai.deepsense.commons.json.IdJsonProtocol
-import ai.deepsense.deeplang.DOperation
-import ai.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
-import ai.deepsense.deeplang.catalogs.doperations.exceptions.DOperationNotFoundException
+import ai.deepsense.deeplang.Action
+import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
+import ai.deepsense.deeplang.catalogs.actions.exceptions.DOperationNotFoundException
 import spray.json._
 
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
@@ -18,9 +18,9 @@ object OperationJsonProtocol extends IdJsonProtocol {
 
   val Parameters = "parameters"
 
-  implicit object DOperationWriter extends JsonWriter[DOperation] with DefaultJsonProtocol with IdJsonProtocol {
+  implicit object DOperationWriter extends JsonWriter[Action] with DefaultJsonProtocol with IdJsonProtocol {
 
-    override def write(operation: DOperation): JsValue = {
+    override def write(operation: Action): JsValue = {
       JsObject(
         Operation  -> JsObject(Id -> operation.id.toJson, Name -> operation.name.toJson),
         Parameters -> operation.paramValuesToJson
@@ -29,14 +29,14 @@ object OperationJsonProtocol extends IdJsonProtocol {
 
   }
 
-  class DOperationReader(graphReader: GraphReader) extends JsonReader[DOperation] with DefaultJsonProtocol {
+  class DOperationReader(graphReader: GraphReader) extends JsonReader[Action] with DefaultJsonProtocol {
 
-    override def read(json: JsValue): DOperation = json match {
+    override def read(json: JsValue): Action = json match {
       case JsObject(fields) =>
         val operationJs = fields(Operation).asJsObject
         val operationId = operationJs.fields
           .getOrElse(Id, deserializationError(s"Operation id field '$Id' is missing"))
-          .convertTo[DOperation.Id]
+          .convertTo[Action.Id]
 
         val operation =
           try

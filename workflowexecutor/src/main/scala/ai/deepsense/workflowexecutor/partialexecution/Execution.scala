@@ -2,7 +2,7 @@ package ai.deepsense.workflowexecutor.partialexecution
 
 import ai.deepsense.commons.exception.FailureDescription
 import ai.deepsense.commons.models.Entity
-import ai.deepsense.deeplang.DOperable
+import ai.deepsense.deeplang.ActionObject
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph.Node.Id
@@ -48,7 +48,7 @@ sealed abstract class Execution {
       id: Node.Id,
       resultsIds: Seq[Entity.Id],
       reports: Map[Entity.Id, ReportContent],
-      dOperables: Map[Entity.Id, DOperable]
+      dOperables: Map[Entity.Id, ActionObject]
   ): Execution
 
   def enqueue: Execution
@@ -67,7 +67,7 @@ case class IdleExecution(override val graph: StatefulGraph, selectedNodes: Set[N
       id: Node.Id,
       resultsIds: Seq[Entity.Id],
       reports: Map[Entity.Id, ReportContent],
-      dOperables: Map[Entity.Id, DOperable]
+      dOperables: Map[Entity.Id, ActionObject]
   ): Execution =
     throw new IllegalStateException("A node cannot finish in IdleExecution")
 
@@ -173,7 +173,7 @@ abstract class StartedExecution(fullGraph: StatefulGraph, runningPart: StatefulG
       id: Node.Id,
       resultsIds: Seq[Entity.Id],
       reports: Map[Entity.Id, ReportContent],
-      dOperables: Map[Entity.Id, DOperable]
+      dOperables: Map[Entity.Id, ActionObject]
   ): Execution =
     withRunningPartUpdated(_.nodeFinished(id, resultsIds, reports, dOperables))
 

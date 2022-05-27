@@ -1,14 +1,14 @@
 package ai.deepsense.workflowexecutor
 
-import ai.deepsense.deeplang.catalogs.DCatalog
-import ai.deepsense.deeplang.doperations.custom.Sink
-import ai.deepsense.deeplang.doperations.custom.Source
-import ai.deepsense.deeplang.doperations.CreateCustomTransformer
+import ai.deepsense.deeplang.catalogs.FlowCatalog
+import ai.deepsense.deeplang.actions.custom.Sink
+import ai.deepsense.deeplang.actions.custom.Source
+import ai.deepsense.deeplang.actions.CreateCustomTransformer
 import ai.deepsense.deeplang.inference.InferContext
 import ai.deepsense.deeplang.inference.exceptions.NoInputEdgesException
-import ai.deepsense.deeplang.params.custom.InnerWorkflow
+import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
 import ai.deepsense.deeplang.CatalogRecorder
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.deeplang.MockedInferContext
 import ai.deepsense.graph.AbstractInferenceSpec
 import ai.deepsense.graph.DeeplangGraph
@@ -75,9 +75,9 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with InnerWorkflowJso
     }
   }
 
-  implicit class DOperationTestExtension(val dOperation: DOperation) {
+  implicit class DOperationTestExtension(val dOperation: Action) {
 
-    def toNode(): Node[DOperation] = Node(Node.Id.randomId, dOperation)
+    def toNode(): Node[Action] = Node(Node.Id.randomId, dOperation)
 
   }
 
@@ -86,7 +86,7 @@ class KnowledgeInferenceSpec extends AbstractInferenceSpec with InnerWorkflowJso
 
   override protected lazy val graphReader = new GraphReader(operationCatalog)
 
-  private lazy val DCatalog(_, dOperableCatalog, operationCatalog) =
+  private lazy val FlowCatalog(_, dOperableCatalog, operationCatalog) =
     CatalogRecorder.resourcesCatalogRecorder.catalogs
 
 }

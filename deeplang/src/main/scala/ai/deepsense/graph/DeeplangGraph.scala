@@ -2,11 +2,11 @@ package ai.deepsense.graph
 
 import java.util.UUID
 
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 
 case class DeeplangGraph(override val nodes: Set[DeeplangNode] = Set.empty, override val edges: Set[Edge] = Set())
-    extends DirectedGraph[DOperation, DeeplangGraph](nodes, edges)
+    extends DirectedGraph[Action, DeeplangGraph](nodes, edges)
     with KnowledgeInference
     with NodeInferenceImpl {
 
@@ -20,6 +20,6 @@ case class DeeplangGraph(override val nodes: Set[DeeplangNode] = Set.empty, over
 
 object DeeplangGraph {
 
-  type DeeplangNode = Node[DOperation]
+  type DeeplangNode = Node[Action]
 
 }

@@ -6,9 +6,9 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.flatspec.AnyFlatSpec
 import spray.json._
 
-import ai.deepsense.deeplang.catalogs.doperable.ClassDescriptor
-import ai.deepsense.deeplang.catalogs.doperable.HierarchyDescriptor
-import ai.deepsense.deeplang.catalogs.doperable.TraitDescriptor
+import ai.deepsense.deeplang.catalogs.actionobjects.ClassDescriptor
+import ai.deepsense.deeplang.catalogs.actionobjects.HierarchyDescriptor
+import ai.deepsense.deeplang.catalogs.actionobjects.TraitDescriptor
 
 class HierarchyDescriptorJsonProtocolSpec
     extends AnyFlatSpec

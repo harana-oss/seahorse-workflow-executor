@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule
 import com.google.inject.Provides
 import com.google.inject.Singleton
 
-import ai.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
+import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 
 class GraphReaderModule extends AbstractModule {
@@ -15,7 +15,7 @@ class GraphReaderModule extends AbstractModule {
 
   @Singleton
   @Provides
-  def provideGraphReader(dOperationsCatalog: DOperationsCatalog): GraphReader =
+  def provideGraphReader(dOperationsCatalog: ActionCatalog): GraphReader =
     new GraphReader(dOperationsCatalog)
 
 }

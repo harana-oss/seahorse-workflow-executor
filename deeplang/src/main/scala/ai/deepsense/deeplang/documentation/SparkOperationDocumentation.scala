@@ -1,8 +1,8 @@
 package ai.deepsense.deeplang.documentation
 
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 
-trait SparkOperationDocumentation extends OperationDocumentation { self: DOperation =>
+trait SparkOperationDocumentation extends OperationDocumentation { self: Action =>
 
   private val sparkVersion = org.apache.spark.SPARK_VERSION
 

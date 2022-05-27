@@ -11,7 +11,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import ai.deepsense.deeplang.CustomCodeExecutor
 import ai.deepsense.deeplang.DataFrameStorage
-import ai.deepsense.deeplang.OperationExecutionDispatcher
+import ai.deepsense.deeplang.ActionExecutionDispatcher
 import ai.deepsense.sparkutils.SparkSQLSession
 import ai.deepsense.workflowexecutor.customcode.CustomCodeEntryPoint
 
@@ -65,7 +65,7 @@ class PythonCustomCodeEntryPointTest extends AnyWordSpec with MockitoSugar with 
       mock[SparkContext],
       mock[SparkSQLSession],
       mock[DataFrameStorage],
-      mock[OperationExecutionDispatcher]
+      mock[ActionExecutionDispatcher]
     )
 
 }

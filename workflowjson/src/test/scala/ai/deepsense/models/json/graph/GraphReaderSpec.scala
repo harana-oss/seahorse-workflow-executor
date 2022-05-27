@@ -4,23 +4,23 @@ import org.scalatest.matchers.should.Matchers
 import org.mockito.Mockito._
 import spray.json._
 
-import ai.deepsense.deeplang.DOperation
-import ai.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
+import ai.deepsense.deeplang.Action
+import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
 import ai.deepsense.graph.DeeplangGraph.DeeplangNode
 import ai.deepsense.graph._
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 
 class GraphReaderSpec extends GraphJsonTestSupport {
 
-  val catalog = mock[DOperationsCatalog]
+  val catalog = mock[ActionCatalog]
 
   implicit val graphReader = new GraphReader(catalog)
 
-  val operation1 = mockOperation(0, 1, DOperation.Id.randomId, "DataSet1")
+  val operation1 = mockOperation(0, 1, Action.Id.randomId, "DataSet1")
 
-  val operation2 = mockOperation(1, 1, DOperation.Id.randomId, "DoSomething")
+  val operation2 = mockOperation(1, 1, Action.Id.randomId, "DoSomething")
 
-  val operation3 = mockOperation(1, 0, DOperation.Id.randomId, "SaveDataSet")
+  val operation3 = mockOperation(1, 0, Action.Id.randomId, "SaveDataSet")
 
   when(catalog.createDOperation(operation1.id)).thenReturn(operation1)
   when(catalog.createDOperation(operation2.id)).thenReturn(operation2)
@@ -124,6 +124,6 @@ class GraphReaderSpec extends GraphJsonTestSupport {
     testNodes1 == testNodes2
   }
 
-  case class TestNode(id: Node.Id, operation: DOperation)
+  case class TestNode(id: Node.Id, operation: Action)
 
 }

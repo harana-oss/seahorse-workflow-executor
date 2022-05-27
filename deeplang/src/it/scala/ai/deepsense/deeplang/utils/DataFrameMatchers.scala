@@ -3,7 +3,7 @@ package ai.deepsense.deeplang.utils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.StructType
 import org.scalatest.matchers.should.Matchers
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
 
 trait DataFrameMatchers extends Matchers {
 

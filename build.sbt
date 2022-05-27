@@ -72,17 +72,12 @@ deeplang,
 reportlib % "test->test",
 workflowjson) settings settingsForNotPublished
 
-lazy val sdk = project dependsOn (
-  deeplang
-) settings settingsForPublished
-
 lazy val workflowexecutor = project dependsOn (commons % "test->test",
 deeplang,
 deeplang % "test->test",
 deeplang % "test->it",
 workflowjson,
 workflowjson % "test -> test",
-sdk,
 workflowexecutormqprotocol,
 workflowexecutormqprotocol % "test -> test") settings settingsForNotPublished
 

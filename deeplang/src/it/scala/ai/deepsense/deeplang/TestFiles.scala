@@ -2,10 +2,10 @@ package ai.deepsense.deeplang
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.BeforeAndAfterAll
-
-import ai.deepsense.deeplang.doperations.inout.InputFileFormatChoice
-import ai.deepsense.deeplang.doperations.readwritedataframe.FilePath
-import ai.deepsense.deeplang.doperations.readwritedataframe.FileScheme
+import ai.deepsense.deeplang.actions.inout.InputFileFormatChoice
+import ai.deepsense.deeplang.actions.readwritedataframe.FilePath
+import ai.deepsense.deeplang.actions.readwritedataframe.FileScheme
+import ai.deepsense.deeplang.filesystemclients.LocalFileSystemClient
 
 trait TestFiles { self: BeforeAndAfter with BeforeAndAfterAll =>
 

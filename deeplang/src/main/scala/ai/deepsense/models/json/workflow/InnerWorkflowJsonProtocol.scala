@@ -6,8 +6,8 @@ import spray.json.JsValue
 
 import ai.deepsense.commons.json.DateTimeJsonProtocol
 import ai.deepsense.commons.json.IdJsonProtocol
-import ai.deepsense.deeplang.params.custom.InnerWorkflow
-import ai.deepsense.deeplang.params.custom.PublicParam
+import ai.deepsense.deeplang.parameters.custom.InnerWorkflow
+import ai.deepsense.deeplang.parameters.custom.PublicParam
 import ai.deepsense.models.json.graph.GraphJsonProtocol.GraphReader
 import ai.deepsense.models.json.graph.DKnowledgeJsonProtocol
 import ai.deepsense.models.json.graph.NodeJsonProtocol

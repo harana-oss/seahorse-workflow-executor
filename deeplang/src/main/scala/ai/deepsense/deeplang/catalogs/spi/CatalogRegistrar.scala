@@ -12,15 +12,15 @@
 
 package ai.deepsense.deeplang.catalogs.spi
 
-import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
-import ai.deepsense.deeplang.catalogs.doperations.DOperationCategory
-import ai.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
+import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
+import ai.deepsense.deeplang.catalogs.actions.ActionCategory
+import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
 import ai.deepsense.deeplang.catalogs.spi.CatalogRegistrar.OperableType
 import ai.deepsense.deeplang.catalogs.spi.CatalogRegistrar.OperationFactory
-import ai.deepsense.deeplang.catalogs.DCatalog
+import ai.deepsense.deeplang.catalogs.FlowCatalog
 import ai.deepsense.deeplang.catalogs.SortPriority
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.deeplang.Action
 
 import scala.reflect.runtime.universe._
 
@@ -29,46 +29,46 @@ import scala.reflect.runtime.universe._
   */
 trait CatalogRegistrar {
 
-  def registeredCategories: Seq[DOperationCategory]
+  def registeredCategories: Seq[ActionCategory]
 
-  def registeredOperations: Seq[(DOperationCategory, OperationFactory, SortPriority)]
+  def registeredOperations: Seq[(ActionCategory, OperationFactory, SortPriority)]
 
-  def registerOperation(category: DOperationCategory, factory: OperationFactory, priority: SortPriority): Unit
+  def registerOperation(category: ActionCategory, factory: OperationFactory, priority: SortPriority): Unit
 
-  def registerOperable[C <: DOperable: TypeTag](): Unit
+  def registerOperable[C <: ActionObject: TypeTag](): Unit
 
 }
 
 object CatalogRegistrar {
 
-  type OperationFactory = () => DOperation
+  type OperationFactory = () => Action
 
-  type OperableType = TypeTag[_ <: DOperable]
+  type OperableType = TypeTag[_ <: ActionObject]
 
   class DefaultCatalogRegistrar() extends CatalogRegistrar {
 
-    private val operationsCatalog = DOperationsCatalog()
+    private val operationsCatalog = ActionCatalog()
 
-    private var operables = DOperableCatalog()
+    private var operables = ActionObjectCatalog()
 
-    override def registeredCategories: Seq[DOperationCategory] = operationsCatalog.categoryTree.getCategories
+    override def registeredCategories: Seq[ActionCategory] = operationsCatalog.categoryTree.getCategories
 
-    override def registeredOperations: Seq[(DOperationCategory, OperationFactory, SortPriority)] =
+    override def registeredOperations: Seq[(ActionCategory, OperationFactory, SortPriority)] =
       operationsCatalog.registeredOperations
 
     override def registerOperation(
-        category: DOperationCategory,
-        factory: OperationFactory,
-        priority: SortPriority
+                                    category: ActionCategory,
+                                    factory: OperationFactory,
+                                    priority: SortPriority
     ): Unit =
       operationsCatalog.registerDOperation(category, factory, priority)
 
-    override def registerOperable[C <: DOperable: TypeTag](): Unit =
+    override def registerOperable[C <: ActionObject: TypeTag](): Unit =
       operables.register(typeTag[C])
 
     /** Constructs a DCatalog from the set of registered deeplang components. */
-    def catalog: DCatalog =
-      new DCatalog(operationsCatalog.categories, operables, operationsCatalog)
+    def catalog: FlowCatalog =
+      new FlowCatalog(operationsCatalog.categories, operables, operationsCatalog)
 
   }
 

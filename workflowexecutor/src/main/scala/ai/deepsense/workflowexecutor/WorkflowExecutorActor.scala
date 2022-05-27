@@ -162,7 +162,7 @@ abstract class WorkflowExecutorActor(
     }
   }
 
-  private def getGraphNodeExecutor(node: DeeplangNode, dooperable: Vector[DOperable]): ActorRef = {
+  private def getGraphNodeExecutor(node: DeeplangNode, dooperable: Vector[ActionObject]): ActorRef = {
     val nodeExecutionContext = executionContext.createExecutionContext(workflowId, node.id)
     nodeExecutorFactory
       .createGraphNodeExecutor(context, nodeExecutionContext, node, dooperable)
@@ -211,7 +211,7 @@ abstract class WorkflowExecutorActor(
 
 object WorkflowExecutorActor {
 
-  type Results = Map[Entity.Id, DOperable]
+  type Results = Map[Entity.Id, ActionObject]
 
   object Messages {
 
@@ -253,7 +253,7 @@ trait GraphNodeExecutorFactory {
       context: ActorContext,
       executionContext: ExecutionContext,
       node: DeeplangNode,
-      input: Vector[DOperable]
+      input: Vector[ActionObject]
   ): ActorRef
 
 }
@@ -264,7 +264,7 @@ class GraphNodeExecutorFactoryImpl extends GraphNodeExecutorFactory {
       context: ActorContext,
       executionContext: ExecutionContext,
       node: DeeplangNode,
-      input: Vector[DOperable]
+      input: Vector[ActionObject]
   ): ActorRef = {
     val props = Props(new WorkflowNodeExecutorActor(executionContext, node, input))
       .withDispatcher("node-executor-dispatcher")
@@ -293,5 +293,5 @@ case class WorkflowProgress() extends Logging {
 case class NodeExecutionResults(
     entitiesId: Seq[Entity.Id],
     reports: Map[Entity.Id, ReportContent],
-    doperables: Map[Entity.Id, DOperable]
+    doperables: Map[Entity.Id, ActionObject]
 )

@@ -2,23 +2,23 @@ package ai.deepsense.docgen
 
 import java.io.File
 
-import ai.deepsense.deeplang.catalogs.doperations.DOperationCategory
+import ai.deepsense.deeplang.catalogs.actions.ActionCategory
 
 trait LinkPrinter {
 
   // scalastyle:off println
 
   def printOperationSiteLinks(
-      operationsByCategory: Map[DOperationCategory, Seq[OperationWithSparkClassName]],
-      printAll: Boolean
+                               operationsByCategory: Map[ActionCategory, Seq[OperationWithSparkClassName]],
+                               printAll: Boolean
   ): Unit = {
     println("==== Links for operations.md ====")
     printLinksByCategory(operationsByCategory, (url: String, opName: String) => s"* [$opName]($url)", printAll)
   }
 
   def printOperationMenuLinks(
-      operationsByCategory: Map[DOperationCategory, Seq[OperationWithSparkClassName]],
-      printAll: Boolean
+                               operationsByCategory: Map[ActionCategory, Seq[OperationWithSparkClassName]],
+                               printAll: Boolean
   ): Unit = {
     println("==== Links for operationsmenu.html ====")
     printLinksByCategory(
@@ -30,9 +30,9 @@ trait LinkPrinter {
   }
 
   private def printLinksByCategory(
-      sparkOperationsByCategory: Map[DOperationCategory, Seq[OperationWithSparkClassName]],
-      createLink: (String, String) => String,
-      printAll: Boolean
+                                    sparkOperationsByCategory: Map[ActionCategory, Seq[OperationWithSparkClassName]],
+                                    createLink: (String, String) => String,
+                                    printAll: Boolean
   ): Unit = {
 
     sparkOperationsByCategory.foreach { case (category, opList) =>

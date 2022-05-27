@@ -5,19 +5,19 @@ import java.io.PrintWriter
 
 import scala.reflect.runtime.universe.typeTag
 
-import ai.deepsense.deeplang.doperables.Transformer
-import ai.deepsense.deeplang.doperables.dataframe.DataFrame
-import ai.deepsense.deeplang.doperations.EstimatorAsFactory
-import ai.deepsense.deeplang.doperations.EstimatorAsOperation
-import ai.deepsense.deeplang.doperations.EvaluatorAsFactory
-import ai.deepsense.deeplang.doperations.TransformerAsOperation
-import ai.deepsense.deeplang.params._
-import ai.deepsense.deeplang.params.choice.AbstractChoiceParam
-import ai.deepsense.deeplang.params.choice.Choice
-import ai.deepsense.deeplang.params.choice.ChoiceParam
-import ai.deepsense.deeplang.params.choice.MultipleChoiceParam
-import ai.deepsense.deeplang.DOperation
-import ai.deepsense.deeplang.DOperation1To2
+import ai.deepsense.deeplang.actionobjects.Transformer
+import ai.deepsense.deeplang.actionobjects.dataframe.DataFrame
+import ai.deepsense.deeplang.actions.EstimatorAsFactory
+import ai.deepsense.deeplang.actions.EstimatorAsOperation
+import ai.deepsense.deeplang.actions.EvaluatorAsFactory
+import ai.deepsense.deeplang.actions.TransformerAsOperation
+import ai.deepsense.deeplang.parameters._
+import ai.deepsense.deeplang.parameters.choice.AbstractChoiceParameter
+import ai.deepsense.deeplang.parameters.choice.Choice
+import ai.deepsense.deeplang.parameters.choice.ChoiceParameter
+import ai.deepsense.deeplang.parameters.choice.MultipleChoiceParameter
+import ai.deepsense.deeplang.Action
+import ai.deepsense.deeplang.Action1To2
 
 trait DocPageCreator {
 
@@ -225,19 +225,19 @@ trait DocPageCreator {
       .reduce((s1, s2) => s1 + s2)
   }
 
-  private def sparkParamType(param: Param[_]): String = {
+  private def sparkParamType(param: Parameter[_]): String = {
     param match {
-      case (p: IOColumnsParam)                => "InputOutputColumnSelector"
-      case (p: BooleanParam)                  => "Boolean"
-      case (p: ChoiceParam[_])                => "SingleChoice"
-      case (p: ColumnSelectorParam)           => "MultipleColumnSelector"
-      case (p: NumericParam)                  => "Numeric"
-      case (p: MultipleNumericParam)          => "MultipleNumeric"
-      case (p: MultipleChoiceParam[_])        => "MultipleChoice"
-      case (p: PrefixBasedColumnCreatorParam) => "String"
-      case (p: SingleColumnCreatorParam)      => "String"
-      case (p: SingleColumnSelectorParam)     => "SingleColumnSelector"
-      case (p: StringParam)                   => "String"
+      case (p: IOColumnsParameter)                => "InputOutputColumnSelector"
+      case (p: BooleanParameter)                  => "Boolean"
+      case (p: ChoiceParameter[_])                => "SingleChoice"
+      case (p: ColumnSelectorParameter)           => "MultipleColumnSelector"
+      case (p: NumericParameter)                  => "Numeric"
+      case (p: MultipleNumericParameter)          => "MultipleNumeric"
+      case (p: MultipleChoiceParameter[_])        => "MultipleChoice"
+      case (p: PrefixBasedColumnCreatorParameter) => "String"
+      case (p: SingleColumnCreatorParameter)      => "String"
+      case (p: SingleColumnSelectorParameter)     => "SingleColumnSelector"
+      case (p: StringParameter)                   => "String"
       case _                                  => throw new RuntimeException("Unexpected parameter of class " + param.getClass.getSimpleName)
     }
   }
@@ -257,10 +257,10 @@ trait DocPageCreator {
   private def paramTypeAnchor(paramType: String) =
     paramType.replaceAll("(.)([A-Z])", "$1-$2").toLowerCase
 
-  private def extraDescription(param: Param[_]): String = {
+  private def extraDescription(param: Parameter[_]): String = {
     param match {
-      case (p: IOColumnsParam)            => ""
-      case (p: AbstractChoiceParam[_, _]) => " Possible values: " + choiceValues(p.choiceInstances)
+      case (p: IOColumnsParameter)            => ""
+      case (p: AbstractChoiceParameter[_, _]) => " Possible values: " + choiceValues(p.choiceInstances)
       case _                              => ""
     }
   }
@@ -273,7 +273,7 @@ trait DocPageCreator {
   private def appendExamplesSectionIfNecessary(writer: PrintWriter, operation: DocumentedOperation): Unit = {
     val createExamplesSection: Boolean = operation match {
       // It is impossible to match DOperation1To2[DataFrame, DataFrame, Transformer] in match-case
-      case op: DOperation1To2[_, _, _] =>
+      case op: Action1To2[_, _, _] =>
         (op.tTagTI_0.tpe <:< typeTag[DataFrame].tpe) &&
         (op.tTagTO_0.tpe <:< typeTag[DataFrame].tpe) &&
         (op.tTagTO_1.tpe <:< typeTag[Transformer].tpe)

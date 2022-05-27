@@ -5,35 +5,35 @@ import scala.reflect.runtime.{universe => ru}
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
 
-import ai.deepsense.deeplang.catalogs.doperable.DOperableCatalog
-import ai.deepsense.deeplang.catalogs.doperations.DOperationsCatalog
-import ai.deepsense.deeplang.doperations.custom.Source
-import ai.deepsense.deeplang.doperations.custom.Sink
+import ai.deepsense.deeplang.catalogs.actionobjects.ActionObjectCatalog
+import ai.deepsense.deeplang.catalogs.actions.ActionCatalog
+import ai.deepsense.deeplang.actions.custom.Source
+import ai.deepsense.deeplang.actions.custom.Sink
 import ai.deepsense.deeplang.inference.InferenceWarnings
-import ai.deepsense.deeplang.DKnowledge
-import ai.deepsense.deeplang.DOperable
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Knowledge
+import ai.deepsense.deeplang.ActionObject
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph._
 import ai.deepsense.models.json.StandardSpec
 import ai.deepsense.models.json.UnitTestSupport
 
 trait WorkflowTestSupport extends StandardSpec with UnitTestSupport {
 
-  val catalog = mock[DOperationsCatalog]
+  val catalog = mock[ActionCatalog]
 
   val operable = mockOperable()
 
-  val dOperableCatalog = mock[DOperableCatalog]
+  val dOperableCatalog = mock[ActionObjectCatalog]
 
-  when(dOperableCatalog.concreteSubclassesInstances(any(classOf[ru.TypeTag[DOperable]]))).thenReturn(Set(operable))
+  when(dOperableCatalog.concreteSubclassesInstances(any(classOf[ru.TypeTag[ActionObject]]))).thenReturn(Set(operable))
 
-  val operation1 = mockOperation(0, 1, DOperation.Id.randomId, "name1", "version1")
+  val operation1 = mockOperation(0, 1, Action.Id.randomId, "name1", "version1")
 
-  val operation2 = mockOperation(1, 1, DOperation.Id.randomId, "name2", "version2")
+  val operation2 = mockOperation(1, 1, Action.Id.randomId, "name2", "version2")
 
-  val operation3 = mockOperation(1, 1, DOperation.Id.randomId, "name3", "version3")
+  val operation3 = mockOperation(1, 1, Action.Id.randomId, "name3", "version3")
 
-  val operation4 = mockOperation(2, 1, DOperation.Id.randomId, "name4", "version4")
+  val operation4 = mockOperation(2, 1, Action.Id.randomId, "name4", "version4")
 
   when(catalog.createDOperation(operation1.id)).thenReturn(operation1)
   when(catalog.createDOperation(operation2.id)).thenReturn(operation2)
@@ -70,26 +70,26 @@ trait WorkflowTestSupport extends StandardSpec with UnitTestSupport {
 
   val innerWorkflowGraph = DeeplangGraph(nodes ++ Set(sourceNode, sinkNode), edges)
 
-  def mockOperation(inArity: Int, outArity: Int, id: DOperation.Id, name: String, version: String): DOperation = {
-    val dOperation   = mock[DOperation]
+  def mockOperation(inArity: Int, outArity: Int, id: Action.Id, name: String, version: String): Action = {
+    val dOperation   = mock[Action]
     when(dOperation.id).thenReturn(id)
     when(dOperation.name).thenReturn(name)
     when(dOperation.inArity).thenReturn(inArity)
     when(dOperation.outArity).thenReturn(outArity)
-    when(dOperation.inPortTypes).thenReturn(Vector.fill(inArity)(implicitly[ru.TypeTag[DOperable]]))
-    when(dOperation.outPortTypes).thenReturn(Vector.fill(outArity)(implicitly[ru.TypeTag[DOperable]]))
+    when(dOperation.inPortTypes).thenReturn(Vector.fill(inArity)(implicitly[ru.TypeTag[ActionObject]]))
+    when(dOperation.outPortTypes).thenReturn(Vector.fill(outArity)(implicitly[ru.TypeTag[ActionObject]]))
     val operableMock = mockOperable()
-    val knowledge    = mock[DKnowledge[DOperable]]
-    when(knowledge.types).thenReturn(Seq[DOperable](operableMock))
+    val knowledge    = mock[Knowledge[ActionObject]]
+    when(knowledge.types).thenReturn(Seq[ActionObject](operableMock))
     when(knowledge.filterTypes(any())).thenReturn(knowledge)
     when(dOperation.inferKnowledgeUntyped(any())(any()))
       .thenReturn((Vector.fill(outArity)(knowledge), InferenceWarnings.empty))
-    when(dOperation.sameAs(isA(classOf[DOperation]))).thenReturn(true)
+    when(dOperation.sameAs(isA(classOf[Action]))).thenReturn(true)
     dOperation
   }
 
-  def mockOperable(): DOperable = {
-    val dOperable = mock[DOperable]
+  def mockOperable(): ActionObject = {
+    val dOperable = mock[ActionObject]
     when(dOperable.inferenceResult).thenReturn(None)
     dOperable
   }

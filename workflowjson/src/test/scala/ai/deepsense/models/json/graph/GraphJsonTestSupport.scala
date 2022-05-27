@@ -8,7 +8,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import spray.json.DefaultJsonProtocol
 import spray.json.JsObject
 
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.Endpoint
 
 trait GraphJsonTestSupport extends AnyWordSpec with MockitoSugar with DefaultJsonProtocol with Matchers {
@@ -22,9 +22,9 @@ trait GraphJsonTestSupport extends AnyWordSpec with MockitoSugar with DefaultJso
     edgeEndJs.fields("nodeId").convertTo[String] == edgeEnd.nodeId.value.toString &&
       edgeEndJs.fields("portIndex").convertTo[Int] == edgeEnd.portIndex
 
-  def mockOperation(inArity: Int, outArity: Int, id: DOperation.Id, name: String): DOperation = {
+  def mockOperation(inArity: Int, outArity: Int, id: Action.Id, name: String): Action = {
 
-    val dOperation = mock[DOperation]
+    val dOperation = mock[Action]
     when(dOperation.inArity).thenReturn(inArity)
     when(dOperation.outArity).thenReturn(outArity)
     when(dOperation.id).thenReturn(id)

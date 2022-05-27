@@ -1,6 +1,6 @@
 package ai.deepsense.workflowexecutor
 
-import ai.deepsense.deeplang.doperations.exceptions.EmptyDataframeException
+import ai.deepsense.deeplang.actions.exceptions.EmptyDataframeException
 import ai.deepsense.deeplang.exceptions.DeepLangException
 
 /** Unfortunetely Spark exceptions are stringly typed. Spark does not have their exception classes. This extractor hides

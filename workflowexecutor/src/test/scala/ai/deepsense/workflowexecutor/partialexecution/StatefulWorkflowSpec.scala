@@ -8,7 +8,7 @@ import spray.json.JsString
 import ai.deepsense.commons.datetime.DateTimeConverter
 import ai.deepsense.commons.models.Id
 import ai.deepsense.deeplang.CommonExecutionContext
-import ai.deepsense.deeplang.DOperation
+import ai.deepsense.deeplang.Action
 import ai.deepsense.graph.nodestate.Completed
 import ai.deepsense.graph.nodestate.Draft
 import ai.deepsense.graph._
@@ -64,8 +64,8 @@ class StatefulWorkflowSpec extends WorkflowTestSupport with MockitoSugar {
     )
 
     def createGraph(node1Id: Node.Id, node2Id: Node.Id): DeeplangGraph = {
-      val node1 = Node(node1Id, mockOperation(0, 1, DOperation.Id.randomId, "a", "b"))
-      val node2 = Node(node2Id, mockOperation(1, 0, DOperation.Id.randomId, "c", "d"))
+      val node1 = Node(node1Id, mockOperation(0, 1, Action.Id.randomId, "a", "b"))
+      val node2 = Node(node2Id, mockOperation(1, 0, Action.Id.randomId, "c", "d"))
       DeeplangGraph(Set(node1, node2), Set(Edge(Endpoint(node1.id, 0), Endpoint(node2.id, 0))))
     }
 
